@@ -12,13 +12,9 @@ prepare:
 	git submodule update --init --recursive
 	cd esp-idf; bash install.sh; cd ..
 	cd components/micropython/micropython/mpy-cross; make
-	cp configs/default_defconfig sdkconfig
+	cp configs/core_defconfig sdkconfig
 	cp partition_tables/default.csv partitions.csv
 
-prepare-mch2022: prepare
-	cp configs/mch2022_defconfig sdkconfig
-	cp partition_tables/mch2022.csv partitions.csv
-	
 prepare-campzone2019: prepare
 	cp configs/campzone2019_defconfig sdkconfig
 	cp partition_tables/campzone2019.csv partitions.csv
@@ -43,5 +39,3 @@ menuconfig:
 	source "$(IDF_PATH)/export.sh" && idf.py menuconfig
 
 install: flash
-
-mch2022: prepare-mch2022 build
