@@ -119,7 +119,6 @@ set(MICROPY_SOURCE_QSTR
     ${MICROPY_SOURCE_BOARD}
     ${COMPONENT_DIR}/modconsts.c
     ${EXTMODS}
-    ${COMPONENT_DIR}/mpconfigoverrides.h
 )
 
 set(IDF_COMPONENTS
@@ -208,10 +207,8 @@ idf_component_register(
 
 add_custom_command(
     OUTPUT
-        ${COMPONENT_DIR}/mpconfigoverrides.h
-    COMMAND echo extmods: ${EXTMODS} &&
-            python3 mpconfigover_generator.py -b ./ \"${EXTMODS_NAMES}\" &&
-            cp mpconfigport.h micropython/ports/esp32/
+        ${COMPONENT_DIR}/micropython/ports/esp32/mpconfigport.h
+    COMMAND cp mpconfigport.h micropython/ports/esp32/
     WORKING_DIRECTORY ${COMPONENT_DIR}
     DEPENDS ${EXTMODS}
 )
