@@ -19,7 +19,7 @@
 enum Orientation globalOrientation;
 
 /* Private functions */
-inline enum Orientation* _getOrientationContext(Window* window)
+ enum Orientation* _getOrientationContext(Window* window)
 {
 	if (window == NULL) {
 		//No window provided, use global context
@@ -30,7 +30,7 @@ inline enum Orientation* _getOrientationContext(Window* window)
 	}
 }
 
-inline void _getSizeContext(Window* window, int16_t* width, int16_t* height)
+ void _getSizeContext(Window* window, int16_t* width, int16_t* height)
 {
 	if (window == NULL) {
 		//No window provided, use global context

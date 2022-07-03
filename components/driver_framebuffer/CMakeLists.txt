@@ -1,11 +1,11 @@
 if(CONFIG_DRIVER_FRAMEBUFFER_ENABLE)
 set(srcs
-    "driver_framebuffer.cpp"
-    "driver_framebuffer_dirty.cpp"
-    "driver_framebuffer_drawing.cpp"
-    "driver_framebuffer_orientation.cpp"
-    "driver_framebuffer_text.cpp"
-    "driver_framebuffer_window.cpp"
+    "driver_framebuffer.c"
+    "driver_framebuffer_dirty.c"
+    "driver_framebuffer_drawing.c"
+    "driver_framebuffer_orientation.c"
+    "driver_framebuffer_text.c"
+    "driver_framebuffer_window.c"
     "moddisplay.c"
     "png/adler32.c"
     "png/crc32.c"
@@ -55,7 +55,7 @@ endif()
 set(IDF_COMPONENTS
     micropython
     buses
-    driver_display_ili9341
+    driver_display
     spi_flash
     )
 

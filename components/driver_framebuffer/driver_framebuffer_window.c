@@ -12,7 +12,7 @@
 Window* windows = NULL;
 
 /* Private functions */
-inline Window* _create_window()
+ Window* _create_window()
 { //Create an empty window object
 	Window* window = (Window*) calloc(1, sizeof(Window));
 	if (!window) return NULL;
@@ -20,7 +20,7 @@ inline Window* _create_window()
 	return window;
 }
 
-inline void _add_window(Window* window)
+ void _add_window(Window* window)
 { //Add a window to the linked list
 	if (windows == NULL) {
 		windows = window;
@@ -45,7 +45,7 @@ void _debug_windows()
 	printf("\n");
 }
 
-inline void _remove_window_from_linked_list(Window* window)
+ void _remove_window_from_linked_list(Window* window)
 { //Remove a window from the linked list
 	Window* prevWindow = window->_prevWindow;
 	Window* nextWindow = window->_nextWindow;

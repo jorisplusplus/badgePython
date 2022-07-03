@@ -23,7 +23,7 @@ uint8_t* framebuffer;
 
 /* Color space conversions */
 
-inline uint16_t convert24to16(uint32_t in) //RGB24 to 565
+ uint16_t convert24to16(uint32_t in) //RGB24 to 565
 {
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
 	uint8_t b = (in>>16)&0xFF;
@@ -36,7 +36,7 @@ inline uint16_t convert24to16(uint32_t in) //RGB24 to 565
 	return ((b & 0b11111000) << 8) | ((g & 0b11111100) << 3) | (r >> 3);
 }
 
-inline uint8_t convert24to8C(uint32_t in) //RGB24 to 256-color
+ uint8_t convert24to8C(uint32_t in) //RGB24 to 256-color
 {
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
 	uint8_t r = ((in>>16)&0xFF) >> 5;
@@ -49,7 +49,7 @@ inline uint8_t convert24to8C(uint32_t in) //RGB24 to 256-color
 	return r | (g<<3) | (b<<6);
 }
 
-inline uint32_t convert8Cto24(uint8_t in) //256-color to RGB24
+ uint32_t convert8Cto24(uint8_t in) //256-color to RGB24
 {
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
 	uint8_t b = in & 0x07;
@@ -62,7 +62,7 @@ inline uint32_t convert8Cto24(uint8_t in) //256-color to RGB24
 	return b | (g << 8) | (r << 16);
 }
 
-inline uint8_t convert24to8(uint32_t in) //RGB24 to 8-bit greyscale
+ uint8_t convert24to8(uint32_t in) //RGB24 to 8-bit greyscale
 {
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
 	uint8_t b = (in>>16)&0xFF;
@@ -75,14 +75,14 @@ inline uint8_t convert24to8(uint32_t in) //RGB24 to 8-bit greyscale
 	return ( r + g + b + 1 ) / 3;
 }
 
-inline bool convert8to1(uint8_t in) //8-bit greyscale to black&white
+ bool convert8to1(uint8_t in) //8-bit greyscale to black&white
 {
 	return in >= 128;
 }
 
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_CORRECT_GB
 // Corrects for G and B being brighter in most LEDs
-inline uint32_t color_correct(uint32_t value) {
+ uint32_t color_correct(uint32_t value) {
   return (value & 0xFF0000) +
            (uint32_t)((((value>>8)&0xFF)*((float)CONFIG_DRIVER_FRAMEBUFFER_G_RATIO/255))<<8) +
             (uint32_t)(((value)&0xFF)*((float)CONFIG_DRIVER_FRAMEBUFFER_B_RATIO/255));
