@@ -12,6 +12,7 @@
 #include <esp_log.h>
 #include "buses.h"
 #include <driver/uart.h>
+#include "driver_display.h"
 
 #define TAG "platform"
 
@@ -75,6 +76,7 @@ void platform_init()
 
   //Static inits can be performed here
   start_buses();
+  driver_display_init();
 
   //Init generated modules
   platform_gen_init();
