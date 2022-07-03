@@ -1,0 +1,93 @@
+menu "Driver: Generic display"
+	config DRIVER_DISPLAY_ENABLE
+		bool "Enable the display driver"
+		default n
+	
+	config DISPLAY_TYPE
+		depends on DRIVER_DISPLAY_ENABLE
+		int
+		default 0 if DISPLAY_SCREEN_CONTROLLER_ILI9341
+		default 1 if DISPLAY_SCREEN_CONTROLLER_ILI9342
+		default 2 if DISPLAY_SCREEN_CONTROLLER_ILI9806
+		default 3 if DISPLAY_SCREEN_CONTROLLER_ILI9486
+		default 4 if DISPLAY_SCREEN_CONTROLLER_ILI9488
+		default 5 if DISPLAY_SCREEN_CONTROLLER_NT35510
+		default 6 if DISPLAY_SCREEN_CONTROLLER_RM68120
+		default 7 if DISPLAY_SCREEN_CONTROLLER_ST7789
+		default 8 if DISPLAY_SCREEN_CONTROLLER_ST7796
+		default 9 if DISPLAY_SCREEN_CONTROLLER_SSD1351
+		default 10 if DISPLAY_SCREEN_CONTROLLER_SSD1963
+		default 11 if DISPLAY_SCREEN_CONTROLLER_SSD1306
+		default 12 if DISPLAY_SCREEN_CONTROLLER_SSD1307
+		default 13 if DISPLAY_SCREEN_CONTROLLER_SSD1322
+		choice
+			prompt "Set display type"
+			default DISPLAY_SCREEN_CONTROLLER_ILI9341
+			config DISPLAY_SCREEN_CONTROLLER_ILI9341
+				bool "ILI9341"
+			config DISPLAY_SCREEN_CONTROLLER_ILI9342
+				bool "ILI9342"
+			config DISPLAY_SCREEN_CONTROLLER_ILI9806
+				bool "ILI9806"
+			config DISPLAY_SCREEN_CONTROLLER_ILI9486
+				bool "ILI9486"
+			config DISPLAY_SCREEN_CONTROLLER_ILI9488
+				bool "ILI9488"
+			config DISPLAY_SCREEN_CONTROLLER_NT35510
+				bool "NT35510"
+			config DISPLAY_SCREEN_CONTROLLER_RM68120
+				bool "IRM68120"
+			config DISPLAY_SCREEN_CONTROLLER_SSD1351
+				bool "SSD1351"
+			config DISPLAY_SCREEN_CONTROLLER_SSD1963
+				bool "SSD1963"
+			config DISPLAY_SCREEN_CONTROLLER_SSD1306
+				bool "SSD1306"
+			config DISPLAY_SCREEN_CONTROLLER_SSD1307
+				bool "SSD1307"
+			config DISPLAY_SCREEN_CONTROLLER_SSD1322
+				bool "SSD1322"
+		endchoice
+	
+	config DISPLAY_INTERFACE
+		depends on DRIVER_DISPLAY_ENABLE
+		int
+		default 0 if DISPLAY_SPI
+		default 1 if DISPLAU_I2C
+		choice
+			prompt "Set interface"
+			default DISPLAY_SPI
+			config DISPLAY_SPI
+				bool "SPI"
+			config DISPLAY_I2C
+				bool "I2C"
+		endchoice
+	config DISPLAY_PIN_CS
+		depends on DISPLAY_SPI
+		int "Chip select pin"
+		default -1
+	config DISPLAY_PIN_DC
+		depends on DISPLAY_SPI
+		int "Data/command pin"
+		default -1
+	config DISPLAY_I2C_ADDR
+		depends on DISPLAY_I2C
+		int "I2C Addres"
+		default 0
+	config DISPLAY_WIDTH
+		depends on DRIVER_DISPLAY_ENABLE
+		int "Width"
+		default 128
+	config DISPLAY_HEIGHT
+		depends on DRIVER_DISPLAY_ENABLE
+		int "Height"
+		default 64
+	config DISPLAY_HORIZONTAL_OFFSET
+		depends on DRIVER_DISPLAY_ENABLE
+		int "Offset horizontal"
+		default 0
+	config DISPLAY_VERTICAL_OFFSET
+		depends on DRIVER_DISPLAY_ENABLE
+		int "Offset vertical"
+		default 0
+endmenu
