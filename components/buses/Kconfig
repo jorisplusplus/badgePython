@@ -15,22 +15,6 @@ menu "Buses"
         depends on BUS_VSPI_ENABLE
         int "GPIO pin used for VSPI MISO"
 
-    config PIN_NUM_VSPI_WP
-        depends on BUS_VSPI_ENABLE
-        int "GPIO pin used for VSPI WP"
-        default -1
-
-    config PIN_NUM_VSPI_HD
-        depends on BUS_VSPI_ENABLE
-        int "GPIO pin used for VSPI HD"
-        default -1
-
-    config BUS_VSPI_DMA_CHANNEL
-        depends on BUS_VSPI_ENABLE
-        int "VSPI DMA channel"
-        default 2
-        range 0 2
-
     config BUS_VSPI_MAX_TRANSFERSIZE
         depends on BUS_VSPI_ENABLE
         int "VSPI Maximum transfer size (in bytes)"
@@ -51,23 +35,7 @@ menu "Buses"
     config PIN_NUM_HSPI_MISO
         depends on BUS_HSPI_ENABLE
         int "GPIO pin used for HSPI MISO"
-
-    config PIN_NUM_HSPI_WP
-        depends on BUS_HSPI_ENABLE
-        int "GPIO pin used for HSPI WP"
-        default -1
-
-    config PIN_NUM_HSPI_HD
-        depends on BUS_HSPI_ENABLE
-        int "GPIO pin used for HSPI HD"
-        default -1
-
-    config BUS_HSPI_DMA_CHANNEL
-        depends on BUS_HSPI_ENABLE
-        int "HSPI DMA channel"
-        default 2
-        range 0 2
-
+        
     config BUS_HSPI_MAX_TRANSFERSIZE
         depends on BUS_HSPI_ENABLE
         int "HSPI Maximum transfer size (in bytes)"
