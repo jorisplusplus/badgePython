@@ -47,16 +47,17 @@ esp_err_t generate_interface(scr_interface_driver_t **iface_drv) {
 }
 
 void driver_display_init() {
+    #ifdef CONFIG_DISPLAY_DRIVER_ENABLE
     scr_interface_driver_t *iface_drv;
     generate_interface(&iface_drv);
     scr_controller_config_t lcd_cfg = {0};
     lcd_cfg.interface_drv = iface_drv,
-    lcd_cfg.pin_num_rst = 0,
+    lcd_cfg.pin_num_rst = -1,
     lcd_cfg.pin_num_bckl = -1,
     lcd_cfg.rst_active_level = 0,
     lcd_cfg.bckl_active_level = 1,
-    lcd_cfg.width = 128;
-    lcd_cfg.height = 64;
+    lcd_cfg.width = CONFIG_DISPLAY_WIDTH;
+    lcd_cfg.height = CONFIG_DISPLAY_HEIGHT;
     lcd_cfg.rotate = SCR_DIR_LRTB;
     lcd_cfg.offset_hor = CONFIG_DISPLAY_HORIZONTAL_OFFSET;
     lcd_cfg.offset_ver = CONFIG_DISPLAY_VERTICAL_OFFSET;
@@ -73,5 +74,6 @@ void driver_display_init() {
         ESP_LOGE(TAG, "Failed to get info.");
         return;
     }
+    #endif
     ESP_LOGI(TAG, "Screen name:%s | width:%d | height:%d", lcd_info.name, lcd_info.width, lcd_info.height);
 }

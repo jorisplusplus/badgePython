@@ -10,4 +10,5 @@ unset(EXTMODS_INIT CACHE)
 set(EXTRA_COMPONENT_DIRS ./obsolete_components)
 
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
+include($ENV{IOT_SOLUTION_PATH}/component.cmake)
 project(badge_firmware)
