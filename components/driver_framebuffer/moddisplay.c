@@ -863,4 +863,5 @@ const mp_obj_module_t udisplay_module = {
 	.globals = (mp_obj_dict_t *)&framebuffer_module_globals,
 };
 
+MP_REGISTER_MODULE(MP_QSTR_udisplay, udisplay_module);
 #endif //CONFIG_DRIVER_FRAMEBUFFER_ENABLE

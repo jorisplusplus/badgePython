@@ -6,6 +6,9 @@ set(MICROPY_FROZEN_MANIFEST ${PROJECT_DIR}/manifests/${CONFIG_MICROPY_FROZEN_MAN
 include(${MICROPY_DIR}/py/py.cmake)
 
 if(NOT CMAKE_BUILD_EARLY_EXPANSION)
+
+    set(MICROPY_PY_BTREE ON)
+
     include(${MICROPY_DIR}/py/usermod.cmake)
     include(${MICROPY_DIR}/extmod/extmod.cmake)
 
@@ -81,6 +84,7 @@ set(MICROPY_SOURCE_PORT
     ${MICROPY_PORT_DIR}/machine_pin.c
     ${MICROPY_PORT_DIR}/machine_touchpad.c
     ${MICROPY_PORT_DIR}/machine_adc.c
+    ${MICROPY_PORT_DIR}/machine_adcblock.c
     ${MICROPY_PORT_DIR}/machine_dac.c
     ${COMPONENT_DIR}/esp32/machine_i2c.c
     ${MICROPY_PORT_DIR}/machine_i2s.c
@@ -149,6 +153,7 @@ set(IDF_COMPONENTS
     spiffs
     driver_sdcard
     buses
+    esp_adc_cal
 )
 
 if(IDF_VERSION_MINOR GREATER_EQUAL 1 OR IDF_VERSION_MAJOR GREATER_EQUAL 5)

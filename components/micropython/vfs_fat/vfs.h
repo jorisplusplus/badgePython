@@ -28,6 +28,7 @@
 
 #include "py/lexer.h"
 #include "py/obj.h"
+#include "py/builtin.h"
 
 // return values of mp_vfs_lookup_path
 // ROOT is 0 so that the default current directory is the root directory

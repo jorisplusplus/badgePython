@@ -243,4 +243,6 @@ const mp_obj_module_t hub75_module = {
     .globals = (mp_obj_dict_t *)&hub75_module_globals,
 };
 
+MP_REGISTER_MODULE(MP_QSTR_hub75, hub75_module);
+
 #endif
