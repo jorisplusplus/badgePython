@@ -47,7 +47,7 @@ esp_err_t generate_interface(scr_interface_driver_t **iface_drv) {
 }
 
 void driver_display_init() {
-    #ifdef CONFIG_DISPLAY_DRIVER_ENABLE
+    #ifdef CONFIG_DRIVER_DISPLAY_ENABLE
     scr_interface_driver_t *iface_drv;
     generate_interface(&iface_drv);
     scr_controller_config_t lcd_cfg = {0};
