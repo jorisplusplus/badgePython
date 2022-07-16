@@ -7,6 +7,8 @@
 
 __BEGIN_DECLS
 
+#define POS_HEAPLIMITER (2)
+
 extern esp_err_t driver_rtcmem_int_write(int pos, int val);
 extern esp_err_t driver_rtcmem_int_read(int pos, int* val);
 

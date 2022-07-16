@@ -25,14 +25,6 @@ menu "Firmware & device configuration"
 		string "Hostname of server for OTA updates"
 		default "badge.team"
 
-	config OTA_WEB_USE_HTTPS
-		bool "Use HTTPS for OTA updates"
-		default y
-
-	config OTA_WEB_PORT
-		int "Port of server for OTA updates"
-		default 443
-
 	config OTA_WEB_PATH
 		string "Path on the server for OTA updates"
 		default "/firmware/unknown.bin"
@@ -65,12 +57,4 @@ menu "Firmware & device configuration"
 	config DEFAULT_DISPLAY_ORIENTATION_REVERSE_PORTRAIT
 		bool "Reverse portrait (270 degrees)"
 	endchoice
-	
-	config FW_ENABLE_SHA2017_DISOBEY2019_PARTITION_TABLE_UPGRADE
-		bool "Enable partition table upgrade function for SHA2017 and Disobey 2019 badges"
-		default n
-	
-	config FW_DISABLE_OTA_AND_FIRSTBOOT
-		bool "Disable OTA update function and first boot ZIP unpacking"
-		default n
 endmenu

@@ -1,0 +1,8 @@
+menu "PYOTA"
+    config PYOTA_ENABLE
+        bool "Enable python based ota"
+        default n
+    config PYOTA_SKIP_VERSION_CHECK
+        bool "Disable version check"
+        default n
+endmenu

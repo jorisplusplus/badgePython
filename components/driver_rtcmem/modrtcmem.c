@@ -13,6 +13,12 @@
 #include "modmachine.h"
 
 // ====== RTC memory functions ============================
+/**
+ * Usages
+ * pos 0 : ???
+ * pos 1 : ???
+ * pos 2 : heap limit (0 no heap limit)
+ */
 
 //--------------------------------------------------------------------------------
 STATIC mp_obj_t esp_rtcmem_write(mp_obj_t _pos, mp_obj_t _val) {

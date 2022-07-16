@@ -58,6 +58,7 @@
 #include "modmachine.h"
 #include "modnetwork.h"
 #include "mpthreadport.h"
+#include "driver_rtcmem.h"
 
 //EDIT
 #include "vfs_fat/vfs_native.h"
@@ -99,31 +100,54 @@ void mp_task(void *pvParameter) {
     uart_stdout_init();
     machine_init();
 
-    // TODO: CONFIG_SPIRAM_SUPPORT is for 3.3 compatibility, remove after move to 4.0.
-    #if CONFIG_ESP32_SPIRAM_SUPPORT
+    #if CONFIG_SPIRAM_USE_MALLOC
+    // SPIRAM is issued using MALLOC, fallback to normal allocation rules
+    mp_task_heap = NULL;
+    #elif CONFIG_ESP32_SPIRAM_SUPPORT
     // Try to use the entire external SPIRAM directly for the heap
-    size_t mp_task_heap_size = 0x00;
-    void *mp_task_heap = (void *)0x00;
-    ESP_LOGI(TAG, "SPIRAM: %d", esp_spiram_get_chip_size());
-    ESP_LOGI(TAG, "Max free: %d", heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM));
+    mp_task_heap = (void *)SOC_EXTRAM_DATA_LOW;
     switch (esp_spiram_get_chip_size()) {
         case ESP_SPIRAM_SIZE_16MBITS:
             mp_task_heap_size = 2 * 1024 * 1024;
-            mp_task_heap = heap_caps_malloc(mp_task_heap_size, MALLOC_CAP_SPIRAM);
             break;
         case ESP_SPIRAM_SIZE_32MBITS:
         case ESP_SPIRAM_SIZE_64MBITS:
-            mp_task_heap_size = heap_caps_get_largest_free_block(MALLOC_CAP_SPIRAM);
-            mp_task_heap = heap_caps_malloc(mp_task_heap_size, MALLOC_CAP_SPIRAM);
+            mp_task_heap_size = 4 * 1024 * 1024;
             break;
         default:
             // No SPIRAM, fallback to normal allocation
-            mp_task_heap_size = heap_caps_get_largest_free_block(MALLOC_CAP_8BIT);
-            mp_task_heap = malloc(mp_task_heap_size);
+            mp_task_heap = NULL;
+            break;
     }
-    ESP_LOGI(TAG, "Heap adress: %p", mp_task_heap);
-    ESP_LOGI(TAG, "Heap size: %d", mp_task_heap_size);
+    #elif CONFIG_ESP32S2_SPIRAM_SUPPORT || CONFIG_ESP32S3_SPIRAM_SUPPORT
+    // Try to use the entire external SPIRAM directly for the heap
+    size_t esp_spiram_size = esp_spiram_get_size();
+    if (esp_spiram_size > 0) {
+        mp_task_heap = (void *)SOC_EXTRAM_DATA_HIGH - esp_spiram_size;
+        mp_task_heap_size = esp_spiram_size;
+    }
     #endif
+
+    if (mp_task_heap == NULL) {
+        // Allocate the uPy heap using malloc and get the largest available region,
+        // limiting to 1/2 total available memory to leave memory for the OS.
+        #if ESP_IDF_VERSION >= ESP_IDF_VERSION_VAL(4, 1, 0)
+        size_t heap_total = heap_caps_get_total_size(MALLOC_CAP_8BIT);
+        #else
+        multi_heap_info_t info;
+        heap_caps_get_info(&info, MALLOC_CAP_8BIT);
+        size_t heap_total = info.total_free_bytes + info.total_allocated_bytes;
+        #endif
+        
+        int heap_limit = 0;
+        driver_rtcmem_int_read(POS_HEAPLIMITER, &heap_limit);
+        if (heap_limit == 0) {
+            heap_limit = heap_total / 2; //Default heap limit from uPy if no heap limit is specified in rtcmem
+        }
+
+        mp_task_heap_size = MIN(heap_caps_get_largest_free_block(MALLOC_CAP_8BIT), heap_limit);
+        mp_task_heap = malloc(mp_task_heap_size);
+    }
 
 soft_reset:
     // initialise the stack pointer for the main thread
