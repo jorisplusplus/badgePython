@@ -37,7 +37,7 @@ STATIC mp_obj_t esp_heapspace_print() {
     heap_info.max_blocks = MAX_BLOCK_NUM;       // Maximum length of "s_block_arr"
 
     heap_caps_get_per_task_info(&heap_info);
-
+    printf("Free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
     for (int i = 0 ; i < *heap_info.num_totals; i++) {
         printf("Task: %s -> CAP_8BIT: %d CAP_32BIT: %d\n",
                 heap_info.totals[i].task ? pcTaskGetTaskName(heap_info.totals[i].task) : "Pre-Scheduler allocs" ,
