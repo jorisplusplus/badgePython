@@ -6,4 +6,4 @@ for i in range(0, 128):
     for j in range(0, i):
         display.drawPixel(j, 0, 0xFFFFFF)
     display.flush()
-    sleep(0.4)
+    sleep(0.1)
