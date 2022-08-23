@@ -7,7 +7,8 @@
 
 #include "include/fsob_backend.h"
 #include "include/filefunctions.h"
-#include "include/packetutils.h"
+#include "include/messageutils.h"
+#include "include/driver_fsoverbus.h"
 
 #define TAG "fsoveruart_ff"
 
@@ -35,8 +36,8 @@ int getdir(uint8_t *data, uint16_t command, uint32_t message_id, uint32_t size, 
         strcat((char *) data, root); //Append root structure
         uint8_t header[12];
         createMessageHeader(header, command, strlen((char *) data), message_id);
-        fsob_write_bytes((const char*) header, 12);
-        fsob_write_bytes((const char*) data, strlen((char *) data));
+        fsob_write_bytes(true, false, (const char*) header, 12);
+        fsob_write_bytes(false, true, (const char*) data, strlen((char *) data));
         return 1;
     }
      //TODO: Fix when folder list exceeds buffer
@@ -61,8 +62,8 @@ int getdir(uint8_t *data, uint16_t command, uint32_t message_id, uint32_t size, 
     uint8_t header[12];
     //ESP_LOGI(TAG, "len: %d", strlen((char *) data));
     createMessageHeader(header, command, strlen((char *) data), message_id);
-    fsob_write_bytes((const char*) header, 12);
-    fsob_write_bytes((const char*) data, strlen((char *) data));
+    fsob_write_bytes(true, false, (const char*) header, 12);
+    fsob_write_bytes(false, true, (const char*) data, strlen((char *) data));
 
     return 1;
 }
@@ -82,22 +83,22 @@ int readfile(uint8_t *data, uint16_t command, uint32_t message_id, uint32_t size
         //Create header with file size
         uint8_t header[12];
         createMessageHeader(header, command, size_file, message_id);
-        fsob_write_bytes((const char*) header, 12);
+        fsob_write_bytes(true, false, (const char*) header, 12);
         
         fseek(fptr_glb, 0, SEEK_SET);
-        uint32_t read_bytes;
+        uint32_t read_bytes = 0;
         do {
-            read_bytes = fread(data, 1, 128, fptr_glb);
-            fsob_write_bytes((const char*) data, read_bytes);
+            read_bytes += fread(data, 1, 64, fptr_glb);
+            fsob_write_bytes(false, read_bytes == size_file, (const char*) data, read_bytes);
             vTaskDelay(1);  //Delay task to ensure data has time to gets flushed to webusb
-        } while(read_bytes == 128);
+        } while(read_bytes != size_file);
         fclose(fptr_glb);
     } else {
         strcpy((char *) data, "Can't open file");
         uint8_t header[12];
         createMessageHeader(header, command, strlen((char *) data), message_id);
-        fsob_write_bytes((const char*) header, 12);
-        fsob_write_bytes((const char*) data, strlen((char *) data));
+        fsob_write_bytes(true, false, (const char*) header, 12);
+        fsob_write_bytes(false, true, (const char*) data, strlen((char *) data));
     }
     return 1;
 }

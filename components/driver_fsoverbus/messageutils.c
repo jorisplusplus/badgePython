@@ -1,9 +1,10 @@
-#include "include/packetutils.h"
+#include "include/messageutils.h"
 #include "include/fsob_backend.h"
+#include "include/driver_fsoverbus.h"
 #include <string.h>
 #include <esp_log.h>
 
-#define TAG "fsoveruart_pu"
+#define TAG "fsoveruart_mu"
 
 void createMessageHeader(uint8_t *header, uint16_t command, uint32_t size, uint32_t messageid) {
     uint16_t *com = (uint16_t *) header;
@@ -21,7 +22,7 @@ void sender(uint16_t command, uint32_t message_id) {
      uint8_t header[PACKET_HEADER_SIZE+3];
     createMessageHeader(header, command, 3, message_id);
     strcpy((char *) &header[PACKET_HEADER_SIZE], "er");
-    fsob_write_bytes((const char*) header, 15);
+    fsob_write_bytes(true, true, (const char*) header, 15);
 }
 
 //Okay
@@ -29,7 +30,7 @@ void sendok(uint16_t command, uint32_t message_id) {
      uint8_t header[PACKET_HEADER_SIZE+3];
     createMessageHeader(header, command, 3, message_id);
     strcpy((char *) &header[PACKET_HEADER_SIZE], "ok");
-    fsob_write_bytes((const char*) header, 15);
+    fsob_write_bytes(true, true, (const char*) header, 15);
 }
 
 //Transmission error
@@ -37,7 +38,7 @@ void sendte(uint16_t command, uint32_t message_id) {
      uint8_t header[PACKET_HEADER_SIZE+3];
     createMessageHeader(header, command, 3, message_id);
     strcpy((char *) &header[PACKET_HEADER_SIZE], "te");
-    fsob_write_bytes((const char*) header, 15);
+    fsob_write_bytes(true, true, (const char*) header, 15);
 }
 
 //Timeout error
@@ -45,7 +46,7 @@ void sendto(uint16_t command, uint32_t message_id) {
     uint8_t header[PACKET_HEADER_SIZE+3];
     createMessageHeader(header, command, 3, message_id);
     strcpy((char *) &header[PACKET_HEADER_SIZE], "to");
-    fsob_write_bytes((const char*) header, 15);
+    fsob_write_bytes(true, true, (const char*) header, 15);
 }
 
 //Not supported error
@@ -53,7 +54,7 @@ void sendns(uint16_t command, uint32_t message_id) {
     uint8_t header[PACKET_HEADER_SIZE+3];
     createMessageHeader(header, command, 3, message_id);
     strcpy((char *) &header[PACKET_HEADER_SIZE], "ns");
-    fsob_write_bytes((const char*) header, 15);
+    fsob_write_bytes(true, true, (const char*) header, 15);
 }
 
 void buildfile(char *source, char *target) {

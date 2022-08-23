@@ -9,13 +9,13 @@
 
 #include "filefunctions.h"
 #include "specialfunctions.h"
-#include "packetutils.h"
+#include "messageutils.h"
 
 
-void fsob_init();
+void fsob_backend_init();
 
-void fsob_write_bytes(const char *src, size_t size);
+void fsob_backend_write_packet(const void *data);
 
-void fsob_reset();
+void fsob_backend_reset();
 
 #endif

@@ -1,12 +1,12 @@
 if(CONFIG_DRIVER_FSOVERBUS_ENABLE)
     set(srcs
-        "backend.c"
         "driver_fsoverbus.c"
         "filefunctions.c"
-        "packetutils.c"
+        "packethelper.c"
+        "messageutils.c"
         "specialfunctions.c"
         "uart_backend.c"
-        "uartnaive_backend.c"
+        "packethelper.c"
     )
 else()
     set(srcs "")

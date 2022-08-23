@@ -1,6 +1,6 @@
-#include "include/packetutils.h"
+#include "include/messageutils.h"
 #include "include/specialfunctions.h"
-
+#include "include/driver_fsoverbus.h"
 #include <esp_sleep.h>
 #include <esp_err.h>
 #include <esp_log.h>
@@ -30,8 +30,10 @@ int execfile(uint8_t *data, uint16_t command, uint32_t message_id, uint32_t size
 #endif
 
 int heartbeat(uint8_t *data, uint16_t command, uint32_t message_id, uint32_t size, uint32_t received, uint32_t length) {
+    ESP_LOGI(TAG, "%d %d", received, size);
     if(received != size) return 0;
     sendok(command, message_id);
+    ESP_LOGI(TAG, "Sending ok");
     return 1;
 }
 
