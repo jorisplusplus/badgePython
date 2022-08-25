@@ -24,7 +24,7 @@
 #define UART_MIN_WAKEUP_THRESH      (2)
 
 uart_config_t uart_config = {
-    .baud_rate = CONFIG_DRIVER_FSOVERBUS_UART_BAUD,
+    .baud_rate = 921600,
     .data_bits = UART_DATA_8_BITS,
     .parity = UART_PARITY_DISABLE,
     .stop_bits = UART_STOP_BITS_1,
@@ -140,7 +140,6 @@ void fsob_backend_init() {
 
 void fsob_backend_reset() {
     receiving = 0;
-    sendto(1, message_id);
 }
 
 void fsob_backend_write_packet(const void *data) {

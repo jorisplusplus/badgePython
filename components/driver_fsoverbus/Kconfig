@@ -36,10 +36,6 @@ menu "Driver: FS over bus support"
 		int "RX pin"
 		default 35
 		depends on DRIVER_FSOVERBUS_BACKEND = 0
-	config DRIVER_FSOVERBUS_UART_BAUD
-		int "Baud rate"
-		default 256000
-		depends on DRIVER_FSOVERBUS_BACKEND = 0
 	config DRIVER_FSOVERBUS_UART_BUFFER_SIZE
 		int "UART fifo size"
 		default 2048

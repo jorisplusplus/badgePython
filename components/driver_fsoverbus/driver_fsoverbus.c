@@ -31,12 +31,7 @@
 #define min(a,b) (((a) < (b)) ? (a) : (b))
 #define CACHE_SIZE (2048)
 
-TimerHandle_t timeout;
-
 uint8_t buffer[CACHE_SIZE];
-void fsob_timeout_function( TimerHandle_t xTimer );
-
-
 //Function lookup tables
 
 int (*specialfunction[SPECIALFUNCTIONSLEN])(uint8_t *data, uint16_t command, uint32_t message_id, uint32_t size, uint32_t received, uint32_t length);

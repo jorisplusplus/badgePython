@@ -77,7 +77,17 @@ bool fsob_packet_verify_crc(fsobpacket_t *packet) {
 }
 
 void fsob_packet_handler(fsobpacket_t *packet) {
-    if (packet->packet_id <= s_ack_id) {    //Already processed packet
+    if (packet->packet_id == 0) {    //Nack packet
+        if (packet->flags & RESET) {
+            ESP_LOGI(TAG, "Resetting");
+            fsob_reset();
+        }
+        
+        ESP_LOGI(TAG, "Handling ack %d", packet->ack_id);
+        fsob_packet_handle_ack(packet->ack_id);
+        return;
+    }
+    if (packet->packet_id < s_ack_id) {    //Already processed packet
         ESP_LOGW(TAG, "Dropped duplicate packet");
         return;
     }

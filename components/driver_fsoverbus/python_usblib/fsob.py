@@ -11,11 +11,12 @@ import threading
 class fsob_packet():
     packetId = 1
     ackId = 0
-    def __init__(self, data=None, newMessage=False, endMessage=False):
+    def __init__(self, data=None, newMessage=False, endMessage=False, reset=False):
         self.TXHEADER = 0xAFFA
         self.RXHEADER = 0xFAAF
         self.FLAGNEWMESSAGE = 0x01
         self.FLAGENDMESSAGE = 0x02
+        self.FLAGRESET = 0x04
         self.invalid = False
 
         if data != None and len(data) == 80:     #Init from packet
@@ -50,15 +51,20 @@ class fsob_packet():
                 self.flags |= self.FLAGNEWMESSAGE
             if endMessage:
                 self.flags |= self.FLAGENDMESSAGE
+            if reset:
+                self.flags |= self.FLAGRESET
             self.flags |= len(self.payload) << 9
             print(len(self.payload))
             self.packettime = 0
     
     def txPacket(self, resend=False):
         if self.payloadBytes == None:
-            self.packetId = fsob_packet.packetId
-            if len(self.payload) > 0:
-                fsob_packet.packetId += 1
+            if len(self.payload) == 0:  #No data, so nack packet
+                self.packetId = 0
+            else:
+                self.packetId = fsob_packet.packetId
+                fsob_packet.packetId += 1            
+                
         if self.payloadBytes == None or resend:
             crc = 0
             payloadBytes = struct.pack("<HHIII64s", self.TXHEADER, self.flags, crc, self.packetId, fsob_packet.ackId, self.payload)
@@ -153,6 +159,8 @@ class fsob():
         self.packetsSend = list()       #List of packets that are in flight, have not been acked
         self.packetsToSend = list()     #List of packets that need to be send
         self.rxPacketID = 0             #Last received packet id
+        self.lastAck = 0
+        self.resetNext = True           #Send reset on startup
     
     def sendMessage(self, message: fsob_message):
         self.messageQueue.put(message)
@@ -169,16 +177,19 @@ class fsob():
 
     def txNackPacket(self, packet: fsob_packet):
         fsob_packet.ackId = self.rxPacketID
+        self.lastAck = time.time()
         self.write(packet.txPacket())
+        print(f"Nack packet send {packet.packetId}, {packet.ackId}")
 
     def txPacket(self, packet: fsob_packet):
         fsob_packet.ackId = self.rxPacketID
         self.write(packet.txPacket())
         self.packetsSend.append(packet)
+        self.lastAck = time.time()
         print(f"Packet send {packet.packetId}")
 
     def handleAck(self, ackId: int):
-        print(f"Acking {ackId}")
+        print(f"Received ack for packet: {ackId}")
         while len(self.packetsSend) > 0 and self.packetsSend[0].packetId <= ackId:
             self.packetsSend.pop()
 
@@ -188,16 +199,27 @@ class fsob():
             print("Unexpected packet")
             return False
         self.handleAck(packet.ackId)
-        if packet.payload and packet.packetId != self.rxPacketID: #If payload is available handle message receive call
+        if packet.payload and packet.packetId != self.rxPacketID and self.activeMessage: #If payload is available handle message receive call
             print("Handle receive")
             res = self.activeMessage.receiveResponse(packet)
         self.rxPacketID = packet.packetId
         return res
 
+    def reset(self):
+        self.resetNext = True
+
     def run(self):
         self.running = True
         print("Starting thread")
         while self.running:
+            if self.resetNext:
+                self.resetNext = False
+                self.activeMessage = None
+                fsob_message.messageId = 1
+                fsob_packet.ackId = 0
+                fsob_packet.packetId = 1
+                self.txNackPacket(fsob_packet(None, reset=True))
+            
             #Check if queue holds a message a no message is in transit
             #print(f"{self.activeMessage} {not self.messageQueue.empty()}")
             if self.activeMessage == None and (not self.messageQueue.empty()):
@@ -229,6 +251,10 @@ class fsob():
             
             #Send blank ack
             if (self.rxPacketID - fsob_packet.ackId) > 2:
+                print("Acking packets")
+                self.txNackPacket(fsob_packet(None))
+            elif self.rxPacketID != fsob_packet.ackId and (time.time() - self.lastAck) > 0.2:
+                print("Acking packets on timeout")
                 self.txNackPacket(fsob_packet(None))
     
     def start(self):

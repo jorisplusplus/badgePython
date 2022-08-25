@@ -4,6 +4,7 @@
 #define FSOB_PACKETSIZE (80)
 #define COMMAND_START_OFFSET (0)
 #define COMMAND_END_OFFSET (1)
+#define RESET_OFFSET (2)
 #define PAYLOAD_SIZE_OFFSET (9)
 
 #include <stdint.h>
@@ -22,6 +23,7 @@ typedef struct __attribute__((__packed__)) {
 enum FSOB_FLAGMASK {
     COMMAND_START = (1 << COMMAND_START_OFFSET),
     COMMAND_END = (1 << COMMAND_END_OFFSET),
+    RESET = (1 << RESET_OFFSET),
     PAYLOAD_SIZE = (0x7F << PAYLOAD_SIZE_OFFSET)
 };
 
@@ -31,9 +33,8 @@ esp_err_t driver_fsoverbus_init(void);
 
 void fsob_ingest_data(bool newpacket, const uint8_t *src, size_t datasize);
 void fsob_handle_command(uint8_t *data, uint16_t command, uint32_t message_id, uint32_t size, uint32_t received, uint32_t length);
-void fsob_start_timeout();
-void fsob_stop_timeout();
 void fsob_receive_bytes(uint8_t *data, size_t len);
 void fsob_write_bytes(bool newmessage, bool endmessage, const char *src, size_t datasize);
+void fsob_reset();
 
 #endif
