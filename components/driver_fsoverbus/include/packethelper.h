@@ -16,6 +16,6 @@ fsobpacket_t* fsob_packet_get_nonblocking(int *packet_id);
 void fsob_packet_send(int packet_id);
 void fsob_packet_reset();
 void fsob_packet_init();
-
+void fsob_packet_ingest(fsobpacket_t *packet);
 
 #endif

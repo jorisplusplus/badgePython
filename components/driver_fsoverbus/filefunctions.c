@@ -10,7 +10,7 @@
 #include "include/messageutils.h"
 #include "include/driver_fsoverbus.h"
 
-#define TAG "fsoveruart_ff"
+#define TAG "fsob_ff"
 
 const char root[] = {"dflash\ndsdcard"};
 
@@ -83,13 +83,16 @@ int readfile(uint8_t *data, uint16_t command, uint32_t message_id, uint32_t size
         //Create header with file size
         uint8_t header[12];
         createMessageHeader(header, command, size_file, message_id);
-        fsob_write_bytes(true, false, (const char*) header, 12);
+        fsob_write_bytes(true, size_file == 0, (const char*) header, 12);
         
         fseek(fptr_glb, 0, SEEK_SET);
         uint32_t read_bytes = 0;
+        uint32_t data_size = 0;
         do {
-            read_bytes += fread(data, 1, 64, fptr_glb);
-            fsob_write_bytes(false, read_bytes == size_file, (const char*) data, read_bytes);
+
+            data_size = fread(data, 1, 64, fptr_glb);
+            read_bytes += data_size;
+            fsob_write_bytes(false, read_bytes == size_file, (const char*) data, data_size);
             vTaskDelay(1);  //Delay task to ensure data has time to gets flushed to webusb
         } while(read_bytes != size_file);
         fclose(fptr_glb);

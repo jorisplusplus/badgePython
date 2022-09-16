@@ -7,6 +7,9 @@ from crc import Crc32, CrcCalculator
 from queue import Queue
 import time
 import threading
+import logging
+
+fsob_logger = logging.Logger("FSOB")
 
 class fsob_packet():
     packetId = 1
@@ -22,14 +25,14 @@ class fsob_packet():
         if data != None and len(data) == 80:     #Init from packet
             (header, flags, crc, packetId, ackId, payload) = struct.unpack("<HHIII64s", data)
             if header != self.RXHEADER:
-                print(f"Header incorrect: {header}")
+                fsob_logger.warning(f"Header incorrect: {header}")
                 self.invalid = True
                 return
             data = struct.pack("<HHIII64s", header, flags, 0, packetId, ackId, payload)
             crc_calculator = CrcCalculator(Crc32.CRC32)
             crcCalc = crc_calculator.calculate_checksum(data)
             if crc != crcCalc:
-                print("CRC Check failed")
+                fsob_logger.warning("CRC Check failed")
                 self.invalid = True
                 return
             self.flags = flags
@@ -54,7 +57,6 @@ class fsob_packet():
             if reset:
                 self.flags |= self.FLAGRESET
             self.flags |= len(self.payload) << 9
-            print(len(self.payload))
             self.packettime = 0
     
     def txPacket(self, resend=False):
@@ -106,16 +108,16 @@ class fsob_message():
         return packets
 
     def receiveResponse(self, packet: fsob_packet):
-        print(packet.flags)
+        fsob_logger.debug(packet.flags)
         if packet.flags & packet.FLAGNEWMESSAGE and len(self.responseData) != 0:
-            print("Error start of message already received")
+            fsob_logger.error("Error start of message already received")
         self.responseData += packet.payload
         if packet.flags & packet.FLAGENDMESSAGE:
             if self.parseResponse():
                 self.succesCB(self)
             else:
                 self.errorCB(self)
-            print("Called cb")
+            fsob_logger.debug("Called cb")
             return True
         return False
     
@@ -124,16 +126,16 @@ class fsob_message():
             return False
         (command, messageLen, verif, mId) = struct.unpack("<HIHI", self.responseData[0:12])
         if verif != 44510:
-            print(f"Failed message verification, {verif}")
+            fsob_logger.warning(f"Failed message verification, {verif}")
             return False
         if mId != self.messageId:
-            print("Message id is not equal")
+            fsob_logger.warning("Message id is not equal")
             return False
         if command != self.command:
-            print("Command is not correct")
+            fsob_logger.warning("Command is not correct")
             return False
         if messageLen != (len(self.responseData)-12):
-            print("Not all data recevied")
+            fsob_logger.warning("Not all data recevied")
             return False
         (command, messageLen, verif, mId, payload) = struct.unpack(f"<HIHI{messageLen}s", self.responseData)
         self.response = payload
@@ -145,10 +147,9 @@ class fsob():
         self.PACKETTIMEOUT = 0.10        
         self.dev = usb.core.find(idVendor=vendor, idProduct=device)
         if self.dev == None:
-            print("Failed to connect to device")
+            fsob_logger.error("Failed to connect to device")
         else:
             cfg = self.dev.get_active_configuration()
-            #print(cfg)
             if cfg == None:
                 self.dev.set_configuration()
         self.epOut = epAddr
@@ -164,14 +165,18 @@ class fsob():
     
     def sendMessage(self, message: fsob_message):
         self.messageQueue.put(message)
-        print("Message queued")
+        fsob_logger.debug("Message queued")
 
     def write(self, payload: bytes):
         self.dev.write(self.epOut, payload)
 
     def read(self):
         try:
-            return self.dev.read(self.epIn, 80, 5)
+            data = self.dev.read(self.epIn, 80, 100)
+            if len(data) == 80:
+                return data
+            fsob_logger.warning(f"Packet incorrect length: {len(data)}")
+            return None
         except:
             return None
 
@@ -179,28 +184,28 @@ class fsob():
         fsob_packet.ackId = self.rxPacketID
         self.lastAck = time.time()
         self.write(packet.txPacket())
-        print(f"Nack packet send {packet.packetId}, {packet.ackId}")
+        fsob_logger.info(f"Nack packet send {packet.packetId}, {packet.ackId}")
 
     def txPacket(self, packet: fsob_packet):
         fsob_packet.ackId = self.rxPacketID
         self.write(packet.txPacket())
         self.packetsSend.append(packet)
         self.lastAck = time.time()
-        print(f"Packet send {packet.packetId}")
+        fsob_logger.info(f"Packet send {packet.packetId}")
 
     def handleAck(self, ackId: int):
-        print(f"Received ack for packet: {ackId}")
+        fsob_logger.info(f"Received ack for packet: {ackId}")
         while len(self.packetsSend) > 0 and self.packetsSend[0].packetId <= ackId:
-            self.packetsSend.pop()
+            self.packetsSend.pop(0)
 
     def handlePacket(self, packet: fsob_packet):
         res = False
         if packet.packetId > (self.rxPacketID + 1) or packet.packetId < self.rxPacketID:
-            print("Unexpected packet")
+            fsob_logger.warning(f"Unexpected packet id: {packet.packetId}, last: {self.rxPacketID}")
             return False
         self.handleAck(packet.ackId)
         if packet.payload and packet.packetId != self.rxPacketID and self.activeMessage: #If payload is available handle message receive call
-            print("Handle receive")
+            fsob_logger.debug("Handle receive")
             res = self.activeMessage.receiveResponse(packet)
         self.rxPacketID = packet.packetId
         return res
@@ -210,7 +215,7 @@ class fsob():
 
     def run(self):
         self.running = True
-        print("Starting thread")
+        fsob_logger.info("Starting thread")
         while self.running:
             if self.resetNext:
                 self.resetNext = False
@@ -221,40 +226,39 @@ class fsob():
                 self.txNackPacket(fsob_packet(None, reset=True))
             
             #Check if queue holds a message a no message is in transit
-            #print(f"{self.activeMessage} {not self.messageQueue.empty()}")
             if self.activeMessage == None and (not self.messageQueue.empty()):
                 self.activeMessage = self.messageQueue.get()
                 self.packetsToSend.extend(self.activeMessage.generatePackets())
-                print("Message loaded")
+                fsob_logger.info("Message loaded")
             
             #Check if space is available and packets ready to send
             while len(self.packetsSend) < 5 and len(self.packetsToSend) > 0:
-                self.txPacket(self.packetsToSend.pop())
+                self.txPacket(self.packetsToSend.pop(0))
 
             #Ack check on send packets
             for packet in self.packetsSend:
                 if (time.time() - packet.packettime) > self.PACKETTIMEOUT:
                     #pass
-                    print("Packet timeout")
+                    fsob_logger.info("Packet timeout")
 
             #Read packet
             data = self.read()
             if data != None:
-                print(f"Package received {len(data)}")
+                fsob_logger.info(f"Package received {len(data)}")
                 rxPacket = fsob_packet(data)
                 if not rxPacket.invalid:
                     res = self.handlePacket(rxPacket)
                     if res:
                         self.activeMessage = None
                 else:
-                    print("Packet invalid")
+                    fsob_logger.info("Packet invalid")
             
             #Send blank ack
             if (self.rxPacketID - fsob_packet.ackId) > 2:
-                print("Acking packets")
+                fsob_logger.info("Acking packets")
                 self.txNackPacket(fsob_packet(None))
             elif self.rxPacketID != fsob_packet.ackId and (time.time() - self.lastAck) > 0.2:
-                print("Acking packets on timeout")
+                fsob_logger.info("Acking packets on timeout")
                 self.txNackPacket(fsob_packet(None))
     
     def start(self):

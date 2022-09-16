@@ -5,7 +5,7 @@
 #include <esp_err.h>
 #include <esp_log.h>
 
-#define TAG "fsoveruart_sf"
+#define TAG "fsob_sf"
 
 #if CONFIG_DRIVER_FSOVERBUS_RTCMEM_SUPPORT
 //This function is provided by the rtcmem driver.
