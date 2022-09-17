@@ -7,6 +7,3 @@
 [submodule "firmware/python_modules/micropython-lib"]
 	path = python_modules/micropython-lib
 	url = https://github.com/micropython/micropython-lib
-[submodule "esp-iot-solution"]
-	path = esp-iot-solution
-	url = https://github.com/espressif/esp-iot-solution.git

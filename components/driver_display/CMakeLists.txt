@@ -7,8 +7,8 @@ set(includes
     )
 
 set(IDF_COMPONENTS
-    screen
     buses
+    esp_lcd
 )
 
 idf_component_register(SRCS "${srcs}"
