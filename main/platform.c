@@ -1,11 +1,12 @@
 #include "include/platform.h"
 #include "include/platform_gen.h"
+#include "include/factory_reset.h"
 #include "driver_framebuffer.h"
 #include <driver/gpio.h>
 #include <esp_event.h>
 #include <esp_system.h>
 #include <esp_wifi.h>
-#include <esp_spi_flash.h>
+#include <spi_flash_mmap.h>
 #include <esp_partition.h>
 #include <esp_vfs.h>
 #include <esp_vfs_fat.h>
@@ -58,7 +59,12 @@ void fatal_error(const char *message) {
 }
 
 void platform_init()
-{
+{  	
+	logo();
+	bool is_first_boot = nvs_init();
+
+	fflush(stdout);
+
 	if (isr_init() != ESP_OK) restart();
   //Static inits can be performed here
   start_buses();
@@ -69,4 +75,37 @@ void platform_init()
   
 	fflush(stdout);
 	vTaskDelay(100 / portTICK_PERIOD_MS); //Give things time to settle.
+
+  // size_t mp_task_heap_size = mp_preallocate_heap();
+    // ESP_LOGI(TAG, "Heap size: %d", mp_task_heap_size);
+
+// #ifndef CONFIG_FW_DISABLE_OTA_AND_FIRSTBOOT
+// 	if (is_first_boot) {
+// 		#ifdef CONFIG_DRIVER_FRAMEBUFFER_ENABLE
+// 			driver_framebuffer_fill(NULL, COLOR_BLACK);
+// 			driver_framebuffer_print(NULL, "Extracting ZIP...\n", 0, 0, 1, 1, COLOR_WHITE, &roboto_12pt7b);
+// 			driver_framebuffer_flush(0);
+// 		#endif
+// 		printf("Attempting to unpack FAT initialization ZIP file...\b");
+// 		if (unpack_first_boot_zip() != ESP_OK) { //Error
+// 			#ifdef CONFIG_DRIVER_FRAMEBUFFER_ENABLE
+// 				driver_framebuffer_fill(NULL, COLOR_BLACK);
+// 				driver_framebuffer_print(NULL, "ZIP error!\n", 0, 0, 1, 1, COLOR_WHITE, &roboto_12pt7b);
+// 				driver_framebuffer_flush(0);
+// 			#endif
+// 			printf("An error occured while unpacking the ZIP file!");
+// 			nvs_write_zip_status(false);
+// 		} else {
+// 			nvs_write_zip_status(true);
+// 		}
+// 		esp_restart();
+// 	}
+// #endif
+
+	 int magic = get_magic();
+   if (magic == MAGIC_FACTORY_RESET) {
+    factory_reset();
+    esp_restart();
+   }
 }
+

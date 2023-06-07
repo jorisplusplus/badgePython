@@ -1,9 +1,10 @@
 .vscode/
 components/micropython/mpconfigoverrides.h
-build
+build*/
 main/platform_gen.c
 build/
 sdkconfig
 sdkconfig.old
 partitions.csv
 sdkconfig.defaults
+managed_components/

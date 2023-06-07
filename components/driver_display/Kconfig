@@ -12,6 +12,8 @@ menu "Driver: Generic display"
 			default DISPLAY_SCREEN_CONTROLLER_SSD1306
 			config DISPLAY_SCREEN_CONTROLLER_SSD1306
 				bool "SSD1306"
+			config DISPLAY_SCREEN_CONTROLLER_GC9A01
+				bool "GC9A01"
 		endchoice
 	
 	config DISPLAY_INTERFACE
@@ -34,6 +36,9 @@ menu "Driver: Generic display"
 	config DISPLAY_PIN_DC
 		depends on DISPLAY_SPI
 		int "Data/command pin"
+		default -1
+	config DISPLAY_PIN_RST
+		int "Reset pin"
 		default -1
 	config DISPLAY_I2C_ADDR
 		depends on DISPLAY_I2C

@@ -9,6 +9,7 @@ set(includes
 set(IDF_COMPONENTS
     buses
     esp_lcd
+    esp_lcd_gc9a01
 )
 
 idf_component_register(SRCS "${srcs}"

@@ -1,9 +1,12 @@
-[submodule "firmware/components/micropython/micropython"]
-	path = components/micropython/micropython
-	url = https://github.com/micropython/micropython.git
 [submodule "esp-idf"]
 	path = esp-idf
 	url = https://github.com/espressif/esp-idf.git
 [submodule "firmware/python_modules/micropython-lib"]
 	path = python_modules/micropython-lib
 	url = https://github.com/micropython/micropython-lib
+[submodule "micropython"]
+	path = micropython
+	url = git@github.com:dpgeorge/micropython.git
+[submodule "components/lvgl_mpy/lv_binding_micropython"]
+	path = components/lvgl_mpy/lv_binding_micropython
+	url = git@github.com:lvgl/lv_binding_micropython.git

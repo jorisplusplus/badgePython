@@ -5,10 +5,14 @@
 #include "esp_lcd_panel_vendor.h"
 #include "esp_lcd_panel_ops.h"
 #include "driver/i2c.h"
+#include "driver/spi_master.h"
 
-#if CONFIG_DISPLAY_SCREEN_CONTROLLER_SSD1306
-#include "sdd1306_config.h"
-#endif
+    #if CONFIG_DISPLAY_SCREEN_CONTROLLER_SSD1306
+    #include "sdd1306_config.h"
+    #elif CONFIG_DISPLAY_SCREEN_CONTROLLER_GC9A01
+    #include "gc9a01_config.h"
+    #endif
+
 
 #define TAG "DISPLAY"
 
@@ -27,17 +31,24 @@ esp_err_t driver_display_write_partial(const uint8_t *buffer, uint16_t x0, uint1
     return ESP_OK;
 }
 
+#if CONFIG_DRIVER_DISPLAY_ENABLE
 void driver_display_init() {
-    if(LCDPORT == LCDI2C) {
+    #if LCDI2C
         esp_lcd_panel_io_i2c_config_t io_config = BUSCONFIG();
         ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)I2C_NUM_0, &io_config, &io_handle));
-    } else {
+    #elif LCDSPI
+        esp_lcd_panel_io_spi_config_t io_config = BUSCONFIG();
+        ESP_ERROR_CHECK(esp_lcd_new_panel_io_spi((esp_lcd_spi_bus_handle_t) SPI2_HOST, &io_config, &io_handle));
+    #else
         return;
-    }
+    #endif
     esp_lcd_panel_dev_config_t panel_config = PANELCONFIG();
-    ESP_ERROR_CHECK(esp_lcd_new_panel_ssd1306(io_handle, &panel_config, &panel_handle));
+    ESP_ERROR_CHECK(LCDINIT(io_handle, &panel_config, &panel_handle));
 
     ESP_ERROR_CHECK(esp_lcd_panel_reset(panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_init(panel_handle));
     ESP_ERROR_CHECK(esp_lcd_panel_disp_off(panel_handle, false));
 }
+#else
+void driver_display_init() {}
+#endif

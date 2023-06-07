@@ -1,7 +1,4 @@
 #pragma once
-#include "driver_display.h"
-
-
 
 #define BUSCONFIG()                            \
     {                                          \
@@ -19,4 +16,6 @@
         .color_space = ESP_LCD_COLOR_SPACE_MONOCHROME \
     }
 
-#define LCDPORT LCDI2C
+#define LCDI2C (1)
+
+#define LCDINIT esp_lcd_new_panel_ssd1306

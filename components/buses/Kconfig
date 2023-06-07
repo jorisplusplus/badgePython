@@ -1,44 +1,44 @@
 menu "Buses"
-    config BUS_VSPI_ENABLE
-        bool "Enable the VSPI bus"
+    config BUS_SPI2_ENABLE
+        bool "Enable the SPI2 bus"
         default n
 
-    config PIN_NUM_VSPI_CLK
-        depends on BUS_VSPI_ENABLE
-        int "GPIO pin used for VSPI CLK"
+    config PIN_NUM_SPI2_CLK
+        depends on BUS_SPI2_ENABLE
+        int "GPIO pin used for SPI2 CLK"
 
-    config PIN_NUM_VSPI_MOSI
-        depends on BUS_VSPI_ENABLE
-        int "GPIO pin used for VSPI MOSI"
+    config PIN_NUM_SPI2_MOSI
+        depends on BUS_SPI2_ENABLE
+        int "GPIO pin used for SPI2 MOSI"
 
-    config PIN_NUM_VSPI_MISO
-        depends on BUS_VSPI_ENABLE
-        int "GPIO pin used for VSPI MISO"
+    config PIN_NUM_SPI2_MISO
+        depends on BUS_SPI2_ENABLE
+        int "GPIO pin used for SPI2 MISO"
 
-    config BUS_VSPI_MAX_TRANSFERSIZE
-        depends on BUS_VSPI_ENABLE
-        int "VSPI Maximum transfer size (in bytes)"
+    config BUS_SPI2_MAX_TRANSFERSIZE
+        depends on BUS_SPI2_ENABLE
+        int "SPI2 Maximum transfer size (in bytes)"
         default 4094
 
-    config BUS_HSPI_ENABLE
-        bool "Enable the HSPI bus"
+    config BUS_SPI3_ENABLE
+        bool "Enable the SPI3 bus"
         default n
 
-    config PIN_NUM_HSPI_CLK
-        depends on BUS_HSPI_ENABLE
-        int "GPIO pin used for HSPI CLK"
+    config PIN_NUM_SPI3_CLK
+        depends on BUS_SPI3_ENABLE
+        int "GPIO pin used for SPI3 CLK"
 
-    config PIN_NUM_HSPI_MOSI
-        depends on BUS_HSPI_ENABLE
-        int "GPIO pin used for HSPI MOSI"
+    config PIN_NUM_SPI3_MOSI
+        depends on BUS_SPI3_ENABLE
+        int "GPIO pin used for SPI3 MOSI"
 
-    config PIN_NUM_HSPI_MISO
-        depends on BUS_HSPI_ENABLE
-        int "GPIO pin used for HSPI MISO"
+    config PIN_NUM_SPI3_MISO
+        depends on BUS_SPI3_ENABLE
+        int "GPIO pin used for SPI3 MISO"
         
-    config BUS_HSPI_MAX_TRANSFERSIZE
-        depends on BUS_HSPI_ENABLE
-        int "HSPI Maximum transfer size (in bytes)"
+    config BUS_SPI3_MAX_TRANSFERSIZE
+        depends on BUS_SPI3_ENABLE
+        int "SPI3 Maximum transfer size (in bytes)"
         default 4094
         
     config BUS_I2C0_ENABLE

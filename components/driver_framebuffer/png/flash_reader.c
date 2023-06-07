@@ -4,7 +4,7 @@
 #include <string.h>
 #include <fcntl.h>
 
-#include <esp_partition.h>
+#include "esp_partition.h"
 
 #include "flash_reader.h"
 

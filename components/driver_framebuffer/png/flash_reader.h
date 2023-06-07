@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include "spi_flash_mmap.h"
 
 struct lib_flash_reader {
 	const esp_partition_t *part;

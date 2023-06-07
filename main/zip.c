@@ -3,17 +3,18 @@
 #include <string.h>
 #include <fcntl.h>
 
-#include <esp_event.h>
-#include <esp_system.h>
-#include <esp_wifi.h>
-#include <esp_spi_flash.h>
-#include <esp_partition.h>
-#include <esp_vfs.h>
-#include <esp_vfs_fat.h>
-#include <esp_log.h>
-#include <nvs_flash.h>
-#include <nvs.h>
-#include <wear_levelling.h>
+#include "esp_event.h"
+#include "esp_system.h"
+#include "esp_wifi.h"
+#include "esp_flash.h"
+#include "spi_flash_mmap.h"
+#include "esp_partition.h"
+#include "esp_vfs.h"
+#include "esp_vfs_fat.h"
+#include "esp_log.h"
+#include "nvs_flash.h"
+#include "nvs.h"
+#include "wear_levelling.h"
 
 #include <file_reader.h>
 #include <flash_reader.h>
@@ -53,7 +54,7 @@ esp_err_t unpack_first_boot_zip()
 		return ESP_FAIL;
 	}
 	
-	printf("Partition OTA1 is at 0x%08X\n", part_ota1->address);
+	printf("Partition OTA1 is at 0x%08lX\n", part_ota1->address);
 	
 	struct lib_deflate_reader *dr = (struct lib_deflate_reader *) malloc(sizeof(struct lib_deflate_reader));
 	if (dr == NULL) {
@@ -135,7 +136,7 @@ esp_err_t unpack_first_boot_zip()
 				int err = mkdir(fname, 0755);
 				if (err < 0)
 				{
-					ESP_LOGE(TAG, "failed to create dir '%s': %d", fname, errno);
+					ESP_LOGE(TAG, "failed to create dir '%s': %d", fname, err);
 					return ESP_FAIL;
 				}
 			} else { // file
@@ -156,7 +157,7 @@ esp_err_t unpack_first_boot_zip()
 				ESP_LOGE(TAG, "open('%s', O_WRONLY|O_CREAT|O_TRUNC)", fname);
 				int fd = open(fname, O_WRONLY|O_CREAT|O_TRUNC, 0644);
 				if (fd < 0) {
-					ESP_LOGE(TAG, "failed to open file '%s': %d", fname, errno);
+					ESP_LOGE(TAG, "failed to open file '%s'", fname);
 					return ESP_FAIL;
 				}
 
@@ -205,7 +206,7 @@ esp_err_t unpack_first_boot_zip()
 			ESP_LOGE(TAG, "no preseed .zip found");
 			return ESP_OK;
 		} else {
-			ESP_LOGE(TAG, "unknown zip object type 0x%08x", pk_sig);
+			ESP_LOGE(TAG, "unknown zip object type 0x%08lx", pk_sig);
 			return ESP_FAIL;
 		}
 		first_chunk = false;
@@ -213,7 +214,7 @@ esp_err_t unpack_first_boot_zip()
 	free(dr);
 
 	// clear first page to avoid double unpacking
-	int res = spi_flash_erase_sector((part_ota1->address + 4096) / SPI_FLASH_SEC_SIZE);
+	int res = esp_flash_erase_region(NULL, (part_ota1->address + 4096), SPI_FLASH_SEC_SIZE);
 	if (res != ESP_OK) return res;
 	
 	printf("ZIP file extraction done!\n");

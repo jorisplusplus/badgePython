@@ -8,8 +8,8 @@
 #include <esp_log.h>
 #include <esp_err.h>
 
-#include <driver/spi_master.h>
-#include <driver/i2c.h>
+#include "driver/spi_master.h"
+#include "driver/i2c.h"
 
 #include "include/buses.h"
 
@@ -26,25 +26,23 @@
 
 esp_err_t start_buses() {
     // This function initializes the VSPI, HSPI and I2C buses of the ESP32
-    // #if CONFIG_BUS_VSPI_ENABLE
-    //     spi_config_t vspiBusConfiguration = {0};
-    //     vspiBusConfiguration.mosi_io_num     = CONFIG_PIN_NUM_VSPI_MOSI;
-    //     vspiBusConfiguration.miso_io_num     = CONFIG_PIN_NUM_VSPI_MISO;
-    //     vspiBusConfiguration.sclk_io_num     = CONFIG_PIN_NUM_VSPI_CLK;
-    //     vspiBusConfiguration.max_transfer_sz = CONFIG_BUS_VSPI_MAX_TRANSFERSIZE;
-    //     vspi_bus_handle = spi_bus_create(VSPI_HOST, &vspiBusConfiguration);
-    //     if (res != ESP_OK) return res;
-    // #endif
+    #if CONFIG_BUS_SPI2_ENABLE
+        spi_config_t spi2BusConfiguration = {0};
+        spi2BusConfiguration.mosi_io_num     = CONFIG_PIN_NUM_SPI2_MOSI;
+        spi2BusConfiguration.miso_io_num     = CONFIG_PIN_NUM_SPI2_MISO;
+        spi2BusConfiguration.sclk_io_num     = CONFIG_PIN_NUM_SPI2_CLK;
+        spi2BusConfiguration.max_transfer_sz = CONFIG_BUS_SPI2_MAX_TRANSFERSIZE;
+        ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &spi2BusConfiguration, SPI_DMA_CH_AUTO));
+    #endif
 
-    // #if CONFIG_BUS_HSPI_ENABLE
-    //     spi_config_t hspiBusConfiguration = {0};
-    //     hspiBusConfiguration.mosi_io_num     = CONFIG_PIN_NUM_HSPI_MOSI;
-    //     hspiBusConfiguration.miso_io_num     = CONFIG_PIN_NUM_HSPI_MISO;
-    //     hspiBusConfiguration.sclk_io_num     = CONFIG_PIN_NUM_HSPI_CLK;
-    //     hspiBusConfiguration.max_transfer_sz = CONFIG_BUS_HSPI_MAX_TRANSFERSIZE;
-    //     hspi_bus_handle = spi_bus_initialize(HSPI_HOST, &hspiBusConfiguration);
-    //     if (res != ESP_OK) return res;
-    // #endif
+    #if CONFIG_BUS_SPI3_ENABLE
+        spi_config_t spi3BusConfiguration = {0};
+        spi3BusConfiguration.mosi_io_num     = CONFIG_PIN_NUM_SPI3_MOSI;
+        spi3BusConfiguration.miso_io_num     = CONFIG_PIN_NUM_SPI3_MISO;
+        spi3BusConfiguration.sclk_io_num     = CONFIG_PIN_NUM_SPI3_CLK;
+        spi3BusConfiguration.max_transfer_sz = CONFIG_BUS_SPI3_MAX_TRANSFERSIZE;
+        ESP_ERROR_CHECK(spi_bus_initialize(SPI3_HOST, &spi3BusConfiguration, SPI_DMA_CH_AUTO));
+    #endif
 
     #if CONFIG_BUS_I2C0_ENABLE
         ESP_LOGI(TAG, "Init I2C0");

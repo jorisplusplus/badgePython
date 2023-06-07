@@ -9,18 +9,18 @@ set(mod_register "heapspace")
 
 if(CONFIG_DRIVER_HEAPSPACE_ENABLE)
     message(STATUS "heapspace enabled")
-    set(EXTMODS "${EXTMODS}" "${mods}" CACHE INTERNAL "")
-    set(EXTMODS_NAMES "${EXTMODS_NAMES}" "${mod_name}" CACHE INTERNAL "")
+    set(MICROPY_SOURCE_USERMOD "${MICROPY_SOURCE_USERMOD}" "${mods}" CACHE INTERNAL "")
+    # set(EXTMODS_NAMES "${EXTMODS_NAMES}" "${mod_name}" CACHE INTERNAL "")
 
-    add_library("${mod_name}" INTERFACE)
+    # add_library("${mod_name}" INTERFACE)
 
-    target_sources("${mod_name}" INTERFACE
-        "${mods}"
-    )
+    # target_sources("${mod_name}" INTERFACE
+    #     "${mods}"
+    # )
 
-    target_include_directories("${mod_name}" INTERFACE
-        ${CMAKE_CURRENT_LIST_DIR}
-    )
+    # target_include_directories("${mod_name}" INTERFACE
+    #     ${CMAKE_CURRENT_LIST_DIR}
+    # )
 
-    target_link_libraries("${mod_name}" INTERFACE "${mod_name}")
+    # target_link_libraries("${mod_name}" INTERFACE "${mod_name}")
 endif()

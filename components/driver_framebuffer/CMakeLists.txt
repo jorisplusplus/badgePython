@@ -53,10 +53,10 @@ set(srcs
 endif()
 
 set(IDF_COMPONENTS
-    micropython
     buses
     driver_display
     spi_flash
+    esp_partition
     )
 
 set(includes

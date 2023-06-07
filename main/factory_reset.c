@@ -13,6 +13,7 @@
 #include "esp_partition.h"
 #include "esp_system.h"
 #include "esp_wifi.h"
+#include "esp_flash.h"
 
 #include "nvs.h"
 #include "nvs_flash.h"
@@ -131,7 +132,7 @@ static void factory_reset_task(void *pvParameter)
 	}
 	while (partitions) {
 			const esp_partition_t* partition = esp_partition_get(partitions);
-			printf("Found FAT partition '%s' at address 0x%08x (%u bytes)\n",
+			printf("Found FAT partition '%s' at address 0x%08lx (%lu bytes)\n",
 				partition->label,
 				partition->address,
 				partition->size
@@ -159,7 +160,7 @@ static void factory_reset_task(void *pvParameter)
 						graphics_show_fr(text, progress, true, false);
 						vTaskDelay(1 / portTICK_PERIOD_MS);
 					}
-					err = spi_flash_erase_sector(first_sector+i);
+					err = esp_flash_erase_region(NULL, first_sector+i, SPI_FLASH_SEC_SIZE);
 					if (err != ESP_OK) {
 						printf("Erase error %u\n", err);
 						graphics_show_fr("Erase failed!", 0, false, true);

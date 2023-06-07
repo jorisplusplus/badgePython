@@ -40,7 +40,7 @@ STATIC mp_obj_t esp_heapspace_print() {
     printf("Free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
     for (int i = 0 ; i < *heap_info.num_totals; i++) {
         printf("Task: %s -> CAP_8BIT: %d CAP_32BIT: %d\n",
-                heap_info.totals[i].task ? pcTaskGetTaskName(heap_info.totals[i].task) : "Pre-Scheduler allocs" ,
+                heap_info.totals[i].task ? pcTaskGetName(heap_info.totals[i].task) : "Pre-Scheduler allocs" ,
                 heap_info.totals[i].size[0],    // Heap size with CAP_8BIT capabilities
                 heap_info.totals[i].size[1]);   // Heap size with CAP32_BIT capabilities
     }
