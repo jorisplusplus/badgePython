@@ -3,8 +3,9 @@ components/micropython/mpconfigoverrides.h
 build*/
 main/platform_gen.c
 build/
-sdkconfig
+/sdkconfig
 sdkconfig.old
 partitions.csv
 sdkconfig.defaults
 managed_components/
+dependencies.lock
