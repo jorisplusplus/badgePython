@@ -21,21 +21,16 @@ endif()
 if(NOT MICROPY_BOARD_DIR)
     set(MICROPY_BOARD_DIR ${CMAKE_SOURCE_DIR}/boards/${MICROPY_BOARD})
 endif()
-if(NOT EXISTS ${MICROPY_BOARD_DIR}/mpconfigboard.cmake)
+if(NOT EXISTS ${MICROPY_BOARD_DIR}/mpconfigboard.h)
     message(FATAL_ERROR "Invalid MICROPY_BOARD specified: ${MICROPY_BOARD}")
 endif()
 
 # Include main IDF cmake file.
 include($ENV{IDF_PATH}/tools/cmake/project.cmake)
 
-# Define the output sdkconfig so it goes in the build directory.
-#set(SDKCONFIG ${CMAKE_BINARY_DIR}/sdkconfig)
-
 # Save the manifest file set from the cmake command line.
 set(MICROPY_USER_FROZEN_MANIFEST ${MICROPY_FROZEN_MANIFEST})
 
-# Include board config; this is expected to set SDKCONFIG_DEFAULTS (among other options).
-#include(${MICROPY_BOARD_DIR}/mpconfigboard.cmake)
 
 # Set the frozen manifest file. Note if MICROPY_FROZEN_MANIFEST is set from the cmake
 # command line, then it will override the default and any manifest set by the board.
