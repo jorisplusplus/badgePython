@@ -1,0 +1,12 @@
+#include "platform.h"
+
+#define MICROPY_HW_BOARD_NAME "HAKnob"
+#define MICROPY_HW_MCU_NAME "ESP32S3"
+#define MICROPY_PY_BLUETOOTH (0)
+#define MICROPY_PY_NETWORK_LAN (0)
+#define MICROPY_PY_MACHINE_DAC (0)
+#define MICROPY_PY_MACHINE_I2S (0)
+
+#ifndef MICROPY_BOARD_STARTUP
+#define MICROPY_BOARD_STARTUP platform_init
+#endif
