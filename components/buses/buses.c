@@ -27,7 +27,7 @@
 esp_err_t start_buses() {
     // This function initializes the VSPI, HSPI and I2C buses of the ESP32
     #if CONFIG_BUS_SPI2_ENABLE
-        spi_config_t spi2BusConfiguration = {0};
+        spi_bus_config_t spi2BusConfiguration = {0};
         spi2BusConfiguration.mosi_io_num     = CONFIG_PIN_NUM_SPI2_MOSI;
         spi2BusConfiguration.miso_io_num     = CONFIG_PIN_NUM_SPI2_MISO;
         spi2BusConfiguration.sclk_io_num     = CONFIG_PIN_NUM_SPI2_CLK;
@@ -36,7 +36,7 @@ esp_err_t start_buses() {
     #endif
 
     #if CONFIG_BUS_SPI3_ENABLE
-        spi_config_t spi3BusConfiguration = {0};
+        spi_bus_config_t spi3BusConfiguration = {0};
         spi3BusConfiguration.mosi_io_num     = CONFIG_PIN_NUM_SPI3_MOSI;
         spi3BusConfiguration.miso_io_num     = CONFIG_PIN_NUM_SPI3_MISO;
         spi3BusConfiguration.sclk_io_num     = CONFIG_PIN_NUM_SPI3_CLK;
