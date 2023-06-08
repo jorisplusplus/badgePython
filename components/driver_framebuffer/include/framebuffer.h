@@ -8,13 +8,13 @@
 #include "esp_log.h"
 #include "esp_system.h"
 
-#include "driver_framebuffer_font.h"
-#include "driver_framebuffer_orientation_internal.h"
-#include "driver_framebuffer_dirty.h"
-#include "driver_framebuffer_compositor.h"
-#include "driver_framebuffer_orientation.h"
-#include "driver_framebuffer_drawing.h"
-#include "driver_framebuffer_text.h"
+#include "framebuffer_font.h"
+#include "framebuffer_orientation_internal.h"
+#include "framebuffer_dirty.h"
+#include "framebuffer_compositor.h"
+#include "framebuffer_orientation.h"
+#include "framebuffer_drawing.h"
+#include "framebuffer_text.h"
 
 //PNG library
 #include "../png/mem_reader.h"
@@ -43,37 +43,37 @@
 extern "C" {
 #endif
 
-esp_err_t driver_framebuffer_init();
+esp_err_t framebuffer_init();
 /* Initialize the framebuffer driver (called once at system boot from platform.c) */
 
-bool driver_framebuffer_flush(uint32_t flags);
+bool framebuffer_flush(uint32_t flags);
 /* Flush the framebuffer to the display */
 
-void driver_framebuffer_fill(Window* window, uint32_t value);
+void framebuffer_fill(Window* window, uint32_t value);
 /* Fill the framebuffer or the provided frame with a single color */
 
-void driver_framebuffer_setPixel(Window* window, int16_t x, int16_t y, uint32_t value);
+void framebuffer_setPixel(Window* window, int16_t x, int16_t y, uint32_t value);
 /* Set a pixel in the framebuffer or the provided frame to a color */
 
-uint32_t driver_framebuffer_getPixel(Window* window, int16_t x, int16_t y);
+uint32_t framebuffer_getPixel(Window* window, int16_t x, int16_t y);
 /* Get the color of a pixel in the framebuffer or the provided frame */
 
-uint16_t driver_framebuffer_getWidth(Window* window);
+uint16_t framebuffer_getWidth(Window* window);
 /* Get the width of the framebuffer or the provided window */
 
-uint16_t driver_framebuffer_getHeight(Window* window);
+uint16_t framebuffer_getHeight(Window* window);
 /* Get the height of the framebuffer or the provided window */
 
-esp_err_t driver_framebuffer_png(Window* window, int16_t x, int16_t y, lib_reader_read_t reader, void* reader_p);
+esp_err_t framebuffer_png(Window* window, int16_t x, int16_t y, lib_reader_read_t reader, void* reader_p);
 /* Draw a PNG image to the framebuffer of the provided window */
 
-void driver_framebuffer_blit(Window* source, Window* target);
+void framebuffer_blit(Window* source, Window* target);
 /* Blit a window to the framebuffer of another window or the main framebuffer */
 
-esp_err_t driver_framebuffer_setBacklight(uint8_t level);
+esp_err_t framebuffer_setBacklight(uint8_t level);
 /* Set the brightness of the backlight (0-255) */
 
-uint8_t driver_framebuffer_getBacklight();
+uint8_t framebuffer_getBacklight();
 /* Get the brightness of the backlight */
 
 #ifdef __cplusplus

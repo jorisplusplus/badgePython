@@ -6,13 +6,13 @@
 #include "py/mphal.h"
 #include "py/runtime.h"
 
-#include "vfs.h"
-#include "vfs_native.h"
+// #include "vfs.h"
+// #include "vfs_native.h"
 
 #ifndef NO_QSTR
-#include "include/driver_framebuffer.h"
-#include "include/driver_framebuffer_compositor.h"
-#include "include/driver_framebuffer_devices.h"
+#include "include/framebuffer.h"
+#include "include/framebuffer_compositor.h"
+#include "include/framebuffer_devices.h"
 #endif
 
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_ENABLE
@@ -21,7 +21,7 @@ const GFXfont * defaultFont = &roboto_12pt7b;
 uint32_t defaultTextColor = COLOR_TEXT_DEFAULT;
 uint32_t defaultFillColor = COLOR_FILL_DEFAULT;
 
-static mp_obj_t framebuffer_flush(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_flush(size_t n_args, const mp_obj_t *args)
 {
 	uint32_t flags = 0;
 	
@@ -29,16 +29,16 @@ static mp_obj_t framebuffer_flush(mp_uint_t n_args, const mp_obj_t *args)
 		flags = mp_obj_get_int(args[0]);
 	}
 	
-	driver_framebuffer_flush(flags);
+	framebuffer_flush(flags);
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_size(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_size(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	
 	if ((n_args > 0) && (MP_OBJ_IS_STR(args[0]))) {
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -46,7 +46,7 @@ static mp_obj_t framebuffer_size(mp_uint_t n_args, const mp_obj_t *args)
 	}
 		
 	int16_t width, height;
-	driver_framebuffer_get_orientation_size(window, &width, &height);
+	framebuffer_get_orientation_size(window, &width, &height);
 	
 	mp_obj_t tuple[2];
 	tuple[0] = mp_obj_new_int(width);
@@ -54,37 +54,37 @@ static mp_obj_t framebuffer_size(mp_uint_t n_args, const mp_obj_t *args)
 	return mp_obj_new_tuple(2, tuple);
 }
 
-static mp_obj_t framebuffer_width(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_width(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	
 	if ((n_args > 0) && (MP_OBJ_IS_STR(args[0]))) {
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
 		}
 	}
 	
-	return mp_obj_new_int(driver_framebuffer_getWidth(window));
+	return mp_obj_new_int(framebuffer_getWidth(window));
 }
 
-static mp_obj_t framebuffer_height(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_height(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	
 	if ((n_args > 0) && (MP_OBJ_IS_STR(args[0]))) {
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
 		}
 	}
 	
-	return mp_obj_new_int(driver_framebuffer_getHeight(window));
+	return mp_obj_new_int(framebuffer_getHeight(window));
 }
 
-static mp_obj_t framebuffer_orientation(mp_uint_t n_args, const mp_obj_t *args) {
+static mp_obj_t mpy_framebuffer_orientation(size_t n_args, const mp_obj_t *args) {
 	Window* window = NULL;
 	
 	if ((n_args > 0) && (!(MP_OBJ_IS_STR(args[0]) || MP_OBJ_IS_INT(args[0])))) {
@@ -101,7 +101,7 @@ static mp_obj_t framebuffer_orientation(mp_uint_t n_args, const mp_obj_t *args) 
 	
 	if ((n_args > 0) && (MP_OBJ_IS_STR(args[0]))) {
 		//First argument is a string: we're operating on a window
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -110,19 +110,19 @@ static mp_obj_t framebuffer_orientation(mp_uint_t n_args, const mp_obj_t *args) 
 	
 	if ((n_args > 0) && (MP_OBJ_IS_INT(args[n_args-1]))) {
 		//Set the orientation (last argument is an integer)
-		driver_framebuffer_set_orientation_angle(window, mp_obj_get_int(args[n_args-1]));
+		framebuffer_set_orientation_angle(window, mp_obj_get_int(args[n_args-1]));
 		return mp_const_none;
 	} else { //Get the orientation (no arguments or one argument which is a string)
-		return mp_obj_new_int(driver_framebuffer_get_orientation_angle(window));
+		return mp_obj_new_int(framebuffer_get_orientation_angle(window));
 	}
 }
 
-static mp_obj_t framebuffer_draw_raw(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_draw_raw(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	
 	if (n_args > 5) { //A window was provided
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -139,45 +139,45 @@ static mp_obj_t framebuffer_draw_raw(mp_uint_t n_args, const mp_obj_t *args)
 		return mp_const_none;
 	}
 	
-	mp_uint_t len;
+	size_t len;
 	uint8_t *data = (uint8_t *)mp_obj_str_get_data(args[4], &len);
 	
 	for (int16_t px = 0; px < w; px++) {
 		for (int16_t py = 0; py < h; py++) {
-			driver_framebuffer_setPixel(window, x+px, y+py, data[(x+px) + (y+py)*w]);
+			framebuffer_setPixel(window, x+px, y+py, data[(x+px) + (y+py)*w]);
 		}
 	}
 	
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_create(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_create(size_t n_args, const mp_obj_t *args)
 {
 	const char* name   = mp_obj_str_get_str(args[0]);
 	int16_t     width  = mp_obj_get_int(args[1]);
 	int16_t     height = mp_obj_get_int(args[2]);
-	if (!driver_framebuffer_window_create(name, width, height)) {
+	if (!framebuffer_window_create(name, width, height)) {
 		mp_raise_ValueError("A window with the provided name exists already!");
 	}
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_remove(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_remove(size_t n_args, const mp_obj_t *args)
 {
 	const char* name = mp_obj_str_get_str(args[0]);
-	Window* window = driver_framebuffer_window_find(name);
+	Window* window = framebuffer_window_find(name);
 	if (!window) {
 		mp_raise_ValueError("Window not found");
 		return mp_const_none;
 	}
-	driver_framebuffer_window_remove(window);
+	framebuffer_window_remove(window);
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_move(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_move(size_t n_args, const mp_obj_t *args)
 {
 	const char* name = mp_obj_str_get_str(args[0]);
-	Window* window = driver_framebuffer_window_find(name);
+	Window* window = framebuffer_window_find(name);
 	if (!window) {
 		mp_raise_ValueError("Window not found");
 		return mp_const_none;
@@ -189,10 +189,10 @@ static mp_obj_t framebuffer_window_move(mp_uint_t n_args, const mp_obj_t *args)
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_hide(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_hide(size_t n_args, const mp_obj_t *args)
 {
 	const char* name = mp_obj_str_get_str(args[0]);
-	Window* window = driver_framebuffer_window_find(name);
+	Window* window = framebuffer_window_find(name);
 	if (!window) {
 		mp_raise_ValueError("Window not found");
 		return mp_const_none;
@@ -201,10 +201,10 @@ static mp_obj_t framebuffer_window_hide(mp_uint_t n_args, const mp_obj_t *args)
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_show(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_show(size_t n_args, const mp_obj_t *args)
 {
 	const char* name = mp_obj_str_get_str(args[0]);
-	Window* window = driver_framebuffer_window_find(name);
+	Window* window = framebuffer_window_find(name);
 	if (!window) {
 		mp_raise_ValueError("Window not found");
 		return mp_const_none;
@@ -213,10 +213,10 @@ static mp_obj_t framebuffer_window_show(mp_uint_t n_args, const mp_obj_t *args)
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_visiblity(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_visiblity(size_t n_args, const mp_obj_t *args)
 {
 	const char* name = mp_obj_str_get_str(args[0]);
-	Window* window = driver_framebuffer_window_find(name);
+	Window* window = framebuffer_window_find(name);
 	if (!window) {
 		mp_raise_ValueError("Window not found");
 		return mp_const_none;
@@ -225,19 +225,19 @@ static mp_obj_t framebuffer_window_visiblity(mp_uint_t n_args, const mp_obj_t *a
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_focus(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_focus(size_t n_args, const mp_obj_t *args)
 {
 	const char* name = mp_obj_str_get_str(args[0]);
-	Window* window = driver_framebuffer_window_find(name);
+	Window* window = framebuffer_window_find(name);
 	if (!window) {
 		mp_raise_ValueError("Window not found");
 		return mp_const_none;
 	}
-	driver_framebuffer_window_focus(window);
+	framebuffer_window_focus(window);
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_resize(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_resize(size_t n_args, const mp_obj_t *args)
 {
 	printf("FIXME\n");
 	/*
@@ -250,7 +250,7 @@ static mp_obj_t framebuffer_window_resize(mp_uint_t n_args, const mp_obj_t *args
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_window_list(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_list(size_t n_args, const mp_obj_t *args)
 {
 	printf("FIXME\n");
 	return mp_const_none;
@@ -258,10 +258,10 @@ static mp_obj_t framebuffer_window_list(mp_uint_t n_args, const mp_obj_t *args)
 
 //Fixme: add window rename function
 
-static mp_obj_t framebuffer_window_transparency(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_window_transparency(size_t n_args, const mp_obj_t *args)
 {
 	const char* name = mp_obj_str_get_str(args[0]);
-	Window* window = driver_framebuffer_window_find(name);
+	Window* window = framebuffer_window_find(name);
 	if (!window) {
 		mp_raise_ValueError("Window not found");
 		return mp_const_none;
@@ -276,11 +276,11 @@ static mp_obj_t framebuffer_window_transparency(mp_uint_t n_args, const mp_obj_t
 	return mp_obj_new_int(window->transparentColor); //Fixme!
 }
 
-static mp_obj_t framebuffer_get_pixel(mp_uint_t n_args, const mp_obj_t *args) {
+static mp_obj_t mpy_framebuffer_get_pixel(size_t n_args, const mp_obj_t *args) {
 	Window* window = NULL;
 	
 	if ((n_args > 0) && (MP_OBJ_IS_STR(args[0]))) { //A window was provided
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -290,14 +290,14 @@ static mp_obj_t framebuffer_get_pixel(mp_uint_t n_args, const mp_obj_t *args) {
 	int x = mp_obj_get_int(args[n_args-2]);
 	int y = mp_obj_get_int(args[n_args-1]);
 	
-	return mp_obj_new_int(driver_framebuffer_getPixel(window, x, y));
+	return mp_obj_new_int(framebuffer_getPixel(window, x, y));
 }
 
-static mp_obj_t framebuffer_draw_pixel(mp_uint_t n_args, const mp_obj_t *args) {
+static mp_obj_t mpy_framebuffer_draw_pixel(size_t n_args, const mp_obj_t *args) {
 	Window* window = NULL;
 	
 	if ((n_args > 0) && (MP_OBJ_IS_STR(args[0]))) { //A window was provided
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -308,11 +308,11 @@ static mp_obj_t framebuffer_draw_pixel(mp_uint_t n_args, const mp_obj_t *args) {
 	int y = mp_obj_get_int(args[n_args-2]);
 	uint32_t color = mp_obj_get_int(args[n_args-1]);
 	
-	driver_framebuffer_setPixel(window, x, y, color);
+	framebuffer_setPixel(window, x, y, color);
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_draw_fill(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_draw_fill(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	uint32_t color = defaultFillColor;
@@ -330,7 +330,7 @@ static mp_obj_t framebuffer_draw_fill(mp_uint_t n_args, const mp_obj_t *args)
 	}
 	
 	if ((n_args > 0) && (MP_OBJ_IS_STR(args[0]))) {
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -342,11 +342,11 @@ static mp_obj_t framebuffer_draw_fill(mp_uint_t n_args, const mp_obj_t *args)
 		color = mp_obj_get_int(args[n_args-1]);
 	}
 	
-	driver_framebuffer_fill(window, color);
+	framebuffer_fill(window, color);
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_draw_line(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_draw_line(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	if (MP_OBJ_IS_STR(args[0])) {
@@ -354,7 +354,7 @@ static mp_obj_t framebuffer_draw_line(mp_uint_t n_args, const mp_obj_t *args)
 			mp_raise_ValueError("Expected 5 or 6 arguments: (window), x0, y0, x1, y1 and color");
 			return mp_const_none;
 		}
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -365,11 +365,11 @@ static mp_obj_t framebuffer_draw_line(mp_uint_t n_args, const mp_obj_t *args)
 	int x1 = mp_obj_get_int(args[n_args-3]);
 	int y1 = mp_obj_get_int(args[n_args-2]);
 	uint32_t color = mp_obj_get_int(args[n_args-1]);
-	driver_framebuffer_line(window, x0, y0, x1, y1, color);
+	framebuffer_line(window, x0, y0, x1, y1, color);
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_draw_rect(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_draw_rect(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	if (MP_OBJ_IS_STR(args[0])) {
@@ -377,7 +377,7 @@ static mp_obj_t framebuffer_draw_rect(mp_uint_t n_args, const mp_obj_t *args)
 			mp_raise_ValueError("Expected 6 or 7 arguments: (window), x, y, width, height, fill and color");
 			return mp_const_none;
 		}
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -389,11 +389,11 @@ static mp_obj_t framebuffer_draw_rect(mp_uint_t n_args, const mp_obj_t *args)
 	int h = mp_obj_get_int(args[n_args-3]);
 	int fill = mp_obj_get_int(args[n_args-2]);
 	uint32_t color = mp_obj_get_int(args[n_args-1]);
-	driver_framebuffer_rect(window, x, y, w, h, fill, color);
+	framebuffer_rect(window, x, y, w, h, fill, color);
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_draw_circle(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_draw_circle(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	if (MP_OBJ_IS_STR(args[0])) {
@@ -401,7 +401,7 @@ static mp_obj_t framebuffer_draw_circle(mp_uint_t n_args, const mp_obj_t *args)
 			mp_raise_ValueError("Expected 7 or 8 arguments: (window), x, y, radius, starting-angle, ending-angle, fill and color");
 			return mp_const_none;
 		}
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -414,11 +414,11 @@ static mp_obj_t framebuffer_draw_circle(mp_uint_t n_args, const mp_obj_t *args)
 	int a1    = mp_obj_get_int(args[n_args-3]);
 	int fill  = mp_obj_get_int(args[n_args-2]);
 	uint32_t color = mp_obj_get_int(args[n_args-1]);
-	driver_framebuffer_circle(window, x, y, r, a0, a1, fill, color);
+	framebuffer_circle(window, x, y, r, a0, a1, fill, color);
 	return mp_const_none;
 }
 
-STATIC mp_obj_t framebuffer_draw_text(mp_uint_t n_args, const mp_obj_t *args) {
+STATIC mp_obj_t mpy_framebuffer_draw_text(size_t n_args, const mp_obj_t *args) {
 	uint8_t argOffset = 0;
 	Window* window = NULL;
 	if (MP_OBJ_IS_STR(args[0])) { //window, x, y, text ...
@@ -426,7 +426,7 @@ STATIC mp_obj_t framebuffer_draw_text(mp_uint_t n_args, const mp_obj_t *args) {
 			mp_raise_ValueError("Expected window, x, y, text, ...");
 			return mp_const_none;
 		}
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[argOffset++]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[argOffset++]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -442,7 +442,7 @@ STATIC mp_obj_t framebuffer_draw_text(mp_uint_t n_args, const mp_obj_t *args) {
 	if (n_args>argOffset) color = mp_obj_get_int(args[argOffset++]);
 	
 	const GFXfont *font = defaultFont;
-	if (n_args>argOffset) font = driver_framebuffer_findFontByName(mp_obj_str_get_str(args[argOffset++]));
+	if (n_args>argOffset) font = framebuffer_findFontByName(mp_obj_str_get_str(args[argOffset++]));
 	
 	if (!font) {
 		mp_raise_ValueError("Font not found");
@@ -455,43 +455,43 @@ STATIC mp_obj_t framebuffer_draw_text(mp_uint_t n_args, const mp_obj_t *args) {
 	
 	if (MP_OBJ_IS_STR(args[textArg])) {
 		const char *text = mp_obj_str_get_str(args[textArg]);
-		driver_framebuffer_print(window, text, x, y, xScale, yScale, color, font);
+		framebuffer_print(window, text, x, y, xScale, yScale, color, font);
 	} else {
 		int chr = mp_obj_get_int(args[textArg]);
 		char *text = malloc(2);
 		text[0] = chr;
 		text[1] = 0;
-		driver_framebuffer_print(window, text, x, y, xScale, yScale, color, font);
+		framebuffer_print(window, text, x, y, xScale, yScale, color, font);
 		free(text);
 	}
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_get_text_width(mp_uint_t n_args, const mp_obj_t *args) {
+static mp_obj_t mpy_framebuffer_get_text_width(size_t n_args, const mp_obj_t *args) {
 	const char *text = mp_obj_str_get_str(args[0]);
 	const GFXfont *font = defaultFont;
-	if (n_args>1) font = driver_framebuffer_findFontByName(mp_obj_str_get_str(args[1]));
+	if (n_args>1) font = framebuffer_findFontByName(mp_obj_str_get_str(args[1]));
 	if (!font) {
 		mp_raise_ValueError("Font not found");
 		return mp_const_none;
 	}
-	int value = driver_framebuffer_get_string_width(text, font);
+	int value = framebuffer_get_string_width(text, font);
 	return mp_obj_new_int(value);
 }
 
-static mp_obj_t framebuffer_get_text_height(mp_uint_t n_args, const mp_obj_t *args) {
+static mp_obj_t mpy_framebuffer_get_text_height(size_t n_args, const mp_obj_t *args) {
 	const char *text = mp_obj_str_get_str(args[0]);
 	const GFXfont *font = defaultFont;
-	if (n_args>1) font = driver_framebuffer_findFontByName(mp_obj_str_get_str(args[1]));
+	if (n_args>1) font = framebuffer_findFontByName(mp_obj_str_get_str(args[1]));
 	if (!font) {
 		mp_raise_ValueError("Font not found");
 		return mp_const_none;
 	}
-	int value = driver_framebuffer_get_string_height(text, font);
+	int value = framebuffer_get_string_height(text, font);
 	return mp_obj_new_int(value);
 }
 
-static mp_obj_t framebuffer_png_info(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_png_info(size_t n_args, const mp_obj_t *args)
 {
 	lib_reader_read_t reader;
 	void * reader_p;
@@ -507,22 +507,23 @@ static mp_obj_t framebuffer_png_info(mp_uint_t n_args, const mp_obj_t *args)
 		reader = (lib_reader_read_t) &lib_mem_read;
 		reader_p = mr;
 	} else {
-		const char* filename = mp_obj_str_get_str(args[0]);
-		char fullname[128] = {'\0'};
-		int res = physicalPathN(filename, fullname, sizeof(fullname));
-		if ((res != 0) || (strlen(fullname) == 0)) {
-			mp_raise_ValueError("Error resolving file name");
-			return mp_const_none;
-		}
+		return mp_const_none;
+		// const char* filename = mp_obj_str_get_str(args[0]);
+		// char fullname[128] = {'\0'};
+		// int res = physicalPathN(filename, fullname, sizeof(fullname));
+		// if ((res != 0) || (strlen(fullname) == 0)) {
+		// 	mp_raise_ValueError("Error resolving file name");
+		// 	return mp_const_none;
+		// }
 
-		struct lib_file_reader *fr = lib_file_new(fullname, 1024);
-		if (fr == NULL) {
-			nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Could not open file '%s'!",filename));
-			return mp_const_none;
-		}
+		// struct lib_file_reader *fr = lib_file_new(fullname, 1024);
+		// if (fr == NULL) {
+		// 	nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Could not open file '%s'!",filename));
+		// 	return mp_const_none;
+		// }
 		
-		reader = (lib_reader_read_t) &lib_file_read;
-		reader_p = fr;
+		// reader = (lib_reader_read_t) &lib_file_read;
+		// reader_p = fr;
 
 	}
 
@@ -560,7 +561,7 @@ static mp_obj_t framebuffer_png_info(mp_uint_t n_args, const mp_obj_t *args)
 	return mp_obj_new_tuple(4, tuple);
 }
 
-static mp_obj_t framebuffer_draw_png(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_draw_png(size_t n_args, const mp_obj_t *args)
 {
 	Window* window = NULL;
 	int paramOffset = 0;
@@ -570,7 +571,7 @@ static mp_obj_t framebuffer_draw_png(mp_uint_t n_args, const mp_obj_t *args)
 			mp_raise_ValueError("Expected: window, x, y, file");
 			return mp_const_none;
 		}
-		window = driver_framebuffer_window_find(mp_obj_str_get_str(args[0]));
+		window = framebuffer_window_find(mp_obj_str_get_str(args[0]));
 		if (!window) {
 			mp_raise_ValueError("Window not found");
 			return mp_const_none;
@@ -588,7 +589,7 @@ static mp_obj_t framebuffer_draw_png(mp_uint_t n_args, const mp_obj_t *args)
 	esp_err_t renderRes = ESP_FAIL;
 	
 	if (is_bytes) {
-		mp_uint_t len;
+		size_t len;
 		uint8_t *data = (uint8_t *)mp_obj_str_get_data(args[paramOffset], &len);
 		struct lib_mem_reader *mr = lib_mem_new(data, len);
 		if (mr == NULL) {
@@ -596,24 +597,25 @@ static mp_obj_t framebuffer_draw_png(mp_uint_t n_args, const mp_obj_t *args)
 			return mp_const_none;
 		}
 		reader = (lib_reader_read_t) &lib_mem_read;
-		renderRes = driver_framebuffer_png(NULL, x, y, reader, mr);
+		renderRes = framebuffer_png(NULL, x, y, reader, mr);
 		lib_mem_destroy(mr);
 	} else {
-		const char* filename = mp_obj_str_get_str(args[paramOffset]);
-		char fullname[128] = {'\0'};
-		int res = physicalPathN(filename, fullname, sizeof(fullname));
-		if ((res != 0) || (strlen(fullname) == 0)) {
-			mp_raise_ValueError("File not found");
-			return mp_const_none;
-		}
-		struct lib_file_reader *fr = lib_file_new(fullname, 1024);
-		if (fr == NULL) {
-			nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Could not open file '%s'!",filename));
-			return mp_const_none;
-		}
-		reader = (lib_reader_read_t) &lib_file_read;
-		renderRes = driver_framebuffer_png(window, x, y, reader, fr);
-		lib_file_destroy(fr);
+		return mp_const_none;
+		// const char* filename = mp_obj_str_get_str(args[paramOffset]);
+		// char fullname[128] = {'\0'};
+		// int res = physicalPathN(filename, fullname, sizeof(fullname));
+		// if ((res != 0) || (strlen(fullname) == 0)) {
+		// 	mp_raise_ValueError("File not found");
+		// 	return mp_const_none;
+		// }
+		// struct lib_file_reader *fr = lib_file_new(fullname, 1024);
+		// if (fr == NULL) {
+		// 	nlr_raise(mp_obj_new_exception_msg_varg(&mp_type_ValueError, "Could not open file '%s'!",filename));
+		// 	return mp_const_none;
+		// }
+		// reader = (lib_reader_read_t) &lib_file_read;
+		// renderRes = framebuffer_png(window, x, y, reader, fr);
+		// lib_file_destroy(fr);
 	}
 	
 	if (renderRes != ESP_OK) {
@@ -623,23 +625,23 @@ static mp_obj_t framebuffer_draw_png(mp_uint_t n_args, const mp_obj_t *args)
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_backlight(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_backlight(size_t n_args, const mp_obj_t *args)
 {
 	if (n_args > 0) {
 		uint8_t brightness = mp_obj_get_int(args[0]);
-		esp_err_t res = driver_framebuffer_setBacklight(brightness);
+		esp_err_t res = framebuffer_setBacklight(brightness);
 		if (res != ESP_OK) {
 			mp_raise_ValueError("Failed to set backlight brightness!");
 		}
 		return mp_const_none;
 	} else {
-		return mp_obj_new_int(driver_framebuffer_getBacklight());
+		return mp_obj_new_int(framebuffer_getBacklight());
 	}
 }
 
 extern const char* fontNames[];
 
-static mp_obj_t framebuffer_list_fonts(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_list_fonts(size_t n_args, const mp_obj_t *args)
 {
 	uint16_t amount = 0;
 	while (fontNames[amount] != NULL) amount++;
@@ -656,9 +658,9 @@ static mp_obj_t framebuffer_list_fonts(mp_uint_t n_args, const mp_obj_t *args)
 	return mp_obj_new_tuple(amount, tuple);
 }
 
-static mp_obj_t framebuffer_set_default_font(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_set_default_font(size_t n_args, const mp_obj_t *args)
 {
-	const GFXfont* font = driver_framebuffer_findFontByName(mp_obj_str_get_str(args[0]));
+	const GFXfont* font = framebuffer_findFontByName(mp_obj_str_get_str(args[0]));
 	if (!font) {
 		mp_raise_ValueError("Font not found");
 		return mp_const_none;
@@ -667,7 +669,7 @@ static mp_obj_t framebuffer_set_default_font(mp_uint_t n_args, const mp_obj_t *a
 	return mp_const_none;
 }
 
-static mp_obj_t framebuffer_default_text_color(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_default_text_color(size_t n_args, const mp_obj_t *args)
 {
 	if (n_args > 0) {
 		defaultTextColor = mp_obj_get_int(args[0]);
@@ -677,7 +679,7 @@ static mp_obj_t framebuffer_default_text_color(mp_uint_t n_args, const mp_obj_t 
 	}
 }
 
-static mp_obj_t framebuffer_default_fill_color(mp_uint_t n_args, const mp_obj_t *args)
+static mp_obj_t mpy_framebuffer_default_fill_color(size_t n_args, const mp_obj_t *args)
 {
 	if (n_args > 0) {
 		defaultFillColor = mp_obj_get_int(args[0]);
@@ -689,100 +691,100 @@ static mp_obj_t framebuffer_default_fill_color(mp_uint_t n_args, const mp_obj_t 
 
 
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_flush_obj,                0, 1, framebuffer_flush      );
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_flush_obj,                0, 1, mpy_framebuffer_flush      );
 /* Flush the framebuffer to the display. Arguments: flags (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_size_obj,                 0, 1, framebuffer_size   );
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_size_obj,                 0, 1, mpy_framebuffer_size   );
 /* Get the size (width, height) of the framebuffer or a window. Arguments: window (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_width_obj,                0, 1, framebuffer_width  );
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_width_obj,                0, 1, mpy_framebuffer_width  );
 /* Get the width of the framebuffer or a window. Arguments: window (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_height_obj,               0, 1, framebuffer_height );
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_height_obj,               0, 1, mpy_framebuffer_height );
 /* Get the height of the framebuffer or a window. Arguments: window (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_orientation_obj,          0, 2, framebuffer_orientation);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_orientation_obj,          0, 2, mpy_framebuffer_orientation);
 /* Get or set the orientation of the framebuffer or a window. Arguments: window (optional), orientation (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_raw_obj,             5, 6, framebuffer_draw_raw);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_raw_obj,             5, 6, mpy_framebuffer_draw_raw);
 /* Copy a raw bytes buffer directly to the framebuffer or a window. Arguments: window (optional), x, y, width, height, data */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_create_obj,        3, 3, framebuffer_window_create);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_create_obj,        3, 3, mpy_framebuffer_window_create);
 /* Create a new window. Arguments: window name, width, height */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_remove_obj,        1, 1, framebuffer_window_remove);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_remove_obj,        1, 1, mpy_framebuffer_window_remove);
 /* Delete a window. Arguments: window name */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_move_obj,          3, 3, framebuffer_window_move);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_move_obj,          3, 3, mpy_framebuffer_window_move);
 /* Move a window. Arguments: window name, x, y */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_hide_obj,          1, 1, framebuffer_window_hide);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_hide_obj,          1, 1, mpy_framebuffer_window_hide);
 /* Hide a window. Arguments: window name */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_show_obj,          1, 1, framebuffer_window_show);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_show_obj,          1, 1, mpy_framebuffer_window_show);
 /* Hide a window. Arguments: window name */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_visiblity_obj,     2, 2, framebuffer_window_visiblity);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_visiblity_obj,     2, 2, mpy_framebuffer_window_visiblity);
 /* Set the visibilty of a window. Arguments: window name, visible */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_focus_obj,         1, 1, framebuffer_window_focus);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_focus_obj,         1, 1, mpy_framebuffer_window_focus);
 /* Focus a window. Arguments: window name */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_resize_obj,        3, 3, framebuffer_window_resize);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_resize_obj,        3, 3, mpy_framebuffer_window_resize);
 /* Resize a window. Arguments: window name, width, height */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_list_obj,          0, 0, framebuffer_window_list);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_list_obj,          0, 0, mpy_framebuffer_window_list);
 /* Query a list of all window names */
 
 //static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_window_transparency_obj,  1, 3, framebuffer_window_transparency);
 /* Query or configure transparency for a window. Arguments: window, enable (optional), color (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_get_pixel_obj,            2, 3, framebuffer_get_pixel);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_get_pixel_obj,            2, 3, mpy_framebuffer_get_pixel);
 /* Get the color of a pixel in the framebuffer or in a window. Arguments: window (optional), x, y */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_pixel_obj,           3, 4, framebuffer_draw_pixel);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_pixel_obj,           3, 4, mpy_framebuffer_draw_pixel);
 /* Set the color of a pixel in the framebuffer or in a window. Arguments: window (optional), x, y, color */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_fill_obj,            0, 2, framebuffer_draw_fill);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_fill_obj,            0, 2, mpy_framebuffer_draw_fill);
 /* Fill the framebuffer or a window with a color. Arguments: window (optional), color */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_line_obj,            5, 6, framebuffer_draw_line);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_line_obj,            5, 6, mpy_framebuffer_draw_line);
 /* Draw a line from point (x0,y0) to point (x1,y1) in the framebuffer or a window. Arguments: window (optional), x0, y0, x1, y1, color */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_rect_obj,            6, 7, framebuffer_draw_rect);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_rect_obj,            6, 7, mpy_framebuffer_draw_rect);
 /* Draw a rectangle in the framebuffer or a window. Arguments: window (optional), x, y, width, height, color*/
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_circle_obj,          7, 8, framebuffer_draw_circle);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_circle_obj,          7, 8, mpy_framebuffer_draw_circle);
 /* Draw a circle in the framebuffer or a window. Arguments: window (optional), x, y, radius, starting-angle, ending-angle, fill, color */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_text_obj,            3, 8, framebuffer_draw_text);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_draw_text_obj,            3, 8, mpy_framebuffer_draw_text);
 /* Draw text in the framebuffer or a window. Arguments: window (optional), x, y, text, color (optional), font (optional), x-scale (optional), y-scale (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_get_text_width_obj,       1, 2, framebuffer_get_text_width);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_get_text_width_obj,       1, 2, mpy_framebuffer_get_text_width);
 /* Get the width of a string when printed with a font. Arguments: text, font (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_get_text_height_obj,      1, 2, framebuffer_get_text_height);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN( framebuffer_get_text_height_obj,      1, 2, mpy_framebuffer_get_text_height);
 /* Get the height of a string when printed with a font. Arguments: text, font (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_png_info_obj,              1, 1, framebuffer_png_info);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_png_info_obj,              1, 1, mpy_framebuffer_png_info);
 /* Get information about a PNG image. Arguments: buffer with PNG data or filename of PNG image */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_draw_png_obj,              3, 4, framebuffer_draw_png);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_draw_png_obj,              3, 4, mpy_framebuffer_draw_png);
 /* Draw a PNG image. Arguments: x, y, buffer with PNG data or filename of PNG image */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_backlight_obj,             0, 1, framebuffer_backlight);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_backlight_obj,             0, 1, mpy_framebuffer_backlight);
 /* Set or get the backlight brightness level. Arguments: level (0-255) (optional) */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_list_fonts_obj,            0, 0, framebuffer_list_fonts);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_list_fonts_obj,            0, 0, mpy_framebuffer_list_fonts);
 /* Query list of available fonts */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_set_default_font_obj,      1, 1, framebuffer_set_default_font);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_set_default_font_obj,      1, 1, mpy_framebuffer_set_default_font);
 /* Set default font */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_default_text_color_obj,    0, 1, framebuffer_default_text_color);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_default_text_color_obj,    0, 1, mpy_framebuffer_default_text_color);
 /* Set or get the default text color */
 
-static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_default_fill_color_obj,    0, 1, framebuffer_default_fill_color);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(framebuffer_default_fill_color_obj,    0, 1, mpy_framebuffer_default_fill_color);
 /* Set or get the default fill color */
 
 static const mp_rom_map_elem_t framebuffer_module_globals_table[] = {

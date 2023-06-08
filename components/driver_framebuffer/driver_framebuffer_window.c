@@ -4,7 +4,7 @@
  * to the primary framebuffer
  */
 
-#include "include/driver_framebuffer_internal.h"
+#include "include/framebuffer_internal.h"
 
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_ENABLE
 
@@ -56,9 +56,9 @@ void _debug_windows()
 
 /* Public functions */
 
-Window* driver_framebuffer_window_create(const char* name, uint16_t width, uint16_t height)
+Window* framebuffer_window_create(const char* name, uint16_t width, uint16_t height)
 {
-	if (driver_framebuffer_window_find(name)) return NULL; //If the window already exists do nothing and return.
+	if (framebuffer_window_find(name)) return NULL; //If the window already exists do nothing and return.
 	Window* window = _create_window();
 	
 	/* Set properties */
@@ -84,20 +84,20 @@ Window* driver_framebuffer_window_create(const char* name, uint16_t width, uint1
 	#endif
 	
 	/* Linked list */
-	window->_prevWindow = driver_framebuffer_window_last();
+	window->_prevWindow = framebuffer_window_last();
 	window->_nextWindow = NULL;
 	_add_window(window); //Add window to linked list of windows
 	return window;
 }
 
-void driver_framebuffer_window_remove(Window* window)
+void framebuffer_window_remove(Window* window)
 {
 	if (window->buffer) free(window->buffer);
 	_remove_window_from_linked_list(window);
 	free(window);
 }
 
-Window* driver_framebuffer_window_find(const char* name)
+Window* framebuffer_window_find(const char* name)
 {
 	Window* currentWindow = windows;
 	while (currentWindow != NULL) {
@@ -111,12 +111,12 @@ Window* driver_framebuffer_window_find(const char* name)
 	return NULL;
 }
 
-Window* driver_framebuffer_window_first()
+Window* framebuffer_window_first()
 {
 	return windows;
 }
 
-Window* driver_framebuffer_window_last()
+Window* framebuffer_window_last()
 {
 	Window* lastWindow = windows;
 	while (lastWindow && lastWindow->_nextWindow != NULL) {
@@ -125,16 +125,16 @@ Window* driver_framebuffer_window_last()
 	return lastWindow;
 }
 
-void driver_framebuffer_window_focus(Window* window)
+void framebuffer_window_focus(Window* window)
 {
 	_remove_window_from_linked_list(window);
 	if (windows == window) windows = window->_nextWindow;
-	window->_prevWindow = driver_framebuffer_window_last();
+	window->_prevWindow = framebuffer_window_last();
 	_add_window(window);
 	window->_nextWindow = NULL;
 }
 
-void driver_framebuffer_window_getSize(Window* window, int16_t* width, int16_t* height)
+void framebuffer_window_getSize(Window* window, int16_t* width, int16_t* height)
 {
 	if (window == NULL) {
 		//No window provided, use global context

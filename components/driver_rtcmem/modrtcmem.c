@@ -24,7 +24,7 @@
 STATIC mp_obj_t esp_rtcmem_write(mp_obj_t _pos, mp_obj_t _val) {
 	int pos = mp_obj_get_int(_pos);
 	int val = mp_obj_get_int(_val);
-	if (driver_rtcmem_int_write(pos, val) != ESP_OK) return mp_const_false;
+	if (rtcmem_int_write(pos, val) != ESP_OK) return mp_const_false;
 	return mp_const_true;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_2(esp_rtcmem_write_obj, esp_rtcmem_write);
@@ -33,7 +33,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_2(esp_rtcmem_write_obj, esp_rtcmem_write);
 STATIC mp_obj_t esp_rtcmem_read(mp_obj_t _pos) {
 	int pos = mp_obj_get_int(_pos);
 	int value;
-	if (driver_rtcmem_int_read(pos, &value) != ESP_OK) return mp_const_none;	
+	if (rtcmem_int_read(pos, &value) != ESP_OK) return mp_const_none;	
 	return mp_obj_new_int(value);
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(esp_rtcmem_read_obj, esp_rtcmem_read);
@@ -41,7 +41,7 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(esp_rtcmem_read_obj, esp_rtcmem_read);
 //--------------------------------------------------------------------------
 STATIC mp_obj_t esp_rtcmem_write_string(mp_obj_t str_in) {
 	const char *str = mp_obj_str_get_str(str_in);
-	if (driver_rtcmem_string_write(str) != ESP_OK) return mp_const_false;
+	if (rtcmem_string_write(str) != ESP_OK) return mp_const_false;
 	return mp_const_true;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_1(esp_rtcmem_write_string_obj, esp_rtcmem_write_string);
@@ -49,14 +49,14 @@ STATIC MP_DEFINE_CONST_FUN_OBJ_1(esp_rtcmem_write_string_obj, esp_rtcmem_write_s
 //--------------------------------------------------------
 STATIC mp_obj_t esp_rtcmem_read_string() {
 	const char* str;
-	if (driver_rtcmem_string_read(&str) != ESP_OK) return mp_const_none;
+	if (rtcmem_string_read(&str) != ESP_OK) return mp_const_none;
 	return mp_obj_new_str(str, strlen(str));
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(esp_rtcmem_read_string_obj, esp_rtcmem_read_string);
 
 //--------------------------------------------------
 STATIC mp_obj_t esp_rtcmem_clear() {
-    driver_rtcmem_clear();
+    rtcmem_clear();
 	return mp_const_none;
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_0(esp_rtcmem_clear_obj, esp_rtcmem_clear);

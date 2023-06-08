@@ -390,7 +390,7 @@ lib_png_decode(Window* window, struct lib_png_reader *pr, uint32_t width, uint32
 			if (a != 0 && x >= dst_min_x && x < dst_width && y >= dst_min_y && y < dst_height)
 			{
 				#ifdef CONFIG_DRIVER_FRAMEBUFFER_ENABLE
-				driver_framebuffer_setPixel(window, offset_x + x, offset_y + y, ((r>>8)<<16)+((g>>8)<<8)+(b>>8));
+				framebuffer_setPixel(window, offset_x + x, offset_y + y, ((r>>8)<<16)+((g>>8)<<8)+(b>>8));
 				#endif
 			}
 		}

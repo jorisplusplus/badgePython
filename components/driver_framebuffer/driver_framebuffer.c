@@ -10,11 +10,11 @@
 #include "esp_system.h"
 
 
-#include "include/driver_framebuffer_internal.h"
+#include "include/framebuffer_internal.h"
 #define TAG "fb"
 
 
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_DOUBLE_BUFFERED
+#ifdef CONFIG_FRAMEBUFFER_DOUBLE_BUFFERED
 uint8_t* framebuffer1;
 uint8_t* framebuffer2;
 #endif
@@ -25,7 +25,7 @@ uint8_t* framebuffer;
 
  uint16_t convert24to16(uint32_t in) //RGB24 to 565
 {
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
+#ifdef CONFIG_FRAMEBUFFER_SWAP_R_AND_B
 	uint8_t b = (in>>16)&0xFF;
 	uint8_t r = in&0xFF;
 #else
@@ -38,7 +38,7 @@ uint8_t* framebuffer;
 
  uint8_t convert24to8C(uint32_t in) //RGB24 to 256-color
 {
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
+#ifdef CONFIG_FRAMEBUFFER_SWAP_R_AND_B
 	uint8_t r = ((in>>16)&0xFF) >> 5;
 	uint8_t b = ( in     &0xFF) >> 6;
 #else
@@ -51,7 +51,7 @@ uint8_t* framebuffer;
 
  uint32_t convert8Cto24(uint8_t in) //256-color to RGB24
 {
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
+#ifdef CONFIG_FRAMEBUFFER_SWAP_R_AND_B
 	uint8_t b = in & 0x07;
 	uint8_t r = in >> 6;
 #else
@@ -64,7 +64,7 @@ uint8_t* framebuffer;
 
  uint8_t convert24to8(uint32_t in) //RGB24 to 8-bit greyscale
 {
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
+#ifdef CONFIG_FRAMEBUFFER_SWAP_R_AND_B
 	uint8_t b = (in>>16)&0xFF;
 	uint8_t r = in&0xFF;
 #else
@@ -80,16 +80,16 @@ uint8_t* framebuffer;
 	return in >= 128;
 }
 
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_CORRECT_GB
+#ifdef CONFIG_FRAMEBUFFER_CORRECT_GB
 // Corrects for G and B being brighter in most LEDs
  uint32_t color_correct(uint32_t value) {
   return (value & 0xFF0000) +
-           (uint32_t)((((value>>8)&0xFF)*((float)CONFIG_DRIVER_FRAMEBUFFER_G_RATIO/255))<<8) +
-            (uint32_t)(((value)&0xFF)*((float)CONFIG_DRIVER_FRAMEBUFFER_B_RATIO/255));
+           (uint32_t)((((value>>8)&0xFF)*((float)CONFIG_FRAMEBUFFER_G_RATIO/255))<<8) +
+            (uint32_t)(((value)&0xFF)*((float)CONFIG_FRAMEBUFFER_B_RATIO/255));
 }
 #endif
 
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_CORRECT_GAMMA
+#ifdef CONFIG_FRAMEBUFFER_CORRECT_GAMMA
 //C/p'ed from https://ledshield.wordpress.com/2012/11/13/led-brightness-to-your-eye-gamma-correction-no/
 const uint16_t lumConvTab[]={
     65535,    65508,    65479,    65451,    65422,    65394,    65365,    65337,
@@ -139,22 +139,22 @@ uint32_t gamma_correct(uint32_t value) {
 }
 #endif
 
-esp_err_t driver_framebuffer_init()
+esp_err_t framebuffer_init()
 {
-	static bool driver_framebuffer_init_done = false;
-	if (driver_framebuffer_init_done) return ESP_OK;
+	static bool framebuffer_init_done = false;
+	if (framebuffer_init_done) return ESP_OK;
 	ESP_LOGD(TAG, "init called");
 
-	#ifdef CONFIG_DRIVER_FRAMEBUFFER_DOUBLE_BUFFERED
+	#ifdef CONFIG_FRAMEBUFFER_DOUBLE_BUFFERED
 		ESP_LOGI(TAG, "Allocating %u bytes for framebuffer 1", FB_SIZE);
-		#ifdef CONFIG_DRIVER_FRAMEBUFFER_SPIRAM
+		#ifdef CONFIG_FRAMEBUFFER_SPIRAM
 			framebuffer1 = (uint8_t*) heap_caps_malloc(FB_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 		#else
 			framebuffer1 = (uint8_t*) heap_caps_malloc(FB_SIZE, MALLOC_CAP_8BIT);
 		#endif
 		if (!framebuffer1) return ESP_FAIL;
 		ESP_LOGI(TAG, "Allocating %u bytes for framebuffer 2", FB_SIZE);
-		#ifdef CONFIG_DRIVER_FRAMEBUFFER_SPIRAM
+		#ifdef CONFIG_FRAMEBUFFER_SPIRAM
 			framebuffer2 = (uint8_t*) heap_caps_malloc(FB_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 		#else
 			framebuffer2 = (uint8_t*) heap_caps_malloc(FB_SIZE, MALLOC_CAP_8BIT);
@@ -163,7 +163,7 @@ esp_err_t driver_framebuffer_init()
 		framebuffer = framebuffer1;
 	#else
 		ESP_LOGI(TAG, "Allocating %u bytes for the framebuffer", FB_SIZE);
-		#ifdef CONFIG_DRIVER_FRAMEBUFFER_SPIRAM
+		#ifdef CONFIG_FRAMEBUFFER_SPIRAM
 		framebuffer = (uint8_t*) heap_caps_malloc(FB_SIZE, MALLOC_CAP_SPIRAM | MALLOC_CAP_8BIT);
 		#else
 		framebuffer = (uint8_t*) heap_caps_malloc(FB_SIZE, MALLOC_CAP_8BIT);
@@ -174,16 +174,16 @@ esp_err_t driver_framebuffer_init()
 		}
 	#endif
 
-	driver_framebuffer_fill(NULL, COLOR_FILL_DEFAULT); //1st framebuffer
+	framebuffer_fill(NULL, COLOR_FILL_DEFAULT); //1st framebuffer
 
-	#ifdef CONFIG_DRIVER_HUB75_ENABLE
-		driver_hub75_switch_buffer((uint8_t*)framebuffer); //Needed to make the legacy compositor work.
+	#ifdef CONFIG_HUB75_ENABLE
+		hub75_switch_buffer((uint8_t*)framebuffer); //Needed to make the legacy compositor work.
 	#endif
 
-	//driver_framebuffer_flush(FB_FLAG_FORCE | FB_FLAG_FULL);
-	//driver_framebuffer_fill(NULL, COLOR_FILL_DEFAULT); //2nd framebuffer
-	driver_framebuffer_set_orientation_angle(NULL, 0); //Apply global orientation (needed for flip)
-	driver_framebuffer_init_done = true;
+	//framebuffer_flush(FB_FLAG_FORCE | FB_FLAG_FULL);
+	//framebuffer_fill(NULL, COLOR_FILL_DEFAULT); //2nd framebuffer
+	framebuffer_set_orientation_angle(NULL, 0); //Apply global orientation (needed for flip)
+	framebuffer_init_done = true;
 	ESP_LOGD(TAG, "init done");
 	return ESP_OK;
 }
@@ -207,18 +207,18 @@ bool _getFrameContext(Window* window, uint8_t** buffer, int16_t* width, int16_t*
 	return true;
 }
 
-void driver_framebuffer_fill(Window* window, uint32_t value)
+void framebuffer_fill(Window* window, uint32_t value)
 {
 	uint8_t* buffer;
 	int16_t width, height;
 	if (!_getFrameContext(window, &buffer, &width, &height)) return;
-	if (!window) driver_framebuffer_set_dirty_area(0,0,width-1,height-1, true);
+	if (!window) framebuffer_set_dirty_area(0,0,width-1,height-1, true);
 
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_CORRECT_GB
+#ifdef CONFIG_FRAMEBUFFER_CORRECT_GB
         value = color_correct(value);
 #endif
 
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_CORRECT_GAMMA
+#ifdef CONFIG_FRAMEBUFFER_CORRECT_GAMMA
         value = gamma_correct(value);
 #endif
 
@@ -227,7 +227,7 @@ void driver_framebuffer_fill(Window* window, uint32_t value)
 	#elif defined(FB_TYPE_8BPP)
 		memset(buffer, convert24to8(value), width*height);
 	#elif defined(FB_TYPE_12BPP)
-		#ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
+		#ifdef CONFIG_FRAMEBUFFER_SWAP_R_AND_B
 			uint8_t r = (value >> 20) &0x0F;
 			uint8_t b = (value >> 04) &0x0F;
 		#else
@@ -267,7 +267,7 @@ void driver_framebuffer_fill(Window* window, uint32_t value)
 			buffer[i] = value;
 		}
 	#elif defined(FB_TYPE_24BPP)
-		#ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
+		#ifdef CONFIG_FRAMEBUFFER_SWAP_R_AND_B
 			uint8_t b = (value>>16)&0xFF;
 			uint8_t r = value&0xFF;
 		#else
@@ -281,7 +281,7 @@ void driver_framebuffer_fill(Window* window, uint32_t value)
 			buffer[i + 2] = b;
 		}
 	#elif defined(FB_TYPE_32BPP)
-		#ifdef CONFIG_DRIVER_FRAMEBUFFER_SWAP_R_AND_B
+		#ifdef CONFIG_FRAMEBUFFER_SWAP_R_AND_B
 			uint8_t b = (value>>16)&0xFF;
 			uint8_t r = value&0xFF;
 		#else
@@ -301,18 +301,18 @@ void driver_framebuffer_fill(Window* window, uint32_t value)
 	#endif
 }
 
-void driver_framebuffer_setPixel(Window* window, int16_t x, int16_t y, uint32_t value)
+void framebuffer_setPixel(Window* window, int16_t x, int16_t y, uint32_t value)
 {
 	uint8_t* buffer; int16_t width, height;
 	if (!_getFrameContext(window, &buffer, &width, &height)) return;
-	if (!driver_framebuffer_orientation_apply(window, &x, &y)) return;
+	if (!framebuffer_orientation_apply(window, &x, &y)) return;
 	bool changed = false;
 
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_CORRECT_GB
+#ifdef CONFIG_FRAMEBUFFER_CORRECT_GB
         value = color_correct(value);
 #endif
 
-#ifdef CONFIG_DRIVER_FRAMEBUFFER_CORRECT_GAMMA
+#ifdef CONFIG_FRAMEBUFFER_CORRECT_GAMMA
         value = gamma_correct(value);
 #endif
 
@@ -408,14 +408,14 @@ void driver_framebuffer_setPixel(Window* window, int16_t x, int16_t y, uint32_t 
 		#error "No framebuffer type configured."
 	#endif
 
-	if ((!window) && changed) driver_framebuffer_set_dirty_area(x,y,x,y,false);
+	if ((!window) && changed) framebuffer_set_dirty_area(x,y,x,y,false);
 }
 
-uint32_t driver_framebuffer_getPixel(Window* window, int16_t x, int16_t y)
+uint32_t framebuffer_getPixel(Window* window, int16_t x, int16_t y)
 {
 	uint8_t* buffer; int16_t width, height;
 	if (!_getFrameContext(window, &buffer, &width, &height)) return 0;
-	if (!driver_framebuffer_orientation_apply(window, &x, &y)) return 0;
+	if (!framebuffer_orientation_apply(window, &x, &y)) return 0;
 
 	#if defined(FB_TYPE_1BPP)
 		#ifndef FB_1BPP_VERT
@@ -489,7 +489,7 @@ uint32_t driver_framebuffer_getPixel(Window* window, int16_t x, int16_t y)
 	#endif
 }
 
-void driver_framebuffer_blit(Window* source, Window* target)
+void framebuffer_blit(Window* source, Window* target)
 {
 	if (source->vOffset >= source->height) return; //The vertical offset is larger than the height of the window
 	if (source->hOffset >= source->width)  return; //The horizontal offset is larger than the width of the window
@@ -497,9 +497,9 @@ void driver_framebuffer_blit(Window* source, Window* target)
 		for (uint16_t wx = source->hOffset; wx < source->drawWidth; wx++) {
 			if (wy >= source->height) continue; //Out-of-bounds
 			if (wx >= source->width) continue;  //Out-of-bounds
-			uint32_t color = driver_framebuffer_getPixel(source, wx, wy); //Read the pixel from the window framebuffer
+			uint32_t color = framebuffer_getPixel(source, wx, wy); //Read the pixel from the window framebuffer
 			if (source->enableTransparentColor && source->transparentColor == color) continue; //Transparent
-			driver_framebuffer_setPixel(target, source->x + wx, source->y + wy, color); //Write the pixel to the global framebuffer
+			framebuffer_setPixel(target, source->x + wx, source->y + wy, color); //Write the pixel to the global framebuffer
 		}
 	}
 }
@@ -507,16 +507,16 @@ void driver_framebuffer_blit(Window* source, Window* target)
 void _render_windows()
 {
 	//Step through the linked list of windows and blit each of the visible windows to the main framebuffer
-	Window* currentWindow = driver_framebuffer_window_first();
+	Window* currentWindow = framebuffer_window_first();
 	while (currentWindow != NULL) {
 		if (currentWindow->visible) {
-			driver_framebuffer_blit(currentWindow, NULL);
+			framebuffer_blit(currentWindow, NULL);
 		}
 		currentWindow = currentWindow->_nextWindow;
 	}
 }
 
-bool driver_framebuffer_flush(uint32_t flags)
+bool framebuffer_flush(uint32_t flags)
 {
 	if (!framebuffer) {
 		ESP_LOGE(TAG, "flush without alloc!");
@@ -528,15 +528,15 @@ bool driver_framebuffer_flush(uint32_t flags)
 	uint32_t eink_flags = 0;
 
 	if ((flags & FB_FLAG_FULL) || (flags & FB_FLAG_FORCE)) {
-		driver_framebuffer_set_dirty_area(0, 0, FB_WIDTH-1, FB_HEIGHT-1, true);
+		framebuffer_set_dirty_area(0, 0, FB_WIDTH-1, FB_HEIGHT-1, true);
 		#ifdef DISPLAY_FLAG_LUT_BIT
-			eink_flags |= DRIVER_EINK_LUT_FULL << DISPLAY_FLAG_LUT_BIT;
+			eink_flags |= EINK_LUT_FULL << DISPLAY_FLAG_LUT_BIT;
 		#endif
-	} else if (!driver_framebuffer_is_dirty()) {
+	} else if (!framebuffer_is_dirty()) {
 		return false; //No need to update, stop.
 	}
 
-	#ifdef CONFIG_DRIVER_HUB75_ENABLE
+	#ifdef CONFIG_HUB75_ENABLE
 	compositor_disable();
 	#endif
 
@@ -546,13 +546,13 @@ bool driver_framebuffer_flush(uint32_t flags)
 
 	#ifdef DISPLAY_FLAG_LUT_BIT
 		if (flags & FB_FLAG_LUT_NORMAL) {
-			eink_flags |= DRIVER_EINK_LUT_NORMAL << DISPLAY_FLAG_LUT_BIT;
+			eink_flags |= EINK_LUT_NORMAL << DISPLAY_FLAG_LUT_BIT;
 		}
 		if (flags & FB_FLAG_LUT_FAST) {
-			eink_flags |= DRIVER_EINK_LUT_FASTER << DISPLAY_FLAG_LUT_BIT;
+			eink_flags |= EINK_LUT_FASTER << DISPLAY_FLAG_LUT_BIT;
 		}
 		if (flags & FB_FLAG_LUT_FASTEST) {
-			eink_flags |= DRIVER_EINK_LUT_FASTEST << DISPLAY_FLAG_LUT_BIT;
+			eink_flags |= EINK_LUT_FASTEST << DISPLAY_FLAG_LUT_BIT;
 		}
 	#else
 	#warning "NO LUT BIT"
@@ -564,13 +564,13 @@ bool driver_framebuffer_flush(uint32_t flags)
 	} else {
 	#endif
 		int16_t dirty_x0, dirty_y0, dirty_x1, dirty_y1;
-		driver_framebuffer_get_dirty_area(&dirty_x0, &dirty_y0, &dirty_x1, &dirty_y1);
+		framebuffer_get_dirty_area(&dirty_x0, &dirty_y0, &dirty_x1, &dirty_y1);
 		FB_FLUSH(framebuffer,eink_flags,dirty_x0,dirty_y0,dirty_x1,dirty_y1);
 	#ifdef FB_FLUSH_GS
 	}
 	#endif
 
-	#ifdef CONFIG_DRIVER_FRAMEBUFFER_DOUBLE_BUFFERED
+	#ifdef CONFIG_FRAMEBUFFER_DOUBLE_BUFFERED
 	if (framebuffer==framebuffer1) {
 		framebuffer = framebuffer2;
 		memcpy(framebuffer, framebuffer1, FB_SIZE);
@@ -580,11 +580,11 @@ bool driver_framebuffer_flush(uint32_t flags)
 	}
 	#endif
 
-	driver_framebuffer_set_dirty_area(FB_WIDTH-1, FB_HEIGHT-1, 0, 0, true); //Not dirty.
+	framebuffer_set_dirty_area(FB_WIDTH-1, FB_HEIGHT-1, 0, 0, true); //Not dirty.
 	return true;
 }
 
-esp_err_t driver_framebuffer_png(Window* window, int16_t x, int16_t y, lib_reader_read_t reader, void* reader_p)
+esp_err_t framebuffer_png(Window* window, int16_t x, int16_t y, lib_reader_read_t reader, void* reader_p)
 {
 	if (!framebuffer) {
 		ESP_LOGE(TAG, "png without alloc!");
@@ -612,7 +612,7 @@ esp_err_t driver_framebuffer_png(Window* window, int16_t x, int16_t y, lib_reade
 	int16_t screenWidth;
 	int16_t screenHeight;
 
-	driver_framebuffer_get_orientation_size(window, &screenWidth, &screenHeight);
+	framebuffer_get_orientation_size(window, &screenWidth, &screenHeight);
 
 	res = lib_png_load_image(window, pr, x, y, dst_min_x, dst_min_y, screenWidth - x, screenHeight - y, screenWidth);
 
@@ -623,27 +623,27 @@ esp_err_t driver_framebuffer_png(Window* window, int16_t x, int16_t y, lib_reade
 		return ESP_FAIL;
 	}
 
-	driver_framebuffer_set_dirty_area(x, y, x + width - 1, y + height - 1, false);
+	framebuffer_set_dirty_area(x, y, x + width - 1, y + height - 1, false);
 	return ESP_OK;
 }
 
-uint16_t driver_framebuffer_getWidth(Window* window)
+uint16_t framebuffer_getWidth(Window* window)
 {
 	int16_t width, height;
-	driver_framebuffer_get_orientation_size(window, &width, &height);
+	framebuffer_get_orientation_size(window, &width, &height);
 	return width;
 }
 
-uint16_t driver_framebuffer_getHeight(Window* window)
+uint16_t framebuffer_getHeight(Window* window)
 {
 	int16_t width, height;
-	driver_framebuffer_get_orientation_size(window, &width, &height);
+	framebuffer_get_orientation_size(window, &width, &height);
 	return height;
 }
 
 
 uint8_t currentBrightness = 0;
-esp_err_t driver_framebuffer_setBacklight(uint8_t brightness)
+esp_err_t framebuffer_setBacklight(uint8_t brightness)
 {
 	#if defined(FB_SET_BACKLIGHT)
 		currentBrightness = brightness;
@@ -653,7 +653,7 @@ esp_err_t driver_framebuffer_setBacklight(uint8_t brightness)
 	#endif
 }
 
-uint8_t driver_framebuffer_getBacklight()
+uint8_t framebuffer_getBacklight()
 {
 	return currentBrightness;
 }

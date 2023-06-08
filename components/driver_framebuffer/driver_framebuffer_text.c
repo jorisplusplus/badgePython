@@ -36,7 +36,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "include/driver_framebuffer_internal.h"
+#include "include/framebuffer_internal.h"
 
 #include "esp_heap_caps.h"
 #include "esp_log.h"
@@ -130,9 +130,9 @@ void _print_char(Window* window, unsigned char c, int16_t x0, int16_t y0, uint8_
 			if(!(bit++ & 7)) bits = bitmap[bitmapOffset++];
 			if(bits & 0x80) {
 				if (xScale == 1 && yScale == 1) {
-					driver_framebuffer_setPixel(window, x0+xOffset+x, y0+yOffset+y-1, color);
+					framebuffer_setPixel(window, x0+xOffset+x, y0+yOffset+y-1, color);
 				} else {
-					driver_framebuffer_rect(window, x0+(xOffset+x)*xScale, y0+(yOffset+y)*yScale-1, xScale, yScale, true, color);
+					framebuffer_rect(window, x0+(xOffset+x)*xScale, y0+(yOffset+y)*yScale-1, xScale, yScale, true, color);
 				}
 			}
 			bits <<= 1;
@@ -164,7 +164,7 @@ uint16_t _char_width(uint8_t c, const GFXfont *font)
 
 /* Public functions */
 
-const GFXfont* driver_framebuffer_findFontByName(const char* fontName)
+const GFXfont* framebuffer_findFontByName(const char* fontName)
 {
 	char buffer[32];
 	if (strlen(fontName) > 31) return NULL;
@@ -180,7 +180,7 @@ const GFXfont* driver_framebuffer_findFontByName(const char* fontName)
 	return NULL;
 }
 
-uint16_t driver_framebuffer_print(Window* window, const char* str, int16_t x0, int16_t y0, uint8_t xScale, uint8_t yScale, uint32_t color, const GFXfont *font)
+uint16_t framebuffer_print(Window* window, const char* str, int16_t x0, int16_t y0, uint8_t xScale, uint8_t yScale, uint32_t color, const GFXfont *font)
 {
 	int16_t x = x0, y = y0;
 	for (uint16_t i = 0; i < strlen(str); i++) {
@@ -189,7 +189,7 @@ uint16_t driver_framebuffer_print(Window* window, const char* str, int16_t x0, i
 	return y;
 }
 
-uint16_t driver_framebuffer_print_len(Window* window, const char* str, int16_t len, int16_t x0, int16_t y0, uint8_t xScale, uint8_t yScale, uint32_t color, const GFXfont *font)
+uint16_t framebuffer_print_len(Window* window, const char* str, int16_t len, int16_t x0, int16_t y0, uint8_t xScale, uint8_t yScale, uint32_t color, const GFXfont *font)
 {
 	int16_t x = x0, y = y0;
 	for (uint16_t i = 0; i < len; i++) {
@@ -198,7 +198,7 @@ uint16_t driver_framebuffer_print_len(Window* window, const char* str, int16_t l
 	return y;
 }
 
-uint16_t driver_framebuffer_get_string_width(const char* str, const GFXfont *font)
+uint16_t framebuffer_get_string_width(const char* str, const GFXfont *font)
 {
 	uint16_t width = 0;
 	uint16_t maxWidth = 0;
@@ -214,7 +214,7 @@ uint16_t driver_framebuffer_get_string_width(const char* str, const GFXfont *fon
 	return width;
 }
 
-uint16_t driver_framebuffer_get_string_height(const char* str, const GFXfont *font)
+uint16_t framebuffer_get_string_height(const char* str, const GFXfont *font)
 {
 	uint16_t height = font->yAdvance;
 	if (strlen(str) < 1) return 0;

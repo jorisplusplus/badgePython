@@ -6,7 +6,7 @@
  * (This only applies to the main framebuffer and not to the compositor frames!)
  */
 
-#include "include/driver_framebuffer_internal.h"
+#include "include/framebuffer_internal.h"
 
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_ENABLE
 
@@ -15,12 +15,12 @@ int16_t dirty_x0 = 0,          dirty_y0 = 0;           // Top-left corner of the
 int16_t dirty_x1 = FB_WIDTH-1, dirty_y1 = FB_HEIGHT-1; // Bottom-right corner of the "dirty" area
 
 /* Public functions */
-bool driver_framebuffer_is_dirty()
+bool framebuffer_is_dirty()
 {
 	return (dirty_x1 >= dirty_x0) || (dirty_y1 >= dirty_y0);
 }
 
-void driver_framebuffer_set_dirty_area(int16_t x0, int16_t y0, int16_t x1, int16_t y1, bool force)
+void framebuffer_set_dirty_area(int16_t x0, int16_t y0, int16_t x1, int16_t y1, bool force)
 {
 	if (force) {
 		//Just set the dirty area
@@ -41,7 +41,7 @@ void driver_framebuffer_set_dirty_area(int16_t x0, int16_t y0, int16_t x1, int16
 	if (dirty_y1 > FB_HEIGHT-1) dirty_y1 = FB_HEIGHT - 1;
 }
 
-void driver_framebuffer_get_dirty_area(int16_t* x0, int16_t* y0, int16_t* x1, int16_t* y1)
+void framebuffer_get_dirty_area(int16_t* x0, int16_t* y0, int16_t* x1, int16_t* y1)
 {
 	*x0 = dirty_x0;
 	*y0 = dirty_y0;

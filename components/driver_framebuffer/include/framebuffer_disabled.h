@@ -17,7 +17,7 @@
 extern "C" {
 #endif
 
-esp_err_t driver_framebuffer_init();
+esp_err_t framebuffer_init();
 /* Initialize the framebuffer driver (called once at system boot from platform.c) */
 
 #ifdef __cplusplus

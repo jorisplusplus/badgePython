@@ -57,6 +57,7 @@ set(IDF_COMPONENTS
     driver_display
     spi_flash
     esp_partition
+    main
     )
 
 set(includes

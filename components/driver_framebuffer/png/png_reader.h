@@ -4,8 +4,8 @@
 #include <stdint.h>
 #include <unistd.h>
 
-#include "../include/driver_framebuffer_compositor.h"
-#include "../include/driver_framebuffer.h"
+#include "../include/framebuffer_compositor.h"
+#include "../include/framebuffer.h"
 
 #include "reader.h"
 

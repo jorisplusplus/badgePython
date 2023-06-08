@@ -9,7 +9,7 @@
  * for each of the compositor windows.
  */
 
-#include "include/driver_framebuffer_internal.h"
+#include "include/framebuffer_internal.h"
 
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_ENABLE
 
@@ -45,19 +45,19 @@ enum Orientation globalOrientation;
 
 /* Public functions */
 
-enum Orientation driver_framebuffer_get_orientation(Window* window)
+enum Orientation framebuffer_get_orientation(Window* window)
 {
 	enum Orientation *orientation = _getOrientationContext(window);
 	return *orientation;
 }
 
-void driver_framebuffer_set_orientation(Window* window, enum Orientation newOrientation)
+void framebuffer_set_orientation(Window* window, enum Orientation newOrientation)
 {
 	enum Orientation *orientation = _getOrientationContext(window);
 	*orientation = newOrientation;
 }
 
-uint16_t driver_framebuffer_get_orientation_angle(Window* window)
+uint16_t framebuffer_get_orientation_angle(Window* window)
 {
 	enum Orientation *orientation = _getOrientationContext(window);
 	switch (*orientation) {
@@ -85,7 +85,7 @@ uint16_t driver_framebuffer_get_orientation_angle(Window* window)
 	}
 }
 
-void driver_framebuffer_set_orientation_angle(Window* window, uint16_t angle)
+void framebuffer_set_orientation_angle(Window* window, uint16_t angle)
 {
 	enum Orientation *orientation = _getOrientationContext(window);
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_FLIP
@@ -121,7 +121,7 @@ void driver_framebuffer_set_orientation_angle(Window* window, uint16_t angle)
 #endif
 }
 
-bool driver_framebuffer_orientation_apply(Window* window, int16_t* x, int16_t* y)
+bool framebuffer_orientation_apply(Window* window, int16_t* x, int16_t* y)
 {
 	enum Orientation *orientation = _getOrientationContext(window);
 	int16_t width, height;
@@ -141,7 +141,7 @@ bool driver_framebuffer_orientation_apply(Window* window, int16_t* x, int16_t* y
 	return (*x >= 0) && (*x < width) && (*y >= 0) && (*y < height);
 }
 
-void driver_framebuffer_orientation_revert(Window* window, int16_t* x, int16_t* y)
+void framebuffer_orientation_revert(Window* window, int16_t* x, int16_t* y)
 {
 	enum Orientation *orientation = _getOrientationContext(window);
 	int16_t width, height;
@@ -161,7 +161,7 @@ void driver_framebuffer_orientation_revert(Window* window, int16_t* x, int16_t* 
 	}
 }
 
-void driver_framebuffer_orientation_revert_square(Window* window, int16_t* x0, int16_t* y0, int16_t* x1, int16_t* y1)
+void framebuffer_orientation_revert_square(Window* window, int16_t* x0, int16_t* y0, int16_t* x1, int16_t* y1)
 {
 	enum Orientation *orientation = _getOrientationContext(window);
 	int16_t width, height;
@@ -191,7 +191,7 @@ void driver_framebuffer_orientation_revert_square(Window* window, int16_t* x0, i
 	}
 }
 
-void driver_framebuffer_get_orientation_size(Window* window, int16_t* width, int16_t* height)
+void framebuffer_get_orientation_size(Window* window, int16_t* width, int16_t* height)
 {
 	enum Orientation *orientation = _getOrientationContext(window);
 	if ((*orientation == portrait) || (*orientation == reverse_portrait))  {

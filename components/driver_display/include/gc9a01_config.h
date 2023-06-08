@@ -1,6 +1,10 @@
 #pragma once
 #include "esp_lcd_gc9a01.h"
 
+#define BITS_PER_PIXEL (16)
+#define FB_SIZE (CONFIG_DISPLAY_WIDTH*CONFIG_DISPLAY_HEIGHT)*2
+#define FB_TYPE_16BPP
+
 #define BUSCONFIG()                            \
     {                                          \
         .dc_gpio_num = CONFIG_DISPLAY_PIN_DC, \
@@ -14,7 +18,7 @@
 
 #define PANELCONFIG()           \
     {                           \
-        .bits_per_pixel = 16,    \
+        .bits_per_pixel = BITS_PER_PIXEL,    \
         .reset_gpio_num = CONFIG_DISPLAY_PIN_RST,    \
         .color_space = LCD_RGB_ENDIAN_BGR \
     }

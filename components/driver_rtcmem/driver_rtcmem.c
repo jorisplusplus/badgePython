@@ -27,7 +27,7 @@ static uint16_t RTC_DATA_ATTR rtc_mem_int_crc;
 static char     RTC_DATA_ATTR rtc_mem_str[RTC_MEM_STR_SIZE] = { 0 };
 static uint16_t RTC_DATA_ATTR rtc_mem_str_crc;
 
-esp_err_t driver_rtcmem_int_write(int pos, int val)
+esp_err_t rtcmem_int_write(int pos, int val)
 {
 	if (pos >= RTC_MEM_INT_SIZE) return ESP_FAIL;
 	rtc_mem_int[pos] = val;
@@ -35,7 +35,7 @@ esp_err_t driver_rtcmem_int_write(int pos, int val)
 	return ESP_OK;
 }
 
-esp_err_t driver_rtcmem_int_read(int pos, int* val)
+esp_err_t rtcmem_int_read(int pos, int* val)
 {
 	if (pos >= RTC_MEM_INT_SIZE) return ESP_FAIL;
 	if (rtc_mem_int_crc != crc16_le(0, (uint8_t const *)rtc_mem_int, RTC_MEM_INT_SIZE*sizeof(int))) return ESP_FAIL;
@@ -43,7 +43,7 @@ esp_err_t driver_rtcmem_int_read(int pos, int* val)
 	return ESP_OK;
 }
 
-esp_err_t driver_rtcmem_string_write(const char* str)
+esp_err_t rtcmem_string_write(const char* str)
 {
 	if (strlen(str) >= RTC_MEM_STR_SIZE) return ESP_FAIL;
 	memset(rtc_mem_str, 0, sizeof(rtc_mem_str));
@@ -52,14 +52,14 @@ esp_err_t driver_rtcmem_string_write(const char* str)
 	return ESP_OK;
 }
 
-esp_err_t driver_rtcmem_string_read(const char** str)
+esp_err_t rtcmem_string_read(const char** str)
 {
 	if (rtc_mem_str_crc != crc16_le(0, (uint8_t const *)rtc_mem_str, RTC_MEM_STR_SIZE)) return ESP_FAIL;
 	*str = rtc_mem_str;
 	return ESP_OK;
 }
 
-esp_err_t driver_rtcmem_clear()
+esp_err_t rtcmem_clear()
 {
 	memset(rtc_mem_int, 0, sizeof(rtc_mem_int));
 	memset(rtc_mem_str, 0, sizeof(rtc_mem_str));
@@ -68,7 +68,7 @@ esp_err_t driver_rtcmem_clear()
 	return ESP_OK;
 }
 
-esp_err_t driver_rtcmem_init(void)
+esp_err_t rtcmem_init(void)
 {
 	//Empty
 	return ESP_OK;

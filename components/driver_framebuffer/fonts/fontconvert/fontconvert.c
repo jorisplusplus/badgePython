@@ -24,7 +24,7 @@ See notes at end for glyph nomenclature & other tidbits.
 #include <ft2build.h>
 #include FT_GLYPH_H
 #include FT_TRUETYPE_DRIVER_H
-#include "../../include/driver_framebuffer_font.h" // Adafruit_GFX font structures
+#include "../../include/framebuffer_font.h" // Adafruit_GFX font structures
 
 #define DEFAULT_DPI 105//112
 
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
 	// the right symbols, and that's not done yet.
 	// fprintf(stderr, "%ld glyphs\n", face->num_glyphs);
 
-	printf("#include \"../include/driver_framebuffer.h\"\n");
+	printf("#include \"../include/framebuffer.h\"\n");
 	printf("const uint8_t %sBitmaps[] = {\n  ", fontName);
 
 	// Process glyphs and output huge bitmap data array

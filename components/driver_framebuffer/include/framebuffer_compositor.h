@@ -5,7 +5,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "esp_system.h"
-#include "driver_framebuffer_orientation_internal.h"
+#include "framebuffer_orientation_internal.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -33,25 +33,25 @@ typedef struct Window_t {
 	uint8_t* buffer;
 } Window;
 
-Window* driver_framebuffer_window_create(const char* name, uint16_t width, uint16_t height);
+Window* framebuffer_window_create(const char* name, uint16_t width, uint16_t height);
 /* Create a window */
 
-void driver_framebuffer_window_remove(Window* window);
+void framebuffer_window_remove(Window* window);
 /* Delete a window */
 
-Window* driver_framebuffer_window_find(const char* name);
+Window* framebuffer_window_find(const char* name);
 /* Find an existing window by name */
 
-Window* driver_framebuffer_window_first();
+Window* framebuffer_window_first();
 /* Find the first window */
 
-Window* driver_framebuffer_window_last();
+Window* framebuffer_window_last();
 /* Find the last window */
 
-void driver_framebuffer_window_focus(Window* window);
+void framebuffer_window_focus(Window* window);
 /* Move a window to the end of the list */
 
-void driver_framebuffer_window_getSize(Window* window, int16_t* width, int16_t* height);
+void framebuffer_window_getSize(Window* window, int16_t* width, int16_t* height);
 /* Get the width and height of a window */
 
 #ifdef __cplusplus

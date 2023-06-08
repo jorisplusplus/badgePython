@@ -5,21 +5,21 @@
 
 #ifdef CONFIG_DRIVER_FRAMEBUFFER_ENABLE
 
-// #include "driver_ssd1306.h"
-// #include "driver_sh1106.h"
-// #include "driver_erc12864.h"
-// #include "driver_eink.h"
-// #include "driver_ili9341.h"
-// #include "driver_hub75.h"
-// #include "driver_i2c_display.h"
-// #include "driver_gxgde0213b1.h"
-// #include "driver_fri3d.h"
-// #include "driver_flipdotter.h"
-// #include "driver_st7735.h"
-// #include "driver_st7789v.h"
-// #include "driver_nokia6100.h"
-// #include "driver_disobey_samd.h"
-// #include "driver_ledmatrix.h"
+// #include "ssd1306.h"
+// #include "sh1106.h"
+// #include "erc12864.h"
+// #include "eink.h"
+// #include "ili9341.h"
+// #include "hub75.h"
+// #include "i2c_display.h"
+// #include "gxgde0213b1.h"
+// #include "fri3d.h"
+// #include "flipdotter.h"
+// #include "st7735.h"
+// #include "st7789v.h"
+// #include "nokia6100.h"
+// #include "disobey_samd.h"
+// #include "ledmatrix.h"
 #include "framebuffer_display.h"
 
 // /* E-INK display as used on the SHA2017 and HackerHotel 2019 badges */
@@ -34,10 +34,10 @@
 // 	#else
 // 		#define FB_TYPE_8BPP
 // 		#define FB_ALPHA_ENABLED
-// 		#define FB_FLUSH_GS(buffer,eink_flags) driver_eink_display_greyscale(buffer,eink_flags,16);
+// 		#define FB_FLUSH_GS(buffer,eink_flags) eink_display_greyscale(buffer,eink_flags,16);
 // 	#endif
-// 	//#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_eink_display(buffer,eink_flags);
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_eink_display_part(buffer,eink_flags,x0,x1);
+// 	//#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) eink_display(buffer,eink_flags);
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) eink_display_part(buffer,eink_flags,x0,x1);
 // 	#define COLOR_FILL_DEFAULT 0xFFFFFF
 // 	#define COLOR_TEXT_DEFAULT 0x000000
 
@@ -48,7 +48,7 @@
 // 	#define FB_HEIGHT GXGDE0213B1_HEIGHT
 // 	#define FB_TYPE_1BPP
 // 	#define FB_1BPP_OHS
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_gxgde0213b1_write(buffer)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) gxgde0213b1_write(buffer)
 // 	#define COLOR_FILL_DEFAULT 0xFFFFFF
 // 	#define COLOR_TEXT_DEFAULT 0x000000
 	
@@ -59,7 +59,7 @@
 // 	#define FB_HEIGHT SSD1306_HEIGHT
 // 	#define FB_TYPE_1BPP
 // 	#define FB_1BPP_VERT2
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_ssd1306_write_part(buffer,x0,y0,x1,y1)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) ssd1306_write_part(buffer,x0,y0,x1,y1)
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 
@@ -69,7 +69,7 @@
 // 	#define FB_HEIGHT SH1106_HEIGHT
 // 	#define FB_TYPE_1BPP
 // 	#define FB_1BPP_VERT
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_sh1106_write_part(buffer,x0,y0,x1,y1)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) sh1106_write_part(buffer,x0,y0,x1,y1)
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 
@@ -80,9 +80,9 @@
 // 	#define FB_HEIGHT ERC12864_HEIGHT
 // 	#define FB_TYPE_1BPP
 // 	#define FB_1BPP_VERT
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_erc12864_write_part(buffer,x0,y0,x1,y1)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) erc12864_write_part(buffer,x0,y0,x1,y1)
 // 	#ifdef CONFIG_DRIVER_DISOBEY_SAMD_ENABLE
-// 		#define FB_SET_BACKLIGHT(brightness) driver_disobey_samd_write_backlight(brightness)
+// 		#define FB_SET_BACKLIGHT(brightness) disobey_samd_write_backlight(brightness)
 // 	#endif
 // 	#define COLOR_FILL_DEFAULT 0xFFFFFF
 // 	#define COLOR_TEXT_DEFAULT 0x000000
@@ -98,8 +98,8 @@
 // 			#define FB_TYPE_16BPP
 // 	#endif
 // 	#define FB_ALPHA_ENABLED
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_ili9341_write_partial(buffer, x0, y0, x1, y1)
-// 	#define FB_SET_BACKLIGHT(brightness) driver_ili9341_set_backlight(brightness > 127)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) ili9341_write_partial(buffer, x0, y0, x1, y1)
+// 	#define FB_SET_BACKLIGHT(brightness) ili9341_set_backlight(brightness > 127)
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 	
@@ -109,8 +109,8 @@
 // 	#define FB_WIDTH ST7735_WIDTH
 // 	#define FB_HEIGHT ST7735_HEIGHT
 // 	#define FB_TYPE_16BPP
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_st7735_write_partial(buffer, x0, y0, x1, y1)
-// 	#define FB_SET_BACKLIGHT(brightness) driver_st7735_set_backlight(brightness > 127)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) st7735_write_partial(buffer, x0, y0, x1, y1)
+// 	#define FB_SET_BACKLIGHT(brightness) st7735_set_backlight(brightness > 127)
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 	
@@ -124,8 +124,8 @@
 // 	#else
 // 			#define FB_TYPE_16BPP
 // 	#endif
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_st7789v_write_partial(buffer, x0, y0, x1, y1)
-// 	#define FB_SET_BACKLIGHT(brightness) driver_st7789v_set_backlight(brightness > 127)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) st7789v_write_partial(buffer, x0, y0, x1, y1)
+// 	#define FB_SET_BACKLIGHT(brightness) st7789v_set_backlight(brightness > 127)
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 	
@@ -137,7 +137,7 @@
 // 	#define FB_HEIGHT HUB75_HEIGHT
 // 	#define FB_TYPE_32BPP
 // 	#define FB_ALPHA_ENABLED
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_hub75_switch_buffer(buffer)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) hub75_switch_buffer(buffer)
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 
@@ -147,7 +147,7 @@
 // 	#define FB_WIDTH FRI3D_WIDTH
 // 	#define FB_HEIGHT FRI3D_HEIGHT
 // 	#define FB_TYPE_8BPP
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_fri3d_write(buffer);
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) fri3d_write(buffer);
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 
@@ -159,7 +159,7 @@
 // 	#define FB_HEIGHT FLIPDOTTER_HEIGHT
 // 	#define FB_TYPE_1BPP
 // 	#define FB_1BPP_VERT
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_flipdotter_write(buffer);
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) flipdotter_write(buffer);
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 	
@@ -169,8 +169,8 @@
 // 	#define FB_WIDTH NOKIA6100_WIDTH
 // 	#define FB_HEIGHT NOKIA6100_HEIGHT
 // 	#define FB_TYPE_16BPP //HACK use 12-bit color depth when this mode is ready for use
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_nokia6100_write_partial(buffer, x0, y0, x1, y1)
-// 	#define FB_SET_BACKLIGHT(brightness) driver_nokia6100_set_backlight(brightness > 127)
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) nokia6100_write_partial(buffer, x0, y0, x1, y1)
+// 	#define FB_SET_BACKLIGHT(brightness) nokia6100_set_backlight(brightness > 127)
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 
@@ -180,7 +180,7 @@
 // 	#define FB_WIDTH LEDMATRIX_WIDTH
 // 	#define FB_HEIGHT LEDMATRIX_HEIGHT
 // 	#define FB_TYPE_8BPP
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_ledmatrix_set_buffer(buffer);
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) ledmatrix_set_buffer(buffer);
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 
@@ -190,7 +190,7 @@
 // 	#define FB_WIDTH I2C_DISPLAY_WIDTH
 // 	#define FB_HEIGHT I2C_DISPLAY_HEIGHT
 // 	#define FB_TYPE_24BPP
-// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) driver_i2c_display_write(buffer);
+// 	#define FB_FLUSH(buffer,eink_flags,x0,y0,x1,y1) i2c_display_write(buffer);
 // 	#define COLOR_FILL_DEFAULT 0x000000
 // 	#define COLOR_TEXT_DEFAULT 0xFFFFFF
 // #else

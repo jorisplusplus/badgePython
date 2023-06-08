@@ -36,7 +36,7 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "include/driver_framebuffer_internal.h"
+#include "include/framebuffer_internal.h"
 
 #include <math.h>
 
@@ -46,7 +46,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define _swap_int16_t(a, b) { int16_t t = a; a = b; b = t; }
 
-void driver_framebuffer_line(Window* window, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint32_t color)
+void framebuffer_line(Window* window, int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint32_t color)
 {
 	int16_t steep = abs(y1 - y0) > abs(x1 - x0);
 	if (steep) {
@@ -74,9 +74,9 @@ void driver_framebuffer_line(Window* window, int16_t x0, int16_t y0, int16_t x1,
 
 	for (/*empty*/; x0<=x1; x0++) {
 		if (steep) {
-			driver_framebuffer_setPixel(window, y0, x0, color);
+			framebuffer_setPixel(window, y0, x0, color);
 		} else {
-			driver_framebuffer_setPixel(window, x0, y0, color);
+			framebuffer_setPixel(window, x0, y0, color);
 		}
 		err -= dy;
 		if (err < 0) {
@@ -86,22 +86,22 @@ void driver_framebuffer_line(Window* window, int16_t x0, int16_t y0, int16_t x1,
 	}
 }
 
-void driver_framebuffer_rect(Window* window, int16_t x, int16_t y, uint16_t w, uint16_t h, bool fill, uint32_t color)
+void framebuffer_rect(Window* window, int16_t x, int16_t y, uint16_t w, uint16_t h, bool fill, uint32_t color)
 {
 	if (fill) {
 		for (int16_t i=x; i<x+w; i++) {
-			driver_framebuffer_line(window, i, y, i, y+h-1, color);
+			framebuffer_line(window, i, y, i, y+h-1, color);
 		}
 	} else {
-		driver_framebuffer_line(window, x,    y,     x+w-1, y,     color);
-		driver_framebuffer_line(window, x,    y+h-1, x+w-1, y+h-1, color);
-		driver_framebuffer_line(window, x,    y,     x,     y+h-1, color);
-		driver_framebuffer_line(window, x+w-1,y,     x+w-1, y+h-1, color);
+		framebuffer_line(window, x,    y,     x+w-1, y,     color);
+		framebuffer_line(window, x,    y+h-1, x+w-1, y+h-1, color);
+		framebuffer_line(window, x,    y,     x,     y+h-1, color);
+		framebuffer_line(window, x+w-1,y,     x+w-1, y+h-1, color);
 	}
 }
 
 
-void driver_framebuffer_circle(Window* window, int16_t x0, int16_t y0, uint16_t r, uint16_t startAngle, uint16_t endAngle, bool fill, uint32_t color)
+void framebuffer_circle(Window* window, int16_t x0, int16_t y0, uint16_t r, uint16_t startAngle, uint16_t endAngle, bool fill, uint32_t color)
 {
 	bool havePrevPixel = 0;
 	int prevX = 0;
@@ -114,9 +114,9 @@ void driver_framebuffer_circle(Window* window, int16_t x0, int16_t y0, uint16_t 
 			int px = x0 + f * cos(radians);
 			int py = y0 + f * sin(radians);
 			if (havePrevPixel && ((prevX != px) || (prevY != py))) {
-				driver_framebuffer_line(window, prevX, prevY, px, py, color);
+				framebuffer_line(window, prevX, prevY, px, py, color);
 			} else {
-				driver_framebuffer_setPixel(window, px, py, color);
+				framebuffer_setPixel(window, px, py, color);
 			}
 			prevX = px;
 			prevY = py;

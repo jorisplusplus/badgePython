@@ -1,5 +1,10 @@
 #pragma once
 
+#define BITS_PER_PIXEL (1)
+#define FB_SIZE (CONFIG_DISPLAY_WIDTH*CONFIG_DISPLAY_HEIGHT)/8
+#define FB_TYPE_1BPP
+#define FB_1BPP_VERT
+
 #define BUSCONFIG()                            \
     {                                          \
         .dev_addr = CONFIG_DISPLAY_I2C_ADDR,   \
