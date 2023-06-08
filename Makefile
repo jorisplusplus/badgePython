@@ -28,12 +28,16 @@ IDFPY_FLAGS += -D MICROPY_BOARD=$(BOARD) -D MICROPY_BOARD_DIR=$(abspath $(BOARD_
 all: prepare build
 
 prepare:
-	cd components/micropython/micropython/mpy-cross; make
-	cp $(BOARD)/sdkconfig sdkconfig
-	cp $(BOARD)/partitions.csv partitions.csv
+	cd micropython/mpy-cross; make
+	cp $(BOARD_DIR)/sdkconfig sdkconfig
+	cp $(BOARD_DIR)/partitions.csv partitions.csv
+	idf.py $(IDFPY_FLAGS) set-target $(shell cat ${BOARD_DIR}/target)
 
 clean:
 	idf.py $(IDFPY_FLAGS) fullclean
+
+build:
+	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) build
 
 flash:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) flash
@@ -43,3 +47,6 @@ erase:
 
 monitor:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) flash monitor
+
+menuconfig:
+	idf.py $(IDFPY_FLAGS) -p $(PORT) menuconfig
