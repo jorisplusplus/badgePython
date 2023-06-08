@@ -1,7 +1,7 @@
 #include "include/platform.h"
 #include "include/platform_gen.h"
 #include "include/factory_reset.h"
-#include "driver_framebuffer.h"
+#include "framebuffer.h"
 #include <driver/gpio.h>
 #include <esp_event.h>
 #include <esp_system.h>
@@ -13,7 +13,7 @@
 #include <esp_log.h>
 #include "buses.h"
 #include <driver/uart.h>
-#include "driver_display.h"
+#include "display.h"
 
 #define TAG "platform"
 
@@ -68,7 +68,7 @@ void platform_init()
 	if (isr_init() != ESP_OK) restart();
   //Static inits can be performed here
   start_buses();
-  driver_display_init();
+  display_init();
 
   //Init generated modules
   platform_gen_init();

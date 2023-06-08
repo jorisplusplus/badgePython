@@ -45,8 +45,8 @@ void logo()
 int get_magic()
 {
 	int magic, inv_magic;
-	if (driver_rtcmem_int_read(0, &magic)     != ESP_OK) return 0;
-	if (driver_rtcmem_int_read(1, &inv_magic) != ESP_OK) return 0;
+	if (rtcmem_int_read(0, &magic)     != ESP_OK) return 0;
+	if (rtcmem_int_read(1, &inv_magic) != ESP_OK) return 0;
 	
 	if (magic == (uint8_t)~inv_magic) return magic;
 	return 0;

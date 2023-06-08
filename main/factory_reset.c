@@ -19,8 +19,8 @@
 #include "nvs_flash.h"
 
 #include "include/factory_reset.h"
-#include "driver_framebuffer.h"
-#include "driver_framebuffer_devices.h"
+#include "framebuffer.h"
+#include "framebuffer_devices.h"
 
 #ifdef CONFIG_DRIVER_HUB75_ENABLE
 #include "compositor.h"
