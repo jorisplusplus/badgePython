@@ -67,7 +67,7 @@ set(MICROPY_SOURCE_PORT
     ${MICROPY_PORT_DIR}/usb_serial_jtag.c
     ${MICROPY_PORT_DIR}/gccollect.c
     ${MICROPY_PORT_DIR}/mphalport.c
-    ${MICROPY_PORT_DIR}/fatfs_port.c
+    #${MICROPY_PORT_DIR}/fatfs_port.c
     ${MICROPY_PORT_DIR}/help.c
     ${MICROPY_PORT_DIR}/machine_bitstream.c
     ${MICROPY_PORT_DIR}/machine_timer.c
@@ -184,10 +184,7 @@ target_compile_definitions(${MICROPY_TARGET} PUBLIC
     ${MICROPY_DEF_CORE}
     MICROPY_ESP_IDF_4=1
     MICROPY_VFS_FAT=1
-    MICROPY_VFS_LFS2=1
     FFCONF_H=\"${MICROPY_OOFATFS_DIR}/ffconf.h\"
-    LFS1_NO_MALLOC LFS1_NO_DEBUG LFS1_NO_WARN LFS1_NO_ERROR LFS1_NO_ASSERT
-    LFS2_NO_MALLOC LFS2_NO_DEBUG LFS2_NO_WARN LFS2_NO_ERROR LFS2_NO_ASSERT
 )
 
 # Disable some warnings to keep the build output clean.
