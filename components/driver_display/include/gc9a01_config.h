@@ -2,8 +2,9 @@
 #include "esp_lcd_gc9a01.h"
 
 #define BITS_PER_PIXEL (16)
-#define FB_SIZE (CONFIG_DISPLAY_WIDTH*CONFIG_DISPLAY_HEIGHT)*2
-#define FB_TYPE_16BPP
+#define DISPLAY_WIDTH (240)
+#define DISPLAY_HEIGHT (240)
+#define FB_SIZE (DISPLAY_WIDTH*DISPLAY_HEIGHT)*2
 
 #define BUSCONFIG()                            \
     {                                          \

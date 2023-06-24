@@ -25,7 +25,6 @@ set(MICROPY_CUSTOM_SOURCE
     ${COMPONENT_DIR}/platform.c
     ${COMPONENT_DIR}/platform_gen.c
     ${COMPONENT_DIR}/system.c
-    ${COMPONENT_DIR}/zip.c
 )
 
 set(MICROPY_QSTRDEFS_PORT

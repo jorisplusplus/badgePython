@@ -21,18 +21,12 @@ esp_err_t display_set_backlight(uint8_t brightness) {
 }
 
 esp_err_t display_write_partial(const uint8_t *buffer, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
-    x0 = (x0/8)*8;
-    y0 = (y0/8)*8;
-    ESP_LOGW(TAG, "%d %d %d %d", x0, x1, y0, y1);
-    for (int i = y0; i <= y1; i++) {
-        int offset = x0*BITS_PER_PIXEL/8 + i*CONFIG_DISPLAY_WIDTH*BITS_PER_PIXEL/16;
-        esp_lcd_panel_draw_bitmap(panel_handle, x0, y0, x1+1, y1+1, &buffer[offset]);
-    }
+    esp_lcd_panel_draw_bitmap(panel_handle, x0, y0, x1, y1, buffer);
     return ESP_OK;
 }
 
-#if CONFIG_DRIVER_DISPLAY_ENABLE
-void display_init() {
+#if CONFIG_DISPLAY_ENABLE
+esp_err_t display_init() {
     #if LCDI2C
         esp_lcd_panel_io_i2c_config_t io_config = BUSCONFIG();
         ESP_ERROR_CHECK(esp_lcd_new_panel_io_i2c((esp_lcd_i2c_bus_handle_t)I2C_NUM_0, &io_config, &io_handle));
@@ -50,9 +44,11 @@ void display_init() {
     ESP_ERROR_CHECK(esp_lcd_panel_invert_color(panel_handle, true));
     ESP_ERROR_CHECK(esp_lcd_panel_mirror(panel_handle, true, false));
     ESP_ERROR_CHECK(esp_lcd_panel_disp_on_off(panel_handle, true));
+    esp_rom_gpio_pad_select_gpio(39);
     gpio_set_direction(39, GPIO_MODE_OUTPUT);
     gpio_set_level(39, 1);
     ESP_LOGI(TAG, "Init display done");
+    return ESP_OK;
 }
 #else
 void display_init() {}

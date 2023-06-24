@@ -1,5 +1,5 @@
 menu "Driver: Generic display"
-	config DRIVER_DISPLAY_ENABLE
+	config DISPLAY_ENABLE
 		bool "Enable the display driver"
 		default n
 	

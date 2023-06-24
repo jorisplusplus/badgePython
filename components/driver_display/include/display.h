@@ -10,7 +10,7 @@
 #include "gc9a01_config.h"
 #endif
 
-void display_init();
+esp_err_t display_init();
 esp_err_t display_set_backlight(uint8_t brightness);
 esp_err_t display_write_partial(const uint8_t *buffer, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
 #endif
