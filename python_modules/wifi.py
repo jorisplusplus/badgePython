@@ -10,7 +10,7 @@ class wifi():
 
     def save(self):
         with open("ssids.json", "w") as j:
-            json.dump(sefl.ssids, j)
+            json.dump(self.ssids, j)
 
     def load(self):
         try:
@@ -29,7 +29,7 @@ class wifi():
     def connect(self, ssid, password):
         self.wlan.disconnect()
         self.wlan.connect(ssid, password)
-        for i in range(0, 10):
+        for i in range(0, 30):
             if self.wlan.isconnected():
                 self.ssids[ssid] = password
                 self.save()
