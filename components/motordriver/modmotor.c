@@ -34,6 +34,12 @@ static mp_obj_t mpy_motor_indent_add(size_t n_args, const mp_obj_t *args) {
 }
 STATIC MP_DEFINE_CONST_FUN_OBJ_VAR(mpy_motor_indent_add_obj, 4, mpy_motor_indent_add);
 
+static mp_obj_t mpy_motor_calibrate() {
+    calibrate();
+    return mp_const_none;
+}
+STATIC MP_DEFINE_CONST_FUN_OBJ_0(mpy_motor_calibrate_obj, mpy_motor_calibrate);
+
 static mp_obj_t mpy_motor_status(mp_obj_t enable) {
     return mp_const_none;
 }
@@ -44,7 +50,8 @@ STATIC const mp_rom_map_elem_t motor_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR_reset),			(mp_obj_t)&mpy_motor_indent_reset_obj},
     { MP_OBJ_NEW_QSTR(MP_QSTR_read),			(mp_obj_t)&mpy_motor_read_obj},
     { MP_OBJ_NEW_QSTR(MP_QSTR_add),			    (mp_obj_t)&mpy_motor_indent_add_obj},
-    { MP_OBJ_NEW_QSTR(MP_QSTR_status),          (mp_obj_t)&mpy_motor_status_obj}
+    { MP_OBJ_NEW_QSTR(MP_QSTR_status),          (mp_obj_t)&mpy_motor_status_obj},
+    { MP_OBJ_NEW_QSTR(MP_QSTR_calibrate),          (mp_obj_t)&mpy_motor_calibrate_obj}
 };
 STATIC MP_DEFINE_CONST_DICT(motor_module_globals, motor_module_globals_table);
 

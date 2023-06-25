@@ -10,6 +10,7 @@
 #include "math.h"
 #include "driver/spi_master.h"
 #include "motorindent.h"
+#include "nvs.h"
 
 #define GPIO_LCD_RESET  GPIO_NUM_1
 #define GPIO_LCD_SDA    GPIO_NUM_2
@@ -77,7 +78,7 @@ mcpwm_oper_handle_t operators[3];
 mcpwm_cmpr_handle_t comparators[3];
 mcpwm_fault_handle_t over_cur_fault = NULL;
 mcpwm_gen_handle_t generators[3][2] = {};
-TaskHandle_t s_processor_handle;
+TaskHandle_t s_processor_handle = NULL;
 
 float offset = 0.0f;
 
@@ -349,6 +350,49 @@ void IRAM_ATTR vMotorProcessor(void *params) {
     }
 }
 
+void calibrate() {
+    mcpwm_timer_event_callbacks_t callbacks;
+    callbacks.on_full = NULL;
+    callbacks.on_empty = NULL;
+    callbacks.on_stop = NULL;
+    mcpwm_timer_disable(timer);
+    mcpwm_timer_register_event_callbacks(timer, &callbacks, s_processor_handle);
+    
+    ESP_LOGI(TAG, "Start the MCPWM timer");
+    ESP_ERROR_CHECK(mcpwm_timer_enable(timer));
+    ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP));
+    ESP_LOGI(TAG, "A");
+    setPhaseVoltage(2.0, 0, _3PI_2);
+    vTaskDelay(100);
+    
+    for (int i = 0; i < 30; i ++) {
+        float angle, angle_avg;
+        read_angle_avg(&angle, &angle_avg);
+        offset = 0.0f;
+        offset = electrical_angle(angle_avg);
+        ESP_LOGI(TAG, "OFFSET: %f %f", offset, angle_avg);
+        vTaskDelay(10);
+    }
+    
+    set_voltages(0, 0, 0);
+    vTaskDelay(100);
+    nvs_handle_t nvs;
+    nvs_open("motor", NVS_READWRITE, &nvs);
+    uint32_t *calvalue = (uint32_t *) &offset;
+    nvs_set_u32(nvs, "calibration", *calvalue);
+
+
+    //Generate interrupts events on timer zero
+    mcpwm_timer_disable(timer);
+    callbacks.on_full = NULL;
+    callbacks.on_empty = md_update;
+    callbacks.on_stop = NULL;
+    mcpwm_timer_register_event_callbacks(timer, &callbacks, s_processor_handle);
+    ESP_LOGI(TAG, "Start the MCPWM timer");
+    ESP_ERROR_CHECK(mcpwm_timer_enable(timer));
+    ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP));
+}
+
 esp_err_t motor_init(void)
 {
     spi_master_init();
@@ -442,39 +486,29 @@ esp_err_t motor_init(void)
     for (int i = 0; i < 3; i++) {
         ESP_ERROR_CHECK(mcpwm_generator_set_dead_time(generators[i][BLDC_MCPWM_GEN_INDEX_HIGH], generators[i][BLDC_MCPWM_GEN_INDEX_LOW], &dt_config));
     }
+    xTaskCreatePinnedToCore(vMotorProcessor, "FOC", 16000, NULL, 100, &s_processor_handle, 0);
 
-    ESP_LOGI(TAG, "Start the MCPWM timer");
-    ESP_ERROR_CHECK(mcpwm_timer_enable(timer));
-    ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP));
-    ESP_LOGI(TAG, "A");
-    setPhaseVoltage(2.0, 0, _3PI_2);
-    vTaskDelay(100);
-    
-    for (int i = 0; i < 30; i ++) {
-        float angle, angle_avg;
-        read_angle_avg(&angle, &angle_avg);
-        offset = 0.0f;
-        offset = electrical_angle(angle_avg);
-        ESP_LOGI(TAG, "OFFSET: %f %f", offset, angle_avg);
-        vTaskDelay(10);
+    nvs_handle_t nvs;
+    if (nvs_open("motor", NVS_READONLY, &nvs) != ESP_OK) {
+        calibrate();
+    } else {
+        nvs_get_u32(nvs, "calibration", (uint32_t *) &offset);
+
+         //Generate interrupts events on timer zero
+        mcpwm_timer_event_callbacks_t callbacks;
+        callbacks.on_full = NULL;
+        callbacks.on_empty = md_update;
+        callbacks.on_stop = NULL;   
+        mcpwm_timer_register_event_callbacks(timer, &callbacks, s_processor_handle);
+        ESP_LOGI(TAG, "Start the MCPWM timer");
+        ESP_ERROR_CHECK(mcpwm_timer_enable(timer));
+        ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP));
     }
-    
-    set_voltages(0, 0, 0);
-    vTaskDelay(100);
-    mcpwm_timer_disable(timer);
 
-    //Generate interrupts events on timer zero
-    mcpwm_timer_event_callbacks_t callbacks;
-    callbacks.on_full = NULL;
-    callbacks.on_empty = md_update;
-    callbacks.on_stop = NULL;
+   
+
     for (int i = 15; i < 360; i+= 30) {
         motor_indent_register(i, 15, 15, 0.8f);
     }
-    xTaskCreatePinnedToCore(vMotorProcessor, "FOC", 16000, NULL, 100, &s_processor_handle, 0);
-    mcpwm_timer_register_event_callbacks(timer, &callbacks, s_processor_handle);
-    ESP_LOGI(TAG, "Start the MCPWM timer");
-    ESP_ERROR_CHECK(mcpwm_timer_enable(timer));
-    ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP));
     return ESP_OK;
 }

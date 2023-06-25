@@ -11,4 +11,5 @@ typedef struct motor_indent {
 } motor_indent_t;
 
 esp_err_t motor_init(void);
+void calibrate();
 float motor_latest_angle();
