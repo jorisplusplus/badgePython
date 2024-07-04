@@ -9,7 +9,7 @@
 #include "display.h"
 #endif
 
-STATIC mp_obj_t mpy_display_flush(mp_obj_t buffer) {
+static mp_obj_t mpy_display_flush(mp_obj_t buffer) {
     mp_buffer_info_t bufinfo;
     mp_get_buffer_raise(buffer, &bufinfo, MP_BUFFER_READ);
 
@@ -17,15 +17,15 @@ STATIC mp_obj_t mpy_display_flush(mp_obj_t buffer) {
     
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(mpy_display_flush_obj, mpy_display_flush);
+static MP_DEFINE_CONST_FUN_OBJ_1(mpy_display_flush_obj, mpy_display_flush);
 
 //=========================================================
-STATIC const mp_rom_map_elem_t display_module_globals_table[] = {
+static const mp_rom_map_elem_t display_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR_flush),   (mp_obj_t)&mpy_display_flush_obj},
     { MP_ROM_QSTR(MP_QSTR_WIDTH),       MP_ROM_INT(DISPLAY_WIDTH)},
     { MP_ROM_QSTR(MP_QSTR_HEIGHT),      MP_ROM_INT(DISPLAY_HEIGHT)}
 };
-STATIC MP_DEFINE_CONST_DICT(display_module_globals, display_module_globals_table);
+static MP_DEFINE_CONST_DICT(display_module_globals, display_module_globals_table);
 
 //===================================
 const mp_obj_module_t display_module = {

@@ -12,7 +12,7 @@
 #include <esp_log.h>
 #include "buses.h"
 #include <driver/uart.h>
-#include "display.h"
+//#include "display.h"
 
 #define TAG "platform"
 
@@ -45,7 +45,7 @@ void platform_init()
 	if (isr_init() != ESP_OK) restart();
   //Static inits can be performed here
   start_buses();
-  display_init();
+  //display_init();
 
   //Init generated modules
   platform_gen_init();

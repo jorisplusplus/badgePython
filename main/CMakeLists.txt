@@ -46,7 +46,7 @@ set(MICROPY_SOURCE_LIB
     ${MICROPY_DIR}/lib/littlefs/lfs1_util.c
     ${MICROPY_DIR}/lib/littlefs/lfs2.c
     ${MICROPY_DIR}/lib/littlefs/lfs2_util.c
-    #${MICROPY_DIR}/lib/mbedtls_errors/esp32_mbedtls_errors.c
+    ${MICROPY_DIR}/lib/mbedtls_errors/esp32_mbedtls_errors.c
     ${MICROPY_DIR}/lib/oofatfs/ff.c
     ${MICROPY_DIR}/lib/oofatfs/ffunicode.c
 )
@@ -60,6 +60,7 @@ set(MICROPY_SOURCE_DRIVERS
 )
 
 set(MICROPY_SOURCE_PORT
+    ${MICROPY_PORT_DIR}/adc.c
     ${MICROPY_PORT_DIR}/main.c
     ${MICROPY_PORT_DIR}/uart.c
     ${MICROPY_PORT_DIR}/usb.c
@@ -72,13 +73,13 @@ set(MICROPY_SOURCE_PORT
     ${MICROPY_PORT_DIR}/machine_timer.c
     ${MICROPY_PORT_DIR}/machine_pin.c
     ${MICROPY_PORT_DIR}/machine_touchpad.c
-    ${MICROPY_PORT_DIR}/machine_adc.c
-    ${MICROPY_PORT_DIR}/machine_adcblock.c
+    #${MICROPY_PORT_DIR}/machine_adc.c
+    #${MICROPY_PORT_DIR}/machine_adc_block.c
     ${MICROPY_PORT_DIR}/machine_dac.c
     ${MICROPY_PORT_DIR}/machine_i2c.c
-    ${MICROPY_PORT_DIR}/machine_i2s.c
-    ${MICROPY_PORT_DIR}/machine_uart.c
-    ${MICROPY_PORT_DIR}/modmachine.c
+    #${MICROPY_PORT_DIR}/machine_i2s.c
+    #${MICROPY_PORT_DIR}/machine_uart.c
+    #${MICROPY_PORT_DIR}/modmachine.c
     ${MICROPY_PORT_DIR}/network_common.c
     ${MICROPY_PORT_DIR}/network_lan.c
     ${MICROPY_PORT_DIR}/network_ppp.c
@@ -92,12 +93,13 @@ set(MICROPY_SOURCE_PORT
     ${MICROPY_PORT_DIR}/esp32_ulp.c
     ${MICROPY_PORT_DIR}/modesp32.c
     ${MICROPY_PORT_DIR}/machine_hw_spi.c
-    ${MICROPY_PORT_DIR}/machine_wdt.c
+    #${MICROPY_PORT_DIR}/machine_wdt.c
     ${MICROPY_PORT_DIR}/mpthreadport.c
     ${MICROPY_PORT_DIR}/machine_rtc.c
     ${MICROPY_PORT_DIR}/machine_sdcard.c
     ${MICROPY_PORT_DIR}/modespnow.c
 )
+list(APPEND MICROPY_SOURCE_PORT ${CMAKE_BINARY_DIR}/pins.c)
 
 set(MICROPY_SOURCE_QSTR
     ${MICROPY_SOURCE_PY}
@@ -112,6 +114,7 @@ set(MICROPY_SOURCE_QSTR
 set(IDF_COMPONENTS
     app_update
     bootloader_support
+    esp_bootloader_format
     bt
     driver
     esp_adc
@@ -144,6 +147,7 @@ set(IDF_COMPONENTS
     vfs
     xtensa
     fatfs
+    ulp
 )
 
 if(IDF_TARGET STREQUAL "esp32c3")
@@ -210,6 +214,32 @@ endforeach()
 
 # Include the main MicroPython cmake rules.
 include(${MICROPY_DIR}/py/mkrules.cmake)
+
+
+set(GEN_PINS_PREFIX "${MICROPY_PORT_DIR}/boards/pins_prefix.c")
+set(GEN_PINS_MKPINS "${MICROPY_PORT_DIR}/boards/make-pins.py")
+set(GEN_PINS_SRC "${CMAKE_BINARY_DIR}/pins.c")
+set(GEN_PINS_HDR "${MICROPY_GENHDR_DIR}/pins.h")
+
+if(EXISTS "${MICROPY_BOARD_DIR}/pins.csv")
+    set(GEN_PINS_BOARD_CSV "${MICROPY_BOARD_DIR}/pins.csv")
+    set(GEN_PINS_BOARD_CSV_ARG --board-csv "${GEN_PINS_BOARD_CSV}")
+endif()
+
+target_sources(${MICROPY_TARGET} PRIVATE ${GEN_PINS_HDR})
+
+add_custom_command(
+    OUTPUT ${GEN_PINS_SRC} ${GEN_PINS_HDR}
+    COMMAND ${Python3_EXECUTABLE} ${GEN_PINS_MKPINS} ${GEN_PINS_BOARD_CSV_ARG}
+        --prefix ${GEN_PINS_PREFIX} --output-source ${GEN_PINS_SRC} --output-header ${GEN_PINS_HDR}
+    DEPENDS
+        ${MICROPY_MPVERSION}
+        ${GEN_PINS_MKPINS}
+        ${GEN_PINS_BOARD_CSV}
+        ${GEN_PINS_PREFIX}
+    VERBATIM
+    COMMAND_EXPAND_LISTS
+)
 
 add_custom_command(
     OUTPUT "${COMPONENT_DIR}/platform_gen.c"

@@ -1,3 +1,4 @@
+if(CONFIG_DISPLAY_ENABLE)
 set(srcs
     "driver_display.c"
     "moddisplay.c"
@@ -17,3 +18,4 @@ set(IDF_COMPONENTS
 idf_component_register(SRCS "${srcs}"
                        INCLUDE_DIRS ${includes}
                        REQUIRES ${IDF_COMPONENTS} )
+endif()
