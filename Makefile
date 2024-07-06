@@ -48,5 +48,8 @@ erase:
 monitor:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) flash monitor
 
+console:
+	idf.py $(IDFPY_FLAGS) -p $(PORT) monitor
+
 menuconfig:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) menuconfig
