@@ -29,9 +29,9 @@ all: prepare build
 
 prepare:
 	cd micropython/mpy-cross; make
+	idf.py $(IDFPY_FLAGS) set-target $(shell cat ${BOARD_DIR}/target)
 	cp $(BOARD_DIR)/sdkconfig sdkconfig
 	cp $(BOARD_DIR)/partitions.csv partitions.csv
-	idf.py $(IDFPY_FLAGS) set-target $(shell cat ${BOARD_DIR}/target)
 
 clean:
 	idf.py $(IDFPY_FLAGS) fullclean
