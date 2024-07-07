@@ -4,8 +4,8 @@ build*/
 main/platform_gen.c
 build/
 /sdkconfig
+/partitions.csv
 sdkconfig.old
-partitions.csv
 sdkconfig.defaults
 managed_components/
 dependencies.lock
