@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 
-esp_err_t driver_hub75_init(void);
+extern esp_err_t driver_hub75_init(void);
 void driver_hub75_set_brightness(int brightness_val);
 void driver_hub75_set_framerate(int framerate_val);
 void driver_hub75_switch_buffer(uint8_t* buffer);

@@ -31,11 +31,12 @@
 #include "driver/gpio.h"
 #include "soc/io_mux_reg.h"
 #include "rom/lldesc.h"
+#include "rom/gpio.h"
 #include "esp_heap_caps.h"
 #include "include/val2pwm.h"
 #include "include/i2s_parallel.h"
 
-#define hw I2S1
+#define hw I2S0
 
 typedef struct {
     volatile lldesc_t *dmadesc_a, *dmadesc_b;
@@ -112,26 +113,14 @@ static void fifo_reset() {
 }
 
 static int i2snum() {
-    return (&hw==&I2S0)?0:1;
+    return 0;
 }
 
 void i2sparallel_init(i2s_parallel_buffer_desc_t *bufa, i2s_parallel_buffer_desc_t *bufb) {
     //Figure out which signal numbers to use for routing
     int sig_data_base, sig_clk;
-    if (&hw==&I2S0) {
-        sig_data_base=I2S0O_DATA_OUT0_IDX;
-        sig_clk=I2S0O_WS_OUT_IDX;
-    } else {
-        if (bits==I2S_PARALLEL_BITS_32) {
-            sig_data_base=I2S1O_DATA_OUT0_IDX;
-        } else if(bits==I2S_PARALLEL_BITS_16){
-            //Because of... reasons... the 16-bit values for i2s1 appear on d8...d23
-            sig_data_base=I2S1O_DATA_OUT8_IDX;
-        } else {
-            sig_data_base=I2S1O_DATA_OUT0_IDX;
-        }
-        sig_clk=I2S1O_WS_OUT_IDX;
-    }
+    sig_data_base=I2S0O_DATA_OUT0_IDX;
+    sig_clk=I2S0O_WS_OUT_IDX;
 
     //Route the signals
     for (int x=0; x<bits; x++) {
@@ -142,11 +131,7 @@ void i2sparallel_init(i2s_parallel_buffer_desc_t *bufa, i2s_parallel_buffer_desc
     gpio_matrix_out(gpio_clk, sig_clk, true, false);
 
     //Power on dev
-    if (&hw==&I2S0) {
-        periph_module_enable(PERIPH_I2S0_MODULE);
-    } else {
-        periph_module_enable(PERIPH_I2S1_MODULE);
-    }
+    periph_module_enable(PERIPH_I2S0_MODULE);
     //Initialize I2S dev
     hw.conf.rx_reset=1; hw.conf.rx_reset=0;
     hw.conf.tx_reset=1; hw.conf.tx_reset=0;
@@ -165,7 +150,7 @@ void i2sparallel_init(i2s_parallel_buffer_desc_t *bufa, i2s_parallel_buffer_desc
     hw.conf2.lcd_tx_wrx2_en=1;
 
     hw.clkm_conf.val=0;
-    hw.clkm_conf.clka_en=0;
+//    hw.clkm_conf.clka_en=0;
     hw.clkm_conf.clkm_div_a=1;
     hw.clkm_conf.clkm_div_b=1;
     //We ignore the possibility for fractional division here, clkspeed_hz must round up for a fractional clock speed, must result in >= 2

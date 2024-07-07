@@ -1,6 +1,6 @@
 #include <sdkconfig.h>
 
-#ifdef CONFIG_DRIVER_HUB75_ENABLE
+//#ifdef CONFIG_DRIVER_HUB75_ENABLE
 
 #include <string.h>
 
@@ -16,7 +16,7 @@
 
 #define TAG "esp32/hub75"
 
-STATIC mp_obj_t hub75_background(mp_obj_t r_obj, mp_obj_t g_obj, mp_obj_t b_obj) {
+static mp_obj_t hub75_background(mp_obj_t r_obj, mp_obj_t g_obj, mp_obj_t b_obj) {
     uint8_t r = mp_obj_get_int(r_obj);
     uint8_t g = mp_obj_get_int(g_obj);
     uint8_t b = mp_obj_get_int(b_obj);
@@ -27,46 +27,46 @@ STATIC mp_obj_t hub75_background(mp_obj_t r_obj, mp_obj_t g_obj, mp_obj_t b_obj)
     compositor_setBackground(k);
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_3(hub75_background_obj, hub75_background);
+static MP_DEFINE_CONST_FUN_OBJ_3(hub75_background_obj, hub75_background);
 
-STATIC mp_obj_t hub75_brightness(mp_obj_t bright_obj) {
+static mp_obj_t hub75_brightness(mp_obj_t bright_obj) {
     int brightness = mp_obj_get_int(bright_obj);
 
     driver_hub75_set_brightness(brightness);
 
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(hub75_brightness_obj, hub75_brightness);
+static MP_DEFINE_CONST_FUN_OBJ_1(hub75_brightness_obj, hub75_brightness);
 
-STATIC mp_obj_t hub75_framerate(mp_obj_t bright_obj) {
+static mp_obj_t hub75_framerate(mp_obj_t bright_obj) {
     int framerate = mp_obj_get_int(bright_obj);
 
     driver_hub75_set_framerate(framerate);
 
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(hub75_framerate_obj, hub75_framerate);
+static MP_DEFINE_CONST_FUN_OBJ_1(hub75_framerate_obj, hub75_framerate);
 
-STATIC mp_obj_t hub75_clear() {
+static mp_obj_t hub75_clear() {
     compositor_clear();
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(hub75_clear_obj, hub75_clear);
+static MP_DEFINE_CONST_FUN_OBJ_0(hub75_clear_obj, hub75_clear);
 
-STATIC mp_obj_t hub75_disablecomp() {
+static mp_obj_t hub75_disablecomp() {
     compositor_disable();
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(hub75_disablecomp_obj, hub75_disablecomp);
+static MP_DEFINE_CONST_FUN_OBJ_0(hub75_disablecomp_obj, hub75_disablecomp);
 
-STATIC mp_obj_t hub75_enablecomp() {
+static mp_obj_t hub75_enablecomp() {
     compositor_enable();
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(hub75_enablecomp_obj, hub75_enablecomp);
+static MP_DEFINE_CONST_FUN_OBJ_0(hub75_enablecomp_obj, hub75_enablecomp);
 
 
-STATIC mp_obj_t hub75_text(size_t n_args, const mp_obj_t *args) {
+static mp_obj_t hub75_text(size_t n_args, const mp_obj_t *args) {
     char *test = (char*)mp_obj_str_get_str(args[0]);
 
     uint8_t r = mp_obj_get_int(args[1]);
@@ -83,10 +83,10 @@ STATIC mp_obj_t hub75_text(size_t n_args, const mp_obj_t *args) {
     compositor_addText(test, k, x, y);
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_text_obj, 6, 6, hub75_text);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_text_obj, 6, 6, hub75_text);
 
 
-STATIC mp_obj_t hub75_scrolltext(size_t n_args, const mp_obj_t *args) {
+static mp_obj_t hub75_scrolltext(size_t n_args, const mp_obj_t *args) {
      char *test = (char*)mp_obj_str_get_str(args[0]);
 
     uint8_t r = mp_obj_get_int(args[1]);
@@ -105,9 +105,9 @@ STATIC mp_obj_t hub75_scrolltext(size_t n_args, const mp_obj_t *args) {
 
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_scrolltext_obj, 7, 7, hub75_scrolltext);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_scrolltext_obj, 7, 7, hub75_scrolltext);
 
-STATIC mp_obj_t hub75_image(size_t n_args, const mp_obj_t *args) {
+static mp_obj_t hub75_image(size_t n_args, const mp_obj_t *args) {
     mp_obj_t *mp_arr;
     size_t len;
     mp_obj_get_array(args[0], &len, &mp_arr);
@@ -132,9 +132,9 @@ STATIC mp_obj_t hub75_image(size_t n_args, const mp_obj_t *args) {
 
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_image_obj, 5, 5, hub75_image);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_image_obj, 5, 5, hub75_image);
 
-STATIC mp_obj_t hub75_pixel(size_t n_args, const mp_obj_t *args) {
+static mp_obj_t hub75_pixel(size_t n_args, const mp_obj_t *args) {
      int r = mp_obj_get_int(args[0]);
      int g = mp_obj_get_int(args[1]);
      int b = mp_obj_get_int(args[2]);
@@ -153,10 +153,10 @@ STATIC mp_obj_t hub75_pixel(size_t n_args, const mp_obj_t *args) {
 
      return mp_const_none;
  }
- STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_pixel_obj, 5, 5, hub75_pixel);
+ static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_pixel_obj, 5, 5, hub75_pixel);
 
 
-STATIC mp_obj_t hub75_gif(size_t n_args, const mp_obj_t *args) {
+static mp_obj_t hub75_gif(size_t n_args, const mp_obj_t *args) {
     mp_obj_t *mp_arr;
     size_t len;
     mp_obj_get_array(args[0], &len, &mp_arr);
@@ -182,9 +182,9 @@ STATIC mp_obj_t hub75_gif(size_t n_args, const mp_obj_t *args) {
 
     return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_gif_obj, 6, 6, hub75_gif);
+static MP_DEFINE_CONST_FUN_OBJ_VAR_BETWEEN(hub75_gif_obj, 6, 6, hub75_gif);
 
-STATIC mp_obj_t hub75_frame(mp_obj_t arr_obj) {
+static mp_obj_t hub75_frame(mp_obj_t arr_obj) {
   mp_obj_t *mp_arr;
   size_t len;
   mp_obj_get_array(arr_obj, &len, &mp_arr);
@@ -202,41 +202,41 @@ STATIC mp_obj_t hub75_frame(mp_obj_t arr_obj) {
 
   return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(hub75_frame_obj, hub75_frame);
+static MP_DEFINE_CONST_FUN_OBJ_1(hub75_frame_obj, hub75_frame);
 
-STATIC mp_obj_t hub75_textwidth(mp_obj_t text_obj) {
+static mp_obj_t hub75_textwidth(mp_obj_t text_obj) {
   char *text = (char*)mp_obj_str_get_str(text_obj);
   unsigned int width = compositor_getTextWidth(text);
   return mp_obj_new_int(width);
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(hub75_textwidth_obj, hub75_textwidth);
+static MP_DEFINE_CONST_FUN_OBJ_1(hub75_textwidth_obj, hub75_textwidth);
 
-STATIC mp_obj_t hub75_setfont(mp_obj_t index_obj) {
+static mp_obj_t hub75_setfont(mp_obj_t index_obj) {
   int index = mp_obj_get_int(index_obj);
   compositor_setFont(index);
   return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_1(hub75_setfont_obj, hub75_setfont);
+static MP_DEFINE_CONST_FUN_OBJ_1(hub75_setfont_obj, hub75_setfont);
 
-STATIC const mp_rom_map_elem_t hub75_module_globals_table[] = {
-    {MP_ROM_QSTR(MP_QSTR___name__), MP_ROM_QSTR(MP_QSTR_hub75)},
-    {MP_ROM_QSTR(MP_QSTR_text), MP_ROM_PTR(&hub75_text_obj)},
-    {MP_ROM_QSTR(MP_QSTR_scrolltext), MP_ROM_PTR(&hub75_scrolltext_obj)},
-    {MP_ROM_QSTR(MP_QSTR_clear), MP_ROM_PTR(&hub75_clear_obj)},
-    {MP_ROM_QSTR(MP_QSTR_brightness), MP_ROM_PTR(&hub75_brightness_obj)},
-    {MP_ROM_QSTR(MP_QSTR_framerate), MP_ROM_PTR(&hub75_framerate_obj)},
-    {MP_ROM_QSTR(MP_QSTR_disablecomp), MP_ROM_PTR(&hub75_disablecomp_obj)},
-    {MP_ROM_QSTR(MP_QSTR_enablecomp), MP_ROM_PTR(&hub75_enablecomp_obj)},
-    {MP_ROM_QSTR(MP_QSTR_background), MP_ROM_PTR(&hub75_background_obj)},
-    {MP_ROM_QSTR(MP_QSTR_frame), MP_ROM_PTR(&hub75_frame_obj)},
-    {MP_ROM_QSTR(MP_QSTR_gif), MP_ROM_PTR(&hub75_gif_obj)},
-    {MP_ROM_QSTR(MP_QSTR_image), MP_ROM_PTR(&hub75_image_obj)},
-    {MP_ROM_QSTR(MP_QSTR_pixel), MP_ROM_PTR(&hub75_pixel_obj)},
-    {MP_ROM_QSTR(MP_QSTR_textwidth), MP_ROM_PTR(&hub75_textwidth_obj)},
-    {MP_ROM_QSTR(MP_QSTR_setfont), MP_ROM_PTR(&hub75_setfont_obj)},
+static const mp_rom_map_elem_t hub75_module_globals_table[] = {
+    {MP_OBJ_NEW_QSTR(MP_QSTR___name__), MP_OBJ_NEW_QSTR(MP_QSTR_hub75)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_text), MP_ROM_PTR(&hub75_text_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_scrolltext), MP_ROM_PTR(&hub75_scrolltext_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_clear), MP_ROM_PTR(&hub75_clear_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_brightness), MP_ROM_PTR(&hub75_brightness_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_framerate), MP_ROM_PTR(&hub75_framerate_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_disablecomp), MP_ROM_PTR(&hub75_disablecomp_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_enablecomp), MP_ROM_PTR(&hub75_enablecomp_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_background), MP_ROM_PTR(&hub75_background_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_frame), MP_ROM_PTR(&hub75_frame_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_gif), MP_ROM_PTR(&hub75_gif_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_image), MP_ROM_PTR(&hub75_image_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_pixel), MP_ROM_PTR(&hub75_pixel_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_textwidth), MP_ROM_PTR(&hub75_textwidth_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_setfont), MP_ROM_PTR(&hub75_setfont_obj)},
 };
 
-STATIC MP_DEFINE_CONST_DICT(hub75_module_globals, hub75_module_globals_table);
+static MP_DEFINE_CONST_DICT(hub75_module_globals, hub75_module_globals_table);
 
 const mp_obj_module_t hub75_module = {
     .base = {&mp_type_module},
@@ -245,4 +245,4 @@ const mp_obj_module_t hub75_module = {
 
 MP_REGISTER_MODULE(MP_QSTR_hub75, hub75_module);
 
-#endif
+//#endif

@@ -7,8 +7,10 @@
 
 #include "esp_heap_caps.h"
 #include "include/val2pwm.h"
+#ifdef CONFIG_HUB75_REGULATE_VLED
 #include "driver/ledc.h"
 #include "driver/adc.h"
+#endif
 
 #include "include/i2s_parallel.h"
 #include "freertos/FreeRTOS.h"
@@ -152,6 +154,7 @@ void displayTask(void *pvParameter)
 {
 	TickType_t xLastWakeTime = xTaskGetTickCount();
 
+#ifdef CONFIG_HUB75_REGULATE_VLED
         ledc_timer_config_t ledc_timer = {
             .duty_resolution = LEDC_TIMER_8_BIT, // resolution of PWM duty
             .freq_hz = 20000,                      // frequency of PWM signal
@@ -173,6 +176,7 @@ void displayTask(void *pvParameter)
         TickType_t lastUsbCheck = 0;
         uint8_t duty = 255;
         uint32_t deduced_current = 0;
+#endif
 
 	while(driver_hub75_active) {
 		if(compositor_status()) composite();
@@ -236,7 +240,7 @@ esp_err_t driver_hub75_init(void)
 {
 	static bool driver_hub75_init_done = false;
 	if (driver_hub75_init_done) return ESP_OK;
-	ESP_LOGD(TAG, "init called");
+	ESP_LOGI(TAG, "init called");
 
 #ifdef CONFIG_HUB75_REGULATE_VLED
         // Initialise the vUSB sensor so we can sense when vLED correction is needed
@@ -300,7 +304,7 @@ esp_err_t driver_hub75_init(void)
 		NULL,         /* Parameter passed as input of the task */
 		1,            /* Priority of the task. (Lower = more important) */
 		NULL,         /* Task handle. */
-		1             /* Core ID */
+		0             /* Core ID */
 	);
 
 	driver_hub75_init_done = true;

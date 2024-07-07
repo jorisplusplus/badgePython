@@ -1,4 +1,4 @@
-if(CONFIG_DRIVER_HUB75_ENABLE)
+#if(CONFIG_DRIVER_HUB75_ENABLE)
     set(srcs
         "driver_hub75.c"
         "compositor.c"
@@ -8,18 +8,14 @@ if(CONFIG_DRIVER_HUB75_ENABLE)
         "val2pwm.c"
         "modhub75.c"
     )
-else()
-    set(srcs "")
-endif()
+#else()
+#    set(srcs "")
+#endif()
 
 set(includes
     "include"
     )
 
-set(IDF_COMPONENTS
-    micropython
-)
-
 idf_component_register(SRCS "${srcs}"
-                       INCLUDE_DIRS ${includes}
-                       REQUIRES ${IDF_COMPONENTS} )
+        INCLUDE_DIRS ${includes}
+        REQUIRES main)
