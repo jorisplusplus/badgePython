@@ -63,4 +63,24 @@ menu "Driver: HUB75 LED panel display"
 		bool "Enables PWM regulation of the LED power rails based on current draw, to prevent its voltage from reaching beyond the 4.7V logic threshold."
 		default n
 
+	config HUB75_BRUCON
+	    bool "Use specific renderer for the brucon badge"
+		default n
+
+	config HUB75_BRUCON_ROW0
+		int "Pin row0-7 enable"
+		default 18
+		depends on HUB75_BRUCON
+
+	config HUB75_BRUCON_ROW1
+		int "Pin row8-15 enable"
+		default 17
+		depends on HUB75_BRUCON
+	
+	config HUB75_BRUCON_ROW2
+		int "Pin row16-18 enable"
+		default 16
+		depends on HUB75_BRUCON
+
+
 endmenu

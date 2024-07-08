@@ -37,7 +37,7 @@
 #include "include/val2pwm.h"
 #include "include/i2s_parallel.h"
 
-#define hw hw
+#define hw I2S0
 
 #define TAG "I2S_parallel"
 
@@ -53,8 +53,11 @@ int gpio_bus[32] = {CONFIG_PIN_NUM_HUB75_R0,
                     CONFIG_PIN_NUM_HUB75_A,
                     CONFIG_PIN_NUM_HUB75_B,
                     CONFIG_PIN_NUM_HUB75_C,
+                    CONFIG_HUB75_BRUCON_ROW0,
+                    CONFIG_HUB75_BRUCON_ROW1,
+                    CONFIG_HUB75_BRUCON_ROW2,
                     CONFIG_PIN_NUM_HUB75_LAT,
-                    CONFIG_PIN_NUM_HUB75_OE, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
+                    CONFIG_PIN_NUM_HUB75_OE, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1};
 int gpio_clk = CONFIG_PIN_NUM_HUB75_CLK;
 //int clkspeed_hz = CONFIG_HUB75_CLOCK_SPEED;
 int clkspeed_hz = 20000000;
@@ -122,8 +125,8 @@ static int i2snum() {
 void i2sparallel_init(i2s_parallel_buffer_desc_t *bufa, i2s_parallel_buffer_desc_t *bufb) {
     //Figure out which signal numbers to use for routing
     int sig_data_base, sig_clk;
-    sig_data_base= hwO_DATA_OUT0_IDX;
-    sig_clk=hwO_WS_OUT_IDX;
+    sig_data_base= I2S0O_DATA_OUT0_IDX;
+    sig_clk=I2S0O_WS_OUT_IDX;
 
     //Route the signals
     for (int x=0; x<bits; x++) {
@@ -134,7 +137,7 @@ void i2sparallel_init(i2s_parallel_buffer_desc_t *bufa, i2s_parallel_buffer_desc
     gpio_matrix_out(gpio_clk, sig_clk, true, false);
 
     //Power on dev
-    periph_module_enable(PERIPH_hw_MODULE);
+    periph_module_enable(PERIPH_I2S0_MODULE);
 
     //Initialize I2S dev
     hw.conf.rx_reset=1; hw.conf.rx_reset=0;
