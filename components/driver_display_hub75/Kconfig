@@ -71,17 +71,17 @@ menu "Driver: HUB75 LED panel display"
 
 	config HUB75_BRUCON_ROW0
 		int "Pin row0-7 enable"
-		default 18
+		default 14
 		depends on HUB75_BRUCON
 
 	config HUB75_BRUCON_ROW1
 		int "Pin row8-15 enable"
-		default 17
+		default 13
 		depends on HUB75_BRUCON
 	
 	config HUB75_BRUCON_ROW2
 		int "Pin row16-18 enable"
-		default 16
+		default 12
 		depends on HUB75_BRUCON
 
 endmenu
