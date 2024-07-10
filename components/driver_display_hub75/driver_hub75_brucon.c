@@ -71,17 +71,18 @@ void render16()
     for (int plane=0; plane<BITPLANE_CNT; plane++) {
         for (unsigned int y=0; y<ROWS; y++) {
             int lbits=0;         //Precalculate line bits of the *previous* line, which is the one we're displaying now
-            if ((y-1)&1) lbits|=BIT_A;
-            if ((y-1)&2) lbits|=BIT_B;
-            if ((y-1)&4) lbits|=BIT_C;
-            if ((y-1) >= 8) lbits|=ROW0_EN;
-            if ((y-1) < 8 || (y-1) >= 16) lbits|=ROW1_EN;
-            if ((y-1) < 16) lbits|=ROW2_EN;
+            int yprev = y > 0 ? y - 1 : ROWS-1;
+			if (yprev&1) lbits|=BIT_A;
+            if (yprev&2) lbits|=BIT_B;
+            if (yprev&4) lbits|=BIT_C;
+            if ((yprev& 0x18) != 0) lbits|=ROW0_EN;
+            if ((yprev& 0x08) != 0x08) lbits|=ROW1_EN;
+            if ((yprev& 0x10) != 0x10) lbits|=ROW2_EN;
 
             int mask=(1<<(8-BITPLANE_CNT+plane));         //bitmask for pixel data in input for this bitplane
-            uint8_t *p=bitplane[backbuf_id][plane] + y * 32;         //bitplane location to write to
+            uint16_t *p=bitplane[backbuf_id][plane] + y * 32;         //bitplane location to write to
             for (int fx=0; fx<COLUMNS; fx++) {
-                int x = fx^2;   //Apply correction. this fixes dma byte stream order
+                int x = fx;   //Apply correction. this fixes dma byte stream order
                 int v = lbits;
                 //Do not show image while the line bits are changing
                 //Don't display for the first cycle to remove line bleed
@@ -109,7 +110,6 @@ void render16()
                     v |= BIT_B1;
                     total_intensity += mask;
                 }
-
 
                 //Save the calculated value to the bitplane memory
                 *p++=v;
@@ -176,7 +176,7 @@ esp_err_t driver_hub75_init(void)
 		//Insert the plane
 		for (int j=0; j<2; j++) {
 			bufdesc[j][i].memory=bitplane[j][ch];
-			bufdesc[j][i].size=BITPLANE_SZ;
+			bufdesc[j][i].size=BITPLANE_SZ*2;
 		}
 		//Magic to make sure we choose this bitplane an appropriate time later next time
 		times[ch]+=(1<<(BITPLANE_CNT-ch));

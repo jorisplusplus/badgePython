@@ -61,7 +61,7 @@ int gpio_bus[32] = {CONFIG_PIN_NUM_HUB75_R0,
 int gpio_clk = CONFIG_PIN_NUM_HUB75_CLK;
 //int clkspeed_hz = CONFIG_HUB75_CLOCK_SPEED;
 int clkspeed_hz = 20000000;
-i2s_parallel_cfg_bits_t bits = I2S_PARALLEL_BITS_8;
+i2s_parallel_cfg_bits_t bits = I2S_PARALLEL_BITS_16;
 
 #define DMA_MAX (4096-4)
 
@@ -125,7 +125,7 @@ static int i2snum() {
 void i2sparallel_init(i2s_parallel_buffer_desc_t *bufa, i2s_parallel_buffer_desc_t *bufb) {
     //Figure out which signal numbers to use for routing
     int sig_data_base, sig_clk;
-    sig_data_base= I2S0O_DATA_OUT0_IDX;
+    sig_data_base= I2S0O_DATA_OUT8_IDX;
     sig_clk=I2S0O_WS_OUT_IDX;
 
     //Route the signals
@@ -153,6 +153,8 @@ void i2sparallel_init(i2s_parallel_buffer_desc_t *bufa, i2s_parallel_buffer_desc
     hw.clkm_conf.clk_sel = 2;
     hw.sample_rate_conf.val = 0;
     hw.sample_rate_conf.tx_bck_div_num = 2;
+    hw.sample_rate_conf.rx_bits_mod=bits;
+    hw.sample_rate_conf.tx_bits_mod=bits;
 
     hw.int_ena.val = 0;
     hw.int_clr.val = ~0;
