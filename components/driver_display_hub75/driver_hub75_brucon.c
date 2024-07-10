@@ -86,7 +86,12 @@ void render16()
                 int v = lbits;
                 //Do not show image while the line bits are changing
                 //Don't display for the first cycle to remove line bleed
-                if (x<1 || x>=brightness) v|= BIT_OE;
+                if (x<1 || x>=brightness) {
+					v|= BIT_OE;
+					v|= ROW0_EN; //Hack for dev badge since there is no OE
+					v|= ROW1_EN;
+					v|= ROW2_EN;
+				}
                 if (x==31) v|= BIT_LAT;         //latch on last bit...
                 Color c1;
                 int yreal = y;
