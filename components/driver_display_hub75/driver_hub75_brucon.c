@@ -86,7 +86,7 @@ void render16()
                 int v = lbits;
                 //Do not show image while the line bits are changing
                 //Don't display for the first cycle to remove line bleed
-                if (x<1 || x>=brightness) {
+                if (x<3 || x>=brightness) {
 					v|= BIT_OE;
 					v|= ROW0_EN; //Hack for dev badge since there is no OE
 					v|= ROW1_EN;
@@ -94,8 +94,8 @@ void render16()
 				}
                 if (x==31) v|= BIT_LAT;         //latch on last bit...
                 Color c1;
-                int yreal = y;
-                int xreal = 31-x;
+                int yreal = ROWS-y-1;
+                int xreal = x;
                 if (hub75_framebuffer) {
                         c1 = hub75_framebuffer[yreal*CONFIG_HUB75_WIDTH+xreal];
                 } else {
