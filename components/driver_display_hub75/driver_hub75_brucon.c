@@ -28,10 +28,8 @@
 //a bitplane count of 7, you should be able to reproduce an 16-bit image more or less faithfully, though.
 //Currently set to 5 to improve scrolling text.
 #define BITPLANE_CNT 6
-#define ROWS (19)
-#define COLUMNS (32)
 //8*32 RGB leds, with a blank frame after it to suppress line bleeding
-#define BITPLANE_SZ (ROWS*COLUMNS)
+#define BITPLANE_SZ (CONFIG_HUB75_HEIGHT*CONFIG_HUB75_WIDTH)
 
 
 //Upper half RGB
@@ -69,9 +67,9 @@ void render16()
     total_intensity = 0;
     //Fill bitplanes with the data for the current image
     for (int plane=0; plane<BITPLANE_CNT; plane++) {
-        for (unsigned int y=0; y<ROWS; y++) {
+        for (unsigned int y=0; y<CONFIG_HUB75_HEIGHT; y++) {
             int lbits=0;         //Precalculate line bits of the *previous* line, which is the one we're displaying now
-            int yprev = y > 0 ? y - 1 : ROWS-1;
+            int yprev = y > 0 ? y - 1 : CONFIG_HUB75_HEIGHT-1;
 			if (yprev&1) lbits|=BIT_A;
             if (yprev&2) lbits|=BIT_B;
             if (yprev&4) lbits|=BIT_C;
@@ -81,7 +79,7 @@ void render16()
 
             int mask=(1<<(8-BITPLANE_CNT+plane));         //bitmask for pixel data in input for this bitplane
             uint16_t *p=bitplane[backbuf_id][plane] + y * 32;         //bitplane location to write to
-            for (int fx=0; fx<COLUMNS; fx++) {
+            for (int fx=0; fx<CONFIG_HUB75_WIDTH; fx++) {
                 int x = fx;   //Apply correction. this fixes dma byte stream order
                 int v = lbits;
                 //Do not show image while the line bits are changing
@@ -94,7 +92,7 @@ void render16()
 				}
                 if (x==31) v|= BIT_LAT;         //latch on last bit...
                 Color c1;
-                int yreal = ROWS-y-1;
+                int yreal = CONFIG_HUB75_HEIGHT-y-1;
                 int xreal = x;
                 if (hub75_framebuffer) {
                         c1 = hub75_framebuffer[yreal*CONFIG_HUB75_WIDTH+xreal];

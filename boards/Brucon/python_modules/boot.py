@@ -1,14 +1,11 @@
-import machine, sys, system, time, rtcmem, esp32, nvs
-
-rtcmem.write(0,0)
-rtcmem.write(1,0)
+import system, time, rtcmem, esp32, nvs
 
 # Default app
-app = rtcmem.read_string()
+app = nvs.get_str("system", "boot_app")
 if not app:
-	#app = nvs.nvs_getstr("system", 'default_app')
-	#if not app:
-    app = "launcher"
+	app = nvs.get_str("system", "default_app")
+	if not app:
+		app = "launcher"
 
 # # Override with special boot mode apps if necessary
 if nvs.get_int("system", "factory_checked") != 2:
@@ -17,7 +14,7 @@ if nvs.get_int("system", "factory_checked") != 2:
 elif nvs.get_int("system", "splash_played") != 1:
 	nvs.set_int("system", "splash_played", 1)
 	# Boot splash screen
-	app = "bootsplash"
+	app = "nyan"
 
 if app and not app == "shell":
 	try:
@@ -36,4 +33,4 @@ if app and not app == "shell":
 			system.launcher()
 
 if app and app == "shell":
-	print("\nWelcome to the python shell of your badge!\nCheck out https://pixel.curious.supplies/docs/ for instructions.")
+	print("\nWelcome to the python shell of your badge!")

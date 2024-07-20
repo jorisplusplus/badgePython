@@ -234,6 +234,9 @@ static const mp_rom_map_elem_t hub75_module_globals_table[] = {
     {MP_OBJ_NEW_QSTR(MP_QSTR_pixel), MP_ROM_PTR(&hub75_pixel_obj)},
     {MP_OBJ_NEW_QSTR(MP_QSTR_textwidth), MP_ROM_PTR(&hub75_textwidth_obj)},
     {MP_OBJ_NEW_QSTR(MP_QSTR_setfont), MP_ROM_PTR(&hub75_setfont_obj)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_screenwidth), MP_ROM_INT(CONFIG_HUB75_WIDTH)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_screenheight), MP_ROM_INT(CONFIG_HUB75_HEIGHT)},
+    {MP_OBJ_NEW_QSTR(MP_QSTR_defaultbrightness), MP_ROM_INT(CONFIG_HUB75_DEFAULT_BRIGHTNESS)},
 };
 
 static MP_DEFINE_CONST_DICT(hub75_module_globals, hub75_module_globals_table);

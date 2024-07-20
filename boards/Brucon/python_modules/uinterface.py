@@ -1,5 +1,5 @@
-import rgb, buttons, time, wifi, gc
-from default_icons import icon_no_wifi, animation_loading, animation_connecting_wifi
+import rgb, buttons, time, gc
+from default_icons import animation_loading
 
 ACTION_NO_OPERATION = 0
 ACTION_CONFIRM = 2
@@ -95,6 +95,9 @@ def confirmation_dialog(text):
     return (confirm_dialog_action == ACTION_CONFIRM)
 
 def connect_wifi(duration=None):
+    import wifi
+    from default_icons import animation_connecting_wifi, icon_no_wifi
+
     if wifi.status():
         return True
 
@@ -123,7 +126,7 @@ def connect_wifi(duration=None):
 def loading_text(text):
     data, size, frames = animation_loading
     rgb.gif(data, (1, 1), size, frames)
-    rgb.scrolltext(text, pos=(8,0), width=(rgb.PANEL_WIDTH - 8))
+    rgb.scrolltext(text, pos=(8,0), width=(rgb.screenwidth - 8))
     del data, size, frames
     gc.collect()
 
@@ -343,7 +346,7 @@ def _draw_text_input_state(cursor, text):
     after_mid = text[cursor+1:][:2]
     mid = text[cursor]
     step = FONT_WIDTH + 1
-    midx = int(rgb.PANEL_WIDTH / 2) - int(step / 2)
+    midx = int(rgb.screenwidth / 2) - int(step / 2)
     beforex = midx - step
     afterx = midx + step
     colour_selected = (150, 50, 10)
@@ -367,12 +370,12 @@ def _draw_text_input_sequence(startx, chars, colour, reverse=False):
             curx += step
 
 def _draw_confirmation_dialog(text):
-    yes_x, yes_y = (rgb.PANEL_WIDTH - CONFIRMATION_YES_IMAGE["width"]), 0
-    no_x, no_y = (rgb.PANEL_WIDTH - CONFIRMATION_NO_IMAGE["width"]), CONFIRMATION_YES_IMAGE["height"]
+    yes_x, yes_y = (rgb.screenwidth - CONFIRMATION_YES_IMAGE["width"]), 0
+    no_x, no_y = (rgb.screenwidth - CONFIRMATION_NO_IMAGE["width"]), CONFIRMATION_YES_IMAGE["height"]
     scroll_offset = max(CONFIRMATION_YES_IMAGE["width"], CONFIRMATION_NO_IMAGE["width"])
     _draw_image(CONFIRMATION_YES_IMAGE, yes_x, yes_y)
     _draw_image(CONFIRMATION_NO_IMAGE, no_x, no_y)
-    rgb.scrolltext(text, pos=(0,0), width=(rgb.PANEL_WIDTH - scroll_offset))
+    rgb.scrolltext(text, pos=(0,0), width=(rgb.screenwidth - scroll_offset))
 
 def _draw_image(image, x, y):
     rgb.image(
@@ -386,7 +389,7 @@ def _abort_scroll(pressed):
         global abort
         abort = True
 
-def skippabletext(text, color=(255, 255, 255), pos=None, width=rgb.PANEL_WIDTH):
+def skippabletext(text, color=(255, 255, 255), pos=None, width=rgb.screenwidth):
     
     buttons.init_button_mapping()
     buttons.register(buttons.BTN_A, _abort_scroll)

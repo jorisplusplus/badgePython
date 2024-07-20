@@ -1,4 +1,4 @@
-import machine, esp32, time, term, buttons
+import machine, esp32, time, term, buttons, nvs
 
 # Deep sleep wakeup button
 pin = buttons._gpioMap[buttons.BTN_A]
@@ -47,10 +47,11 @@ def isWakeup(fromTimer=True,fromButton=True, fromIr=True, fromUlp=True):
 def start(app, status=True):
     if status:
         if app == "" or app == "launcher":
+            app = "launcher"
             term.header(True, "Loading menu...")
         else:
             term.header(True, "Loading application "+app+"...")
-    machine.RTC().write_string(app)
+    nvs.set_str("system", "boot_app", app)
     machine.deepsleep(1)
 
 def home(status=False):

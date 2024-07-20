@@ -73,8 +73,8 @@ while next_direction != buttons.BTN_B:
                      cur_y + (1 if next_direction == DOWN else (-1 if next_direction == UP else 0)))
 
     # Make snake loop from one border to the other
-    new_x %= rgb.PANEL_WIDTH
-    new_y %= rgb.PANEL_HEIGHT
+    new_x %= rgb.screenwidth
+    new_y %= rgb.screenheight
     snake.insert(0, (new_x, new_y))
 
     # If snake bites itself, the game's over
@@ -89,7 +89,7 @@ while next_direction != buttons.BTN_B:
 
         # Spawn new food
         while food == []:
-            food = (randint(0, rgb.PANEL_WIDTH-1), randint(0, rgb.PANEL_HEIGHT-1))
+            food = (randint(0, rgb.screenwidth-1), randint(0, rgb.screenheight-1))
             if food in snake: food = []
     else:
         # Remove last entry from tail (snake didn't grow)

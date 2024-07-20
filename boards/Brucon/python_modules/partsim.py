@@ -1,34 +1,26 @@
-import time, system
-import rgb
+import rgb, accel
 from random import random, randint
 from math import sqrt
-from consts import INFO_HARDWARE_WOEZEL_NAME
 
-xdir, ydir, zdir = 1, 1, 1
+MAX_INT16 = 32768
+MAX_MEASURED = MAX_INT16 / 2  # ~1G of acceleration
 
-if INFO_HARDWARE_WOEZEL_NAME == 'pixel':
-    xdir, ydir, zdir = -1, 1, 1
-
-try:
-    import mpu6050
-except:
-    rgb.scrolltext('Newer firmware needed')
-    time.sleep(8)
-    system.reboot()
+xdir, ydir, zdir = -1, -1, -1
 
 ### Based on https://github.com/pierre-muth/IGG_-64x64M/blob/master/java/src/pixeldust/PixelDust.java
 
 n_grains = 32
 
-width, height = rgb.PANEL_WIDTH, rgb.PANEL_HEIGHT
-w8 = (width+7)/8
-x_max, y_max = (width-1)*256-1, (height-1)*256-1
-scale = 1
+width, height = rgb.screenwidth, rgb.screenheight
+w8 = (width + 7) / 8
+x_max, y_max = (width - 1) * 256 - 1, (height - 1) * 256 - 1
+scale = 200
 elasticity = 64
 sort = True
 
 grains = []
 framebuffer = [0] * width * height
+
 
 class Grain:
     x = 0
@@ -48,102 +40,102 @@ class Grain:
     def velocity(self):
         return (self.vx, self.vy)
 
+
 def getpixel(pos):
     x, y = pos
-    x = int(round(x/256))
-    y = int(round(y/256))
+    x = int(round(x / 256))
+    y = int(round(y / 256))
     value = framebuffer[y * width + x]
     # print('Getting', x, y, y * width + x, pos[0], pos[1])
     # print('0x{:08x}'.format(value))
     return value
 
+
 def setpixel(pos):
     x, y = pos
-    x = int(round(x/256))
-    y = int(round(y/256))
+    x = int(round(x / 256))
+    y = int(round(y / 256))
     # print('Setting', x, y, y * width + x, pos[0], pos[1])
     col_left = 0x0000FF00
     col_right = 0xFF00F000
-    col_final = int((1-(float(x + 1)/width)) * col_left) + \
-                int(float(x + 1)/width * col_right)
+    col_final = int((1 - (float(x + 1) / width)) * col_left) + \
+                int(float(x + 1) / width * col_right)
     framebuffer[y * width + x] = col_final
+
 
 def clearpixel(pos):
     x, y = pos
-    x = int(round(x/256))
-    y = int(round(y/256))
+    x = int(round(x / 256))
+    y = int(round(y / 256))
     # print('Clearing', x, y, y * width + x, pos[0], pos[1])
     framebuffer[y * width + x] = 0
+
 
 def clear():
     for i in range(0, len(framebuffer)):
         framebuffer[i] = 0
 
+
 def render():
     rgb.frame(framebuffer)
 
+
 def bounce(n):
     return int((-n) * elasticity / 256.0)
+
 
 def init():
     for _ in range(0, n_grains):
         while True:
             x, y = randint(0, x_max), randint(0, y_max)
-            if not getpixel((x,y)):
+            if not getpixel((x, y)):
                 break
         vx, vy = 0, 0  # Velocity
-        grains.append(Grain(x,y, vx, vy))
-        setpixel((x,y))
+        grains.append(Grain(x, y, vx, vy))
+        setpixel((x, y))
 
-def noisy_get_accel():
-    tries = 0
-    ax, ay, az = 0.0, 0.0, 0.0
-    while ax == 0.0 and ay == 0.0 and az == 0.0:
-        ax, ay, az = mpu6050.get_accel()
-        tries += 1
-        if tries % 5 == 0:
-            print('Reinitialising MPU6050')
-            mpu6050.init()
 
-    return ax*xdir, ay*ydir, az*zdir
+def get_accel():
+    ax, ay, az = accel.get_xyz()
+    return ax * xdir, ay * ydir, az * zdir
+
 
 def step():
-    # mpu6050.init()
-    ax, ay, az = noisy_get_accel()
-    # ax, ay, az = (5000, 0, 0)
-    ax *= float(scale) / 256
-    ay *= -float(scale) / 256
-    az *= float(scale) / 2048
+    ax, ay, az = get_accel()
 
-    print('Accel', ax, ay, az)
+    ax *= float(scale) / MAX_MEASURED
+    ay *= float(scale) / MAX_MEASURED
+    az *= float(scale) / MAX_MEASURED / 50
+
+    # print('Accel', ax, ay, az)
 
     # A tiny bit of random motion is applied to each grain, so that tall
     # stacks of pixels tend to topple (else the whole stack slides across
     # the display).  This is a function of the Z axis input, so it's more
     # pronounced the more the display is tilted (else the grains shift
     # around too much when the display is held level).
-    az  = 1 if (az >= 4) else 5 - az  # Clip & invert
-    ax -= az                          # Subtract Z motion factor from X, Y,
-    ay -= az                          # then...
-    az2 = az * 2 + 1                  # max random motion to add back in
+    az = 1 if (az >= 4) else 5 - az  # Clip & invert
+    ax -= az  # Subtract Z motion factor from X, Y,
+    ay -= az  # then...
+    az2 = az * 2 + 1  # max random motion to add back in
 
     # Apply 2D accel vector to grain velocities...
     v2 = 0  # Velocity squared
-    v = 0   # Absolute velocity
+    v = 0  # Absolute velocity
 
     for grain in grains:
-        grain.vx += ax + random()*az2  # X velocity
-        grain.vy += ay + random()*az2  # Y velocity
+        grain.vx += ax + random() * az2  # X velocity
+        grain.vy += ay + random() * az2  # Y velocity
         # Terminal velocity (in any direction) is 256 units -- equal to
         # 1 pixel -- which keeps moving grains from passing through each other
         # and other such mayhem.  Though it takes some extra math, velocity is
         # clipped as a 2D vector (not separately-limited X & Y) so that
         # diagonal movement isn't faster than horizontal/vertical.
-        v2 = grain.vx*grain.vx+grain.vy*grain.vy
+        v2 = grain.vx * grain.vx + grain.vy * grain.vy
         if v2 > 65536:  # If v^2 > 65536, then v > 256
             v = sqrt(v2)
-            grain.vx = int(256.0*float(grain.vx/v))  # Maintain heading &
-            grain.vy = int(256.0*float(grain.vy/v))  # limit magnitude
+            grain.vx = int(256.0 * float(grain.vx / v))  # Maintain heading &
+            grain.vy = int(256.0 * float(grain.vy / v))  # limit magnitude
 
     # ...then update position of each grain, one at a time, checking for
     # collisions and having them react.  This really seems like it shouldn't
@@ -245,13 +237,9 @@ def step():
         setpixel((newx, newy))
         # print('Setting', grain_index, 'from', oldpos, 'to', newpos)
 
-if not mpu6050.has_sensor():
-    rgb.scrolltext('Addon required')
-    time.sleep(6)
-    system.reboot()
 
 init()
-mpu6050.init()
+accel.init()
 rgb.disablecomp()
 while True:
     step()

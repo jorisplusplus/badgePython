@@ -1,22 +1,23 @@
 import uos as os, time, ujson, gc, term, deepsleep, nvs
 import system, term_menu, virtualtimers, tasks.powermanagement as pm, buttons
 import rgb, uinterface
-from default_icons import icon_snake, icon_clock, icon_settings, icon_appstore, icon_activities, icon_nickname, \
-                            icon_slider, icon_unknown
-import esp32
-# Application list
+from default_icons import icon_snake, icon_nickname, icon_nyan, icon_partsim, icon_unknown
 
+# Application list
 apps = []
 current_index = 0
 current_icon = None
-nvs = esp32.NVS("launcher")
+next_icon = None
 
 def show_text(text):
     rgb.scrolltext(text, (255,255,255))
 
 
-def show_app_name(name):
-    rgb.scrolltext(name, (255,255,255), (8,0), rgb.PANEL_WIDTH-8)
+def show_app_name(name, pos=(9,0), animate=True):
+    if animate:
+        rgb.scrolltext(name, (255,255,255), pos, rgb.screenwidth-pos[0])
+    else:
+        rgb.text(name, (255,255,255), pos)
 
 
 def clear():
@@ -48,7 +49,7 @@ def add_app(app, information):
 
 
 def populate_apps():
-    global apps, current_index, nvs
+    global apps, current_index
     apps = []
     try:
         userApps = os.listdir('apps')
@@ -57,22 +58,24 @@ def populate_apps():
         userApps = []
     for app in userApps:
         add_app(app, read_metadata(app))
-    add_app("snake", {"name": "Snake", "category": "system", "icon": icon_snake})
-    # add_app("activities", {"name": "Activities", "category": "system", "icon": icon_activities})
-    add_app("clock", {"name": "Clock", "category": "system", "icon": icon_clock})
     add_app("nickname", {"name": "Nickname", "category": "system", "icon": icon_nickname})
-    add_app("slider", {"name": "Slider", "category": "system", "icon": icon_slider})
-    add_app("appstore", {"name": "App store", "category": "system", "icon": icon_appstore})
-    add_app("setupwifi", {"name": "Set up wifi", "category": "system", "icon": icon_settings})
-    add_app("slider_config", {"name": "Slider settings", "category": "system", "icon": icon_settings})
-    add_app("update", {"name": "Firmware update", "category": "system", "icon": icon_settings})
-    add_app("updateapps", {"name": "App updates", "category": "system", "icon": icon_settings})
+    add_app("snake", {"name": "Snake", "category": "system", "icon": icon_snake})
+    add_app("nyan", {"name": "Nyan cat", "category": "system", "icon": icon_nyan})
+    add_app("partsim", {"name": "Particle simulator", "category": "system", "icon": icon_partsim})
+    # add_app("activities", {"name": "Activities", "category": "system", "icon": icon_activities})
+    # add_app("clock", {"name": "Clock", "category": "system", "icon": icon_clock})
+    # add_app("slider", {"name": "Slider", "category": "system", "icon": icon_slider})
+    # add_app("appstore", {"name": "App store", "category": "system", "icon": icon_appstore})
+    # add_app("setupwifi", {"name": "Set up wifi", "category": "system", "icon": icon_settings})
+    # add_app("slider_config", {"name": "Slider settings", "category": "system", "icon": icon_settings})
+    # add_app("update", {"name": "Firmware update", "category": "system", "icon": icon_settings})
+    # add_app("updateapps", {"name": "App updates", "category": "system", "icon": icon_settings})
     current_index = 0
     try:
-        current_index = nvs.get_int("system", 'index')
-    except Exception as e:
+        current_index = nvs.get_int("system", "index")
+    except Exception:
         current_index = 0
-    if current_index >= len(apps):
+    if current_index is None or current_index >= len(apps):
         current_index = 0
 
 
@@ -109,8 +112,26 @@ def render_current_app():
 
     data, num_frames = current_icon
 
-    rgb.gif(data, (0, 0), (8, 8), num_frames)
+    rgb.gif(data, (0, 1), (8, 8), num_frames)
     show_app_name(app["title"])
+    preview_next_app()
+
+
+
+def preview_next_app():
+    global next_icon
+
+    next = (current_index+1) % len(apps)
+    app = apps[next]
+
+    next_icon = None
+    gc.collect()
+    next_icon = get_icon(app)
+
+    data, num_frames = next_icon
+
+    rgb.gif(data, (0, 11), (8, 8), num_frames)
+    show_app_name(app["title"], (9, 11), animate=False)
 
 
 # Read app metadata
@@ -131,7 +152,6 @@ def read_metadata(app):
 
 # Uninstaller
 def uninstall(app):
-    global nvs
     if app["category"] == "system":
         # dialogs.notice("System apps can not be removed!","Can not uninstall '"+currentListTitles[selected]+"'")
         rgb.clear()
@@ -139,9 +159,8 @@ def uninstall(app):
         render_current_app()
         return
 
-    nvs.set_blob('uninstall_name', app['title'])
-    nvs.set_blob('uninstall_file', app['file'])
-    nvs.commit()
+    nvs.set_blob('system', 'uninstall_name', app['title'])
+    nvs.set_blob('system', 'uninstall_file', app['file'])
     system.start('uninstall')
 
 
@@ -176,24 +195,22 @@ def input_B(pressed):
 
 
 def input_up(pressed):
-    global current_index, nvs
+    global current_index
 
     pm.feed()
     if pressed:
         current_index = (current_index - 1) % len(apps)
         nvs.set_int("system", 'index', current_index)
-        nvs.commit()
         render_current_app()
 
 
 def input_down(pressed):
-    global current_index, nvs
+    global current_index
 
     pm.feed()
     if pressed:
         current_index = (current_index + 1) % len(apps)
         nvs.set_int("system", 'index', current_index)
-        nvs.commit()
         render_current_app()
 
 
@@ -256,20 +273,18 @@ try:
 except Exception as e:
     cfg_term_menu = True
 
-import uselect
-import sys
-
 
 if cfg_term_menu:
     menu = term_menu.UartMenu(deepsleep.start_sleeping, pm)
     print(gc.mem_free())
     menu.main()
 else:
-        print("Welcome!")
-        print("Press CTRL+C to reboot directly to a Python prompt.")
-        wait = True
-        while wait:
-                c = sys.stdin.read(1)
-                if c == "\x03" or c == "\x04": # CTRL+C or CTRL+D
-                        wait = False
-        import shell
+    import sys
+    print("Welcome!")
+    print("Press CTRL+C to reboot directly to a Python prompt.")
+    wait = True
+    while wait:
+            c = sys.stdin.read(1)
+            if c == "\x03" or c == "\x04": # CTRL+C or CTRL+D
+                    wait = False
+    import shell
