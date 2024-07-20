@@ -1,0 +1,6 @@
+#dummy file
+
+INFO_FIRMWARE_BUILD="<build>"
+INFO_FIRMWARE_NAME="<fw name>"
+INFO_HARDWARE_NAME="<hw name>"
+INFO_HARDWARE_WOEZEL_NAME="<legacy>"

@@ -1,4 +1,6 @@
-freeze("../../python_modules")
+freeze("../../python_modules/", ("flashbdev.py", "inisetup.py", "system.py", "version.py", "term.py", "term_menu.py",
+                                 "display.py", "wifi.py", "valuestore.py", "appconfig.py", "nvs.py", "virtualtimers.py"))
+freeze("./python_modules/")
 # Useful networking-related packages.
 require("bundle-networking")
 
