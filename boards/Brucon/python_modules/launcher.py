@@ -13,7 +13,7 @@ def show_text(text):
     rgb.scrolltext(text, (255,255,255))
 
 
-def show_app_name(name, pos=(9,0), animate=True):
+def show_app_name(name, pos=(9,1), animate=True):
     if animate:
         rgb.scrolltext(name, (255,255,255), pos, rgb.screenwidth-pos[0])
     else:

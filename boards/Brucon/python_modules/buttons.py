@@ -14,7 +14,8 @@ BTN_B      = 5
 # --- INTERNAL MAPPING TABLES ---
 
 __num = 6
-_gpioMap = [34, 35, 37, 38, 6, 5]
+# _gpioMap = [34, 35, 37, 38, 6, 5]
+_gpioMap = [7, 35, 37, 38, 6, 5]  ## DEBUG: BTN_UP hijacked
 
 # --- CALLBACKS ---
 __cb = []

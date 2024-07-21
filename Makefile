@@ -42,6 +42,9 @@ build:
 flash:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) flash
 
+dfu:
+	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) dfu dfu-flash
+
 erase:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) erase_flash
 
