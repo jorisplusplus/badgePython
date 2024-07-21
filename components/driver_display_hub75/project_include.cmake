@@ -7,7 +7,7 @@ set(mods
 set(mod_name "driver_hub75")
 set(mod_register "hub75")
 
-#if(CONFIG_DRIVER_HUB75_ENABLE)
+if(CONFIG_DRIVER_HUB75_ENABLE)
     message(STATUS "hub75 enabled")
     set(EXTMODS "${EXTMODS}" "${mods}" CACHE INTERNAL "")
     set(EXTMODS_NAMES "${EXTMODS_NAMES}" "${mod_name}" CACHE INTERNAL "")
@@ -15,6 +15,6 @@ set(mod_register "hub75")
     set(MICROPY_SOURCE_USERMOD "${MICROPY_SOURCE_USERMOD}" "${mods}" CACHE INTERNAL "")
 
 
-#else()
-#    message(STATUS "hub75 disabled")
-#endif()
+else()
+   message(STATUS "hub75 disabled")
+endif()

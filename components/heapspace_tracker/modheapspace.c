@@ -22,7 +22,7 @@ static heap_task_totals_t s_totals_arr[MAX_TASK_NUM];
 static heap_task_block_t s_block_arr[MAX_BLOCK_NUM];
 
 //--------------------------------------------------------
-STATIC mp_obj_t esp_heapspace_print() {
+static mp_obj_t esp_heapspace_print() {
 	heap_task_info_params_t heap_info = {0};
     heap_info.caps[0] = MALLOC_CAP_8BIT;        // Gets heap with CAP_8BIT capabilities
     heap_info.mask[0] = MALLOC_CAP_8BIT;
@@ -37,10 +37,10 @@ STATIC mp_obj_t esp_heapspace_print() {
     heap_info.max_blocks = MAX_BLOCK_NUM;       // Maximum length of "s_block_arr"
 
     heap_caps_get_per_task_info(&heap_info);
-    printf("Free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
+    ESP_LOGI("heap", "Free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
     for (int i = 0 ; i < *heap_info.num_totals; i++) {
-        printf("Task: %s -> CAP_8BIT: %d CAP_32BIT: %d\n",
-                heap_info.totals[i].task ? pcTaskGetName(heap_info.totals[i].task) : "Pre-Scheduler allocs" ,
+        ESP_LOGI("heap", "Task: %s -> CAP_8BIT: %d CAP_32BIT: %d\n",
+                heap_info.totals[i].task ? "Task" : "Pre-Scheduler allocs" ,
                 heap_info.totals[i].size[0],    // Heap size with CAP_8BIT capabilities
                 heap_info.totals[i].size[1]);   // Heap size with CAP32_BIT capabilities
     }
@@ -48,14 +48,14 @@ STATIC mp_obj_t esp_heapspace_print() {
     printf("\n\n");
 	return mp_const_none;
 }
-STATIC MP_DEFINE_CONST_FUN_OBJ_0(esp_heapspace_print_obj, esp_heapspace_print);
+static MP_DEFINE_CONST_FUN_OBJ_0(esp_heapspace_print_obj, esp_heapspace_print);
 
 
 //=========================================================
-STATIC const mp_rom_map_elem_t heapspace_module_globals_table[] = {
+static const mp_rom_map_elem_t heapspace_module_globals_table[] = {
     { MP_OBJ_NEW_QSTR(MP_QSTR_print),		(mp_obj_t)&esp_heapspace_print_obj}
 };
-STATIC MP_DEFINE_CONST_DICT(heapspace_module_globals, heapspace_module_globals_table);
+static MP_DEFINE_CONST_DICT(heapspace_module_globals, heapspace_module_globals_table);
 
 //===================================
 const mp_obj_module_t heapspace_module = {
