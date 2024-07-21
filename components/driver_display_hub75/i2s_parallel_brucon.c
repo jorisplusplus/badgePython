@@ -152,7 +152,7 @@ void i2sparallel_init(i2s_parallel_buffer_desc_t *bufa, i2s_parallel_buffer_desc
     hw.clkm_conf.clk_en = 1;
     hw.clkm_conf.clk_sel = 2;
     hw.sample_rate_conf.val = 0;
-    hw.sample_rate_conf.tx_bck_div_num = 2;
+    hw.sample_rate_conf.tx_bck_div_num = 17;
     hw.sample_rate_conf.rx_bits_mod=bits;
     hw.sample_rate_conf.tx_bits_mod=bits;
 
