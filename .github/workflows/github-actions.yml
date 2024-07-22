@@ -4,6 +4,8 @@ on: [push]
 jobs:
   Compile_brucon:
     runs-on: ubuntu-latest
+    env:
+      BOARD: Brucon
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
