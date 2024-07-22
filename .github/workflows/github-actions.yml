@@ -12,7 +12,7 @@ jobs:
       with:
         esp_idf_version: v5.2
         target: esp32s2
-        path: 'esp32-s2-hmi-devkit-1/examples/smart-panel'\
+        path: 'espidf'
     - run: (cd micropython/ports/esp32 && make submodules)
     - run: make all
 
