@@ -3,7 +3,8 @@ run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
 on: [push]
 jobs:
   Compile_brucon:
-    runs-on: espressif/idf:v5.2
+    runs-on: ubuntu-latest
+    container: espressif/idf:v5.2
     steps:
       - run: export BOARD=Brucon
       - run: make prepare
