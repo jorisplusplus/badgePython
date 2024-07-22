@@ -15,5 +15,5 @@ jobs:
         esp_idf_version: v5.2
         target: esp32s2
         path: 'esp32-s2-hmi-devkit-1/examples/smart-panel'
-    - runs: make all
+    - run: make all
 
