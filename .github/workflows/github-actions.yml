@@ -4,15 +4,11 @@ on: [push]
 jobs:
   Compile_brucon:
     runs-on: ubuntu-latest
+    container: espressif/idf:v5.2
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
-    - name: esp-idf build
-      uses: espressif/esp-idf-ci-action@v1
-      with:
-        esp_idf_version: v5.2
-        target: esp32s2
-        command: ''
+    - run: git submodule update --init
     - run: (cd micropython/ports/esp32 && make submodules)
     - run: make all
 
