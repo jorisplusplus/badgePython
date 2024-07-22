@@ -16,5 +16,5 @@ jobs:
       with:
         esp_idf_version: v5.2
         target: esp32s2
-        command: (cd micropython/ports/esp32 && make submodules) && make all
+        command: (cd micropython/ports/esp32 && make submodules) && make BOARD=Brucon all
 
