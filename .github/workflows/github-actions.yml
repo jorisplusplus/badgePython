@@ -10,5 +10,10 @@ jobs:
       uses: actions/checkout@v2
       with:
         submodules: 'true'
-    - run: /opt/esp/entrypoint.sh && (cd micropython/ports/esp32 && make submodules) && make all
+    - name: Build Application
+      uses: espressif/esp-idf-ci-action@v1
+      with:
+        esp_idf_version: v5.2
+        target: esp32s2
+        command: (cd micropython/ports/esp32 && make submodules) && make all
 
