@@ -4,7 +4,6 @@ on: [push]
 jobs:
   Compile_brucon:
     runs-on: ubuntu-latest
-    container: espressif/idf:v5.2
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
