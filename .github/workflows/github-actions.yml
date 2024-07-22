@@ -8,6 +8,8 @@ jobs:
     steps:
     - name: Checkout repo
       uses: actions/checkout@v2
+      with:
+        submodules: 'true'
     - run: git submodule update --init
     - run: (cd micropython/ports/esp32 && make submodules)
     - run: make all
