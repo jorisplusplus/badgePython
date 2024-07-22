@@ -1,12 +1,19 @@
 name: Compile boards
-run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+run-name: Compiling all boards
 on: [push]
 jobs:
   Compile_brucon:
     runs-on: ubuntu-latest
-    container: espressif/idf:v5.2
     steps:
-      - run: export BOARD=Brucon
-      - run: make prepare
-      - run: make build
+    - name: Checkout repo
+      uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+    - name: esp-idf build
+      uses: espressif/esp-idf-ci-action@v1
+      with:
+        esp_idf_version: v5.2
+        target: esp32s2
+        path: 'esp32-s2-hmi-devkit-1/examples/smart-panel'
+    - runs: make all
 
