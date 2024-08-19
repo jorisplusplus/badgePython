@@ -194,7 +194,7 @@ void renderImage(uint8_t *image, int x, int y, int sizeX, int sizeY) {
 		for(int px=0; px<sizeX; px++) {
 			xreal = x + px;
 			if(yreal >= 0 && yreal < CONFIG_HUB75_HEIGHT && xreal >= 0 && xreal < CONFIG_HUB75_WIDTH) {
-				compositor_setPixel(xreal, yreal, *((Color *)&image[(py*sizeX+px)*4]));
+				compositor_setPixel(xreal, yreal, *((Color *)&image[(py*sizeX+px)*sizeof(Color)]));
 			}
 		}
 	}
@@ -238,7 +238,6 @@ void compositor_setFont(int index) {
 	font_index = index;
 }
 
-
 void display_crash() {
 	enabled = false;
 	if (!buffer) return;
@@ -280,7 +279,7 @@ void composite() {
 			}
 		} else if(node->id == 3) {//Render animation
 			animation_t *gif = (animation_t *) node->payload;
-			int index = node->sizeX*node->sizeY*4*gif->showFrame;
+			int index = node->sizeX*node->sizeY*sizeof(Color)*gif->showFrame;
 			renderImage(&(gif->gif[index]), node->x, node->y, node->sizeX, node->sizeY);
 			gif->showFrame++;
 			if(gif->showFrame == gif->numberFrames) gif->showFrame = 0;

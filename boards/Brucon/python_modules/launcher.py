@@ -1,7 +1,7 @@
 import uos as os, time, ujson, gc, term, deepsleep, nvs
 import system, term_menu, virtualtimers, tasks.powermanagement as pm, buttons
 import rgb, uinterface
-from default_icons import icon_snake, icon_nickname, icon_nyan, icon_partsim, icon_unknown
+from default_icons import icon_snake, icon_nickname, icon_nyan, icon_partsim, icon_unknown, icon_activities
 
 # Application list
 apps = []
@@ -62,7 +62,7 @@ def populate_apps():
     add_app("snake", {"name": "Snake", "category": "system", "icon": icon_snake})
     add_app("nyan", {"name": "Nyan cat", "category": "system", "icon": icon_nyan})
     add_app("partsim", {"name": "Particle simulator", "category": "system", "icon": icon_partsim})
-    # add_app("activities", {"name": "Activities", "category": "system", "icon": icon_activities})
+    add_app("pouringgame", {"name": "Pouring game", "category": "system", "icon": icon_activities})
     # add_app("clock", {"name": "Clock", "category": "system", "icon": icon_clock})
     # add_app("slider", {"name": "Slider", "category": "system", "icon": icon_slider})
     # add_app("appstore", {"name": "App store", "category": "system", "icon": icon_appstore})
