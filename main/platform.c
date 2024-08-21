@@ -12,6 +12,7 @@
 #include <esp_log.h>
 #include "buses.h"
 #include <driver/uart.h>
+#include "particlesim.h"
 //#include "display.h"
 
 #define TAG "platform"
@@ -49,6 +50,8 @@ void platform_init()
 
   //Init generated modules
   platform_gen_init();
+  init_particlesim();
+  
   
 	fflush(stdout);
 	vTaskDelay(100 / portTICK_PERIOD_MS); //Give things time to settle.
