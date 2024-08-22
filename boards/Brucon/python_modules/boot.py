@@ -1,5 +1,9 @@
 import system, time, rtcmem, esp32, nvs
 
+def bootloader_enter(dfu_mode=False):
+	import bootloader
+	bootloader.enter(dfu_mode)
+
 # Default app
 app = nvs.get_str("system", "boot_app")
 if not app:
@@ -23,7 +27,7 @@ if app and not app == "shell":
 		if app:
 			__import__(app)
 	except KeyboardInterrupt:
-		system.launcher()
+		system.shell()
 	except BaseException as e:
 		sys.print_exception(e)
 		if not nvs.get_int("system", "ignore_crash"):

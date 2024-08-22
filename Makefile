@@ -40,7 +40,8 @@ build:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) build
 
 flash:
-	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) flash
+	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) flash || echo "Ignoring failed flash due to forced reset attempt"
+	esptool.py --after=no_reset --no-stub -p $(PORT) -b $(BAUD) load_ram bootloader_escape/build/bootloader_escape-esp32s2.elf.bin
 
 dfu:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) dfu dfu-flash
@@ -49,7 +50,7 @@ erase:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) -b $(BAUD) erase_flash
 
 monitor:
-	idf.py $(IDFPY_FLAGS) -p $(PORT) flash monitor
+	idf.py $(IDFPY_FLAGS) -p $(PORT) flash monitor --extra-args="--after=no_reset"
 
 console:
 	idf.py $(IDFPY_FLAGS) -p $(PORT) monitor

@@ -70,7 +70,7 @@ void render16()
         for (unsigned int y=0; y<CONFIG_HUB75_HEIGHT; y++) {
             int lbits=0;         //Precalculate line bits of the *previous* line, which is the one we're displaying now
             int yprev = y > 0 ? y - 1 : CONFIG_HUB75_HEIGHT-1;
-			if (yprev&1) lbits|=BIT_A;
+			      if (yprev&1) lbits|=BIT_A;
             if (yprev&2) lbits|=BIT_B;
             if (yprev&4) lbits|=BIT_C;
             if ((yprev& 0x18) != 0) lbits|=ROW0_EN;
@@ -86,12 +86,12 @@ void render16()
                 //Don't display for the first cycle to remove line bleed
                 
 				
-				if (x<3 || x>=brightness) {
-					v|= BIT_OE;
-					//v|= ROW0_EN; //Hack for dev badge since there is no OE
-					//v|= ROW1_EN;
-					//v|= ROW2_EN;
-				}
+                if (x<3 || x>=brightness) {
+                  v|= BIT_OE;
+                  //v|= ROW0_EN; //Hack for dev badge since there is no OE
+                  //v|= ROW1_EN;
+                  //v|= ROW2_EN;
+                }
                 if (x==31) v|= BIT_LAT;         //latch on last bit...
                 Color c1;
                 int yreal = CONFIG_HUB75_HEIGHT-y-1;
@@ -130,8 +130,6 @@ void render16()
 
 void displayTask(void *pvParameter)
 {
-	
-
 	while(driver_hub75_active) {
         TickType_t xLastWakeTime = xTaskGetTickCount();
 		if(compositor_status()) composite();
