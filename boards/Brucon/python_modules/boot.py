@@ -4,23 +4,28 @@ def bootloader_enter(dfu_mode=False):
 	import bootloader
 	bootloader.enter(dfu_mode)
 
-# Default app
-app = nvs.get_str("system", "boot_app")
-if not app:
-	app = nvs.get_str("system", "default_app")
-	if not app:
-		app = "launcher"
+app = ""
 
-# # Override with special boot mode apps if necessary
+# Special boot mode apps for first time boot
 if nvs.get_int("system", "factory_checked") != 2:
-	# Factory check mode, direct import because of GPIO0 bootloader mode after initial flash
+	# Factory check mode
+	# Direct import because of GPIO0 strapped value after initial flash, we can't deepsleep without
+	# going back into bootloader mode
 	import factory_checks
+	app = "shell"
 elif nvs.get_int("system", "splash_played") != 1:
 	nvs.set_int("system", "splash_played", 1)
 	# Boot splash screen
 	app = "nyan"
+else:
+	# Default app
+	app = nvs.get_str("system", "boot_app")
+	if not app:
+		app = nvs.get_str("system", "default_app")
+		if not app:
+			app = "launcher"
 
-if app and not app == "shell":
+if app and app != "shell":
 	try:
 		print("Starting app '%s'..." % app)
 		system.__current_app__ = app
