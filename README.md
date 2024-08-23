@@ -1,5 +1,5 @@
 # BadgePython
-Experimental try at making an ESP-IDF v4.0 compatible Badge oriented Micropython firmware
+Experimental try at making an ESP-IDF v5.2 compatible Badge oriented Micropython firmware
 
 ## Supported environments
 * Linux
