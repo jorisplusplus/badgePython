@@ -189,15 +189,16 @@ while True:
             serial.writeline("Thanks!")
             print("You got a droplet from a friendly neighbour!")
             config['droplets_encrypted'].append(ciphertext)
+            fluidsim.push_particle()
 
     if fluidsim.has_particle(4, 0):
         ciphertext = config['droplets_encrypted'][-1]
         serial.write(binascii.unhexlify(ciphertext))
-        time.sleep(0.2)
         reply = serial.readline()
-        if reply is not None and 'Thanks' in reply:
+        if True:  #reply is not None and 'Thanks' in reply:
             print("Sent droplet to a friendly neighbour!")
             config['droplets_encrypted'].pop()
+            fluidsim.pop_particle()
 
     if config_changed and (time.time() - last_written_config) >= 10:
         valuestore.save('app', 'pouringgame', config)
