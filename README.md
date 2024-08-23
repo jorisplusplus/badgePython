@@ -7,16 +7,16 @@ Experimental try at making an ESP-IDF v4.0 compatible Badge oriented Micropython
 * (Maybe WSL 2 on Windows?)
 
 ## Setup (generic, default configuration)
-1. Clone the repo
-2. Run `make prepare` to clone submodules and install the configuration files
+1. Clone the repo with submodules
+2. Run `make prepare` to install the configuration files
 3. Run `make build` to build the firmware
 4. Run `make flash` to flash the firmware to the device
 
 ## Setup Brucon
-1. Clone the repo
+1. Clone the repo with submodules (git clone --recurse-submodules)
 2. Run `export BOARD=Brucon` to set build type to Brucon
 3. Run `export PORT=....` to set serial port of the badge (linux /dev/ttyACM0)
-4. Run `make prepare` to clone submodules and install the configuration files
+4. Run `make prepare` to install the configuration files
 5. Run `make build` to build firmware
 6. Run `make flash` to flash firmware
 
