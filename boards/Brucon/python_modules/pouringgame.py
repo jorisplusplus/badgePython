@@ -190,6 +190,7 @@ while True:
             print("You got a droplet from a friendly neighbour!")
             config['droplets_encrypted'].append(ciphertext)
             fluidsim.push_particle()
+            config_changed = True
 
     if fluidsim.has_particle(4, 0):
         ciphertext = config['droplets_encrypted'][-1]
@@ -199,6 +200,7 @@ while True:
             print("Sent droplet to a friendly neighbour!")
             config['droplets_encrypted'].pop()
             fluidsim.pop_particle()
+            config_changed = True
 
     if config_changed and (time.time() - last_written_config) >= 10:
         valuestore.save('app', 'pouringgame', config)
