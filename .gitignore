@@ -9,3 +9,4 @@ sdkconfig.old
 sdkconfig.defaults
 managed_components/
 dependencies.lock
+boards/Brucon/python_modules/pkcs1/__pycache__
