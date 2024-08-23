@@ -12,11 +12,13 @@ Experimental try at making an ESP-IDF v4.0 compatible Badge oriented Micropython
 3. Run `make build` to build the firmware
 4. Run `make flash` to flash the firmware to the device
 
-## Setup (MCH2022 badge app)
+## Setup Brucon
 1. Clone the repo
-2. Run `make prepare-mch2022` to clone submodules and install the configuration files
-3. Run `make build` to build the firmware
-4. Install the file `build/badge_firmware.bin` as an app via WebUSB
+2. Run `export BOARD=Brucon` to set build type to Brucon
+3. Run `export PORT=....` to set serial port of the badge (linux /dev/ttyACM0)
+4. Run `make prepare` to clone submodules and install the configuration files
+5. Run `make build` to build firmware
+6. Run `make flash` to flash firmware
 
 ## Other make commands
 * `make clean` remove existing build files
