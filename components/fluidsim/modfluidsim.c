@@ -21,18 +21,46 @@
  */
 
 //--------------------------------------------------------------------------------
-static mp_obj_t esp_fluidsim_update(mp_obj_t accel_x_obj, mp_obj_t accel_y_obj, mp_obj_t accel_z_obj) {
-  float accel_x = mp_obj_get_float_to_f(accel_x_obj);
-  float accel_y = mp_obj_get_float_to_f(accel_y_obj);
-  float accel_z = mp_obj_get_float_to_f(accel_z_obj);
-  fluidsim_step(accel_x, accel_y, accel_z);
-	return mp_const_true;
+static mp_obj_t fluidsim_begin_fun(mp_obj_t num_particles, mp_obj_t colour) {
+  mp_int_t num_int = mp_obj_get_int(num_particles);
+  mp_int_t colour_int = mp_obj_get_int(colour);
+  fluidsim_begin(num_int, (colour_int << 8) + 0xFF);
+  return mp_const_true;
 }
-static MP_DEFINE_CONST_FUN_OBJ_3(esp_fluidsim_update_obj, esp_fluidsim_update);
+static MP_DEFINE_CONST_FUN_OBJ_2(fluidsim_begin_obj, fluidsim_begin_fun);
+
+static mp_obj_t fluidsim_has_particle_fun(mp_obj_t x, mp_obj_t y) {
+  mp_int_t x_int = mp_obj_get_int(x);
+  mp_int_t y_int = mp_obj_get_int(y);
+  return fluidsim_has_particle(x_int, y_int) ? mp_const_true : mp_const_false;
+}
+static MP_DEFINE_CONST_FUN_OBJ_2(fluidsim_has_particle_obj, fluidsim_has_particle_fun);
+
+static mp_obj_t fluidsim_push_fun() {
+  fluidsim_push_particle();
+  return mp_const_true;
+}
+static MP_DEFINE_CONST_FUN_OBJ_0(fluidsim_push_obj, fluidsim_push_fun);
+
+static mp_obj_t fluidsim_pop_fun() {
+  fluidsim_pop_particle();
+  return mp_const_true;
+}
+static MP_DEFINE_CONST_FUN_OBJ_0(fluidsim_pop_obj, fluidsim_pop_fun);
+
+static mp_obj_t fluidsim_num_particles_fun() {
+  fluidsim_num_particles();
+  return mp_const_true;
+}
+static MP_DEFINE_CONST_FUN_OBJ_0(fluidsim_num_particles_obj, fluidsim_num_particles_fun);
 
 //=========================================================
 static const mp_rom_map_elem_t fluidsim_module_globals_table[] = {
-    { MP_OBJ_NEW_QSTR(MP_QSTR_update),			(mp_obj_t)&esp_fluidsim_update_obj},
+    { MP_OBJ_NEW_QSTR(MP_QSTR_begin),			(mp_obj_t)&fluidsim_begin_obj},
+    { MP_OBJ_NEW_QSTR(MP_QSTR_has_particle),			(mp_obj_t)&fluidsim_has_particle_obj},
+    { MP_OBJ_NEW_QSTR(MP_QSTR_push_particle),			(mp_obj_t)&fluidsim_push_obj},
+    { MP_OBJ_NEW_QSTR(MP_QSTR_pop_particle),			(mp_obj_t)&fluidsim_pop_obj},
+    { MP_OBJ_NEW_QSTR(MP_QSTR_num_particles),			(mp_obj_t)&fluidsim_num_particles_obj},
 };
 static MP_DEFINE_CONST_DICT(fluidsim_module_globals, fluidsim_module_globals_table);
 

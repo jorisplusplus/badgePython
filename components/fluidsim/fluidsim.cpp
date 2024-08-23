@@ -1,5 +1,6 @@
 #include <esp_log.h>
 #include <esp_timer.h>
+#include <FreeRTOS.h>
 
 #include "Adafruit_PixelDust.h"
 #include "demo.h"
@@ -7,17 +8,18 @@
 #include "driver_hub75.h"
 
 #define N_FLAKES 1200
-#define WIDTH 32
-#define HEIGHT 19
+#define WIDTH CONFIG_HUB75_WIDTH
+#define HEIGHT CONFIG_HUB75_HEIGHT
+#define MAX_FLAKES (WIDTH * HEIGHT)
+
 
 volatile bool running = true;
 int nFlakes = N_FLAKES;  // Runtime flake count (adapts to res)
-int i;
 int simOption;
 Adafruit_PixelDust *snow;
-dimension_t x, y;
 
 Color *sandbuffer;
+Color droplet_colour = {.value = 0xffbf00ff};
 
 demo::demo() {
   snow = NULL;
@@ -44,7 +46,7 @@ void demo::selectSim(int option, int flakes) {
   if (snow) delete (snow);
   if (simOption == 0) {
     snow = new Adafruit_PixelDust(WIDTH, HEIGHT, nFlakes, 2, 180, true);
-    if (!snow->begin()) {
+    if (!snow->begin(MAX_FLAKES)) {
       printf("PixelDust init failed\n");
     }
 
@@ -56,6 +58,7 @@ void demo::dispSnow() {
   uint8_t address;
   int16_t ay, ax, az;
 
+
   address = 0x28 | 0x80;
   i2c_master_write_read_device(I2C_NUM_0, 0x19, &address, 1, (uint8_t *)&ax, 2, -1);
   address = 0x2A | 0x80;
@@ -66,15 +69,15 @@ void demo::dispSnow() {
   snow->iterate(-ax, -ay, 0);
 
   // Erase canvas and draw new snowflake positions
-  for (i = 0; i < WIDTH * HEIGHT; i++) {
+  for (int i = 0; i < WIDTH * HEIGHT; i++) {
     sandbuffer[i].value = 0;
   }
 
-  for (i = 0; i < nFlakes; i++) {
+  dimension_t x, y;
+  uint16_t num_particles = snow->numPixels();
+  for (int i = 0; i < num_particles; i++) {
     snow->getPosition(i, &x, &y);
-    sandbuffer[x + y * WIDTH].RGB[0] = 0;
-    sandbuffer[x + y * WIDTH].RGB[1] = i+50;
-    sandbuffer[x + y * WIDTH].RGB[2] = 10;
+    sandbuffer[x + y * WIDTH].value = droplet_colour.value;
   }
 }
 
@@ -82,20 +85,49 @@ void demo::setBuffer(Color *framebuffer) {
   sandbuffer = framebuffer;
 }
 
-extern "C" void init_particlesim() {
-  demo *dem = new demo();
-  dem->selectSim(0, 150);
-  dem->setBuffer(getFrameBuffer());
-  compositor_disable();
+extern "C" bool fluidsim_has_particle(uint16_t x, uint16_t y) {
+  dimension_t temp_x, temp_y;
+  uint16_t num_particles = snow->numPixels();
+  for (int i = 0; i < num_particles; i++) {
+    snow->getPosition(i, &temp_x, &temp_y);
+    if (temp_x == x && temp_y == y) { return true; }
+  }
+
+  return false;
+}
+
+extern "C" uint16_t fluidsim_num_particles(void) {
+  return snow->numPixels();
+}
+
+extern "C" void fluidsim_push_particle(void) {
+  snow->pushPixel();
+}
+
+extern "C" void fluidsim_pop_particle(void) {
+  snow->popPixel();
+}
+
+extern "C" void fluidsim_task(void *params) {
+  demo *dem = (demo*)params;
   while (1) {
     int64_t time = esp_timer_get_time();
     dem->dispSnow();
-    int64_t delta = esp_timer_get_time() - time;
-    ESP_LOGI("Delta", "%lld", delta);
+//    int64_t delta = esp_timer_get_time() - time;
+//    ESP_LOGI("Delta", "%lld", delta);
     vTaskDelay(1);
-    
   }
 }
 
-extern "C" void destroy_particlesim() {
+extern "C" void fluidsim_begin(int num_particles, int colour) {
+  droplet_colour.value = (uint32_t) colour;
+  demo *dem = new demo();
+  dem->selectSim(0, num_particles);
+  dem->setBuffer(getFrameBuffer());
+  compositor_disable();
+  xTaskCreate(fluidsim_task, "fluidsim", 4000, dem, 1, NULL);
+}
+
+extern "C" esp_err_t fluidsim_init(void) {
+  return ESP_OK;
 }

@@ -22,6 +22,8 @@
 #include <stdint.h>
 #include <string.h>
 #include <math.h>
+#include <FreeRTOS.h>
+#include "semphr.h"
 /*! Remap Arduino-style random() to stdlib-style. */
 
 
@@ -110,7 +112,11 @@ class Adafruit_PixelDust {
               calling iterate().
       @return True on success (memory allocated), otherwise false.
   */
-  bool begin(void);
+  bool begin(int max_grains);
+
+  uint16_t numPixels(void);
+  void pushPixel(void);
+  void popPixel(void);
 
   /*!
       @brief Sets state of one pixel on the pixel grid. This can be
@@ -183,18 +189,22 @@ class Adafruit_PixelDust {
   */
   void iterate(int16_t ax, int16_t ay, int16_t az=0);
 
+
+
  private:
   dimension_t   width,      // Width in pixels
                 height,     // Height in pixels
                 w8;         // Bitmap scanline bytes ((width + 7) / 8)
   position_t    xMax,       // Max X coordinate in grain space
                 yMax;       // Max Y coordinate in grain space
-  grain_count_t n_grains;   // Number of sand grains
+  grain_count_t n_grains;   // Current number of sand grains
+  grain_count_t max_grains; // Max number of sand grains
   uint8_t       scale,      // Accelerometer input scaling = scale/256
                 elasticity, // Grain elasticity (bounce) = elasticity/256
                *bitmap;     // 2-bit-per-pixel bitmap (width padded to byte)
   Grain        *grain;      // One per grain, alloc'd in begin()
   bool          sort;       // If true, sort bottom-to-top when iterating
+  SemaphoreHandle_t sync;
 };
 
 #endif // _ADAFRUIT_PIXELDUST_H_

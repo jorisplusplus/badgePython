@@ -27,6 +27,8 @@
  */
 
 #include "Adafruit_PixelDust.h"
+#include <FreeRTOS.h>
+#include "semphr.h"
 
 #include "esp_random.h"
 
@@ -34,6 +36,7 @@
 
 Adafruit_PixelDust::Adafruit_PixelDust(dimension_t w, dimension_t h,
                                        grain_count_t n, uint8_t s, uint8_t e, bool sort) : width(w), height(h), w8((w + 7) / 8), xMax(w * 256 - 1), yMax(h * 256 - 1), n_grains(n), scale(s), elasticity(e), bitmap(NULL), grain(NULL), sort(sort) {
+  sync = xSemaphoreCreateMutex();
 }
 
 Adafruit_PixelDust::~Adafruit_PixelDust(void) {
@@ -45,12 +48,14 @@ Adafruit_PixelDust::~Adafruit_PixelDust(void) {
     free(grain);
     grain = NULL;
   }
+  vSemaphoreDelete(sync);
 }
 
-bool Adafruit_PixelDust::begin(void) {
+bool Adafruit_PixelDust::begin(int max) {
   if ((bitmap)) return true;  // Already allocated
+  max_grains = max;
   if ((bitmap = (uint8_t *)calloc(w8 * height, sizeof(uint8_t)))) {
-    if ((!n_grains) || (grain = (Grain *)calloc(n_grains, sizeof(Grain))))
+    if ((grain = (Grain *)calloc(max_grains, sizeof(Grain))))
       return true;  // Success
     free(bitmap);   // Second alloc failed; free first-alloc data too
     bitmap = NULL;
@@ -83,6 +88,30 @@ void Adafruit_PixelDust::randomize(void) {
 
 // Pixel set/read functions for the bitmap buffer
 // Most other architectures will perform better with shifts.
+
+uint16_t Adafruit_PixelDust::numPixels(void) {
+  return n_grains;
+}
+
+void Adafruit_PixelDust::pushPixel(void) {
+  if (n_grains+1 >= max_grains) { return; }
+
+
+  xSemaphoreTake(sync, portMAX_DELAY);
+  grain[n_grains].vx = 0;
+  grain[n_grains].vy = 0;
+  while (!setPosition(n_grains, random(width), random(height)));
+  n_grains++;
+  xSemaphoreGive(sync);
+}
+
+void Adafruit_PixelDust::popPixel(void) {
+  if (n_grains == 0) { return; }
+  xSemaphoreTake(sync, portMAX_DELAY);
+  clearPixel(grain[n_grains-1].x, grain[n_grains-1].y);
+  n_grains--;
+  xSemaphoreGive(sync);
+}
 
 void Adafruit_PixelDust::setPixel(dimension_t x, dimension_t y) {
   bitmap[y * w8 + x / 8] |= (0x80 >> (x & 7));
@@ -139,6 +168,8 @@ static int (*compare[8])(const void *a, const void *b) = {
 
 // Calculate one frame of particle interactions
 void Adafruit_PixelDust::iterate(int16_t ax, int16_t ay, int16_t az) {
+  xSemaphoreTake(sync, portMAX_DELAY);
+
   ax = (int32_t)ax * scale / 256;        // Scale down raw accelerometer
   ay = (int32_t)ay * scale / 256;        // inputs to manageable range.
   az = abs((int32_t)az * scale / 2048);  // Z is further scaled down 1:8
@@ -282,4 +313,6 @@ void Adafruit_PixelDust::iterate(int16_t ax, int16_t ay, int16_t az) {
     grain[i].y = newy;
     setPixel(newx / 256, newy / 256);  // Set new spot
   }
+
+  xSemaphoreGive(sync);
 }

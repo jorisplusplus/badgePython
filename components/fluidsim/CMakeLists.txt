@@ -1,5 +1,6 @@
 set(srcs
-    "fluidsim.c"
+    "Adafruit_PixelDust.cpp"
+    "fluidsim.cpp"
     "modfluidsim.c"
 )
 

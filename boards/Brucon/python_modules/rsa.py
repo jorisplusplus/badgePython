@@ -52,8 +52,6 @@ def _modinv(a, m):
     else:
         return x % m
 
-
-# Generated on PC (79284753922901710415148579064982737711, 326684018224851925040338467521754423887)
 def gen_p_q(bitsize=128):
     p = 0
     while p == 0 or not _miller_rabin_is_prime(p, 40):
@@ -93,3 +91,7 @@ def encrypt(n, e, byte_string):
 def decrypt(n, d, bin_data):
     private_key = keys.RsaPrivateKey(n, d)
     return rsaes_pkcs1_v15.decrypt(private_key, bin_data)
+
+if __name__ == '__main__':
+    # Allows generating big keys on PC
+    print(gen_p_q(192))

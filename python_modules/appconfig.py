@@ -1,5 +1,6 @@
 import valuestore
 
+
 def get(app_slug, default_config):
     config = valuestore.load(namespace='app', keyname=app_slug)
     resave = False
@@ -17,3 +18,7 @@ def get(app_slug, default_config):
         valuestore.save(namespace='app', keyname=app_slug, value=config)
 
     return config
+
+
+def save(app_slug, config):
+    valuestore.save(namespace='app', keyname=app_slug, value=config)

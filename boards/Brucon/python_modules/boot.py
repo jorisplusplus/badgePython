@@ -13,8 +13,8 @@ if not app:
 
 # # Override with special boot mode apps if necessary
 if nvs.get_int("system", "factory_checked") != 2:
-	# Factory check mode
-	app = "factory_checks"
+	# Factory check mode, direct import because of GPIO0 bootloader mode after initial flash
+	import factory_checks
 elif nvs.get_int("system", "splash_played") != 1:
 	nvs.set_int("system", "splash_played", 1)
 	# Boot splash screen
