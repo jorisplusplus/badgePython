@@ -108,7 +108,9 @@ void Adafruit_PixelDust::pushPixel(void) {
 void Adafruit_PixelDust::popPixel(void) {
   if (n_grains == 0) { return; }
   xSemaphoreTake(sync, portMAX_DELAY);
-  clearPixel(grain[n_grains-1].x, grain[n_grains-1].y);
+  dimension_t x, y;
+  getPosition(n_grains-1, &x, &y);
+  clearPixel(x, y);
   n_grains--;
   xSemaphoreGive(sync);
 }
