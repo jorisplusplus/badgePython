@@ -148,6 +148,7 @@ def read_metadata(app):
         return ujson.loads(information)
     except BaseException as e:
         print("[ERROR] Can not read metadata for app " + app)
+        import sys
         sys.print_exception(e)
         information = {"name": app, "description": "", "category": "", "author": "", "revision": 0}
         return [app, ""]
@@ -162,8 +163,8 @@ def uninstall(app):
         render_current_app()
         return
 
-    nvs.set_blob('system', 'uninstall_name', app['title'])
-    nvs.set_blob('system', 'uninstall_file', app['file'])
+    nvs.set_str('system', 'uninstall_name', app['title'])
+    nvs.set_str('system', 'uninstall_file', app['file'])
     system.start('uninstall')
 
 
@@ -281,13 +282,3 @@ if cfg_term_menu:
     menu = term_menu.UartMenu(deepsleep.start_sleeping, pm)
     print(gc.mem_free())
     menu.main()
-else:
-    import sys
-    print("Welcome!")
-    print("Press CTRL+C to reboot directly to a Python prompt.")
-    wait = True
-    while wait:
-            c = sys.stdin.read(1)
-            if c == "\x03" or c == "\x04": # CTRL+C or CTRL+D
-                    wait = False
-    import shell

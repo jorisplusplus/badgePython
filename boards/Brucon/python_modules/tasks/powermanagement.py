@@ -97,9 +97,3 @@ def set_timeout(t):
     ''' Set timeout '''
     global timeout
     timeout = t
-
-try:
-    # If present, include the service for undervoltage detection
-    __import__('tasks/undervoltagemon')
-except:
-    pass

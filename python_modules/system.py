@@ -24,7 +24,7 @@ def sleep(duration=0, status=False):
         else:
             term.header(True, "Sleeping for "+str(duration)+"ms...")
     time.sleep(0.1)
-    machine.deepsleep(0)
+    machine.deepsleep(duration)
 
 def isColdBoot():
     if machine.wake_reason() == (7, 0):
@@ -81,16 +81,16 @@ __current_app__ = None
 def currentApp():
     return __current_app__
 
-def get_vcc_bat():
-    voltage_bat = None
-    try:
-        vcc_bat = machine.ADC(machine.Pin(35))
-        vcc_bat.width(machine.ADC.WIDTH_12BIT)
-        vcc_bat.atten(machine.ADC.ATTN_11DB)
-        voltage_bat = int(vcc_bat.read() / (4095 / 4034) * 2 )
-        vcc_bat.deinit()
-    finally:
-        return voltage_bat
+# def get_vcc_bat():
+#     voltage_bat = None
+#     try:
+#         vcc_bat = machine.ADC(machine.Pin(35))
+#         vcc_bat.width(machine.ADC.WIDTH_12BIT)
+#         vcc_bat.atten(machine.ADC.ATTN_11DB)
+#         voltage_bat = int(vcc_bat.read() / (4095 / 4034) * 2 )
+#         vcc_bat.deinit()
+#     finally:
+#         return voltage_bat
 
 def crashedWarning():
     pass

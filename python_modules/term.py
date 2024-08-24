@@ -65,6 +65,10 @@ def draw_menu_partial(title, items, selected=0, text="", width=32,lastSelected=0
 		color()
 		
 def menu(title, items, selected = 0, text="", width=32):
+	import uselect
+	spoll = uselect.poll()
+	spoll.register(sys.stdin, uselect.POLLIN)
+
 	clear()
 	lastSelected = selected
 	lastForceRedraw = 0.0
@@ -77,12 +81,13 @@ def menu(title, items, selected = 0, text="", width=32):
 		lastSelected = selected
 		key = None
 		while not key:
-			key = machine.stdin_get(1,1)#sys.stdin.read(1)
+			key = sys.stdin.read(1) if spoll.poll(0) else None
+			time.sleep(0.01)
 
 			# Workaround for term not showing on boot on Win/PuTTY
 			# unless you manually press a key. Here we force a redraw
-			# every time for two seconds after booting
-			if time.time() < 3.0 and (time.time() - lastForceRedraw) >= 1.0:
+			# every time for six seconds after booting
+			if time.time() < 6.0 and (time.time() - lastForceRedraw) >= 1.0:
 				key = ' '
 				lastForceRedraw = time.time()
 		feedPm()
@@ -108,7 +113,10 @@ def menu(title, items, selected = 0, text="", width=32):
 				pm.resume()
 				
 			elif (key == "\n" or key == "\r"):
-				junk = machine.stdin_get(10000, 10) #Read all remaining characters and throw them away
+				#Read all remaining characters and throw them away
+				while spoll.poll(0):
+					sys.stdin.read()
+					time.sleep(0.01)
 				return selected
 			else:
 				clear()
@@ -118,7 +126,10 @@ def menu(title, items, selected = 0, text="", width=32):
 			needFullDraw = True
 			sys.print_exception(e)
 			time.sleep(2)
-			junk = machine.stdin_get(10000, 10) #Read all remaining characters and throw them away
+			#Read all remaining characters and throw them away
+			while spoll.poll(0):
+				sys.stdin.read()
+				time.sleep(0.01)
 
 def prompt(prompt, x, y, buff = ""):
 	running = True
@@ -137,6 +148,7 @@ def prompt(prompt, x, y, buff = ""):
 			buff += last
 		if ord(last) == 127:
 			buff = buff[:-1]
+		time.sleep(0.01)
 
 def empty_lines(count = 10):
 	for i in range(0,count):
