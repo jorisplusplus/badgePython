@@ -9,7 +9,7 @@ def set_nickname():
     uinterface.skippabletext('Set nickname:')
     new_name = uinterface.text_input()
     if new_name is not None and new_name != '':
-        nvs.set_int("system", 'nickname', new_name)
+        nvs.set_str("system", 'nickname', new_name)
     system.start('nickname')
 
 
