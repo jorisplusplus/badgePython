@@ -1,37 +1,20 @@
 #include <stdbool.h>
 #include <stdint.h>
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
 
 #include "sdkconfig.h"
-#include "driver/rtc_io.h"
 #include "esp_system.h"
 
 #include <esp_log.h>
 #include <esp_err.h>
 
-#include "rom/usb/usb_device.h"
 #include "rom/usb/chip_usb_dw_wrapper.h"
 #include "rom/usb/usb_persist.h"
-#include "soc/usb_struct.h"
 #include "soc/rtc_cntl_reg.h"
+#include "tinyusb.h"
 
 #include "include/bootloader.h"
 #include "rom/ets_sys.h"
-
-#define DWC2_FS_PERIPH_BASE  0x60080000UL
-#define DWC2 ((dwc2_regs_t*)(DWC2_FS_PERIPH_BASE))
-
-#define GRSTCTL_CSRST_Pos                (0U)
-#define GRSTCTL_CSRST_Msk                (0x1UL << GRSTCTL_CSRST_Pos)             // 0x00000001 */
-#define GRSTCTL_CSRST                    GRSTCTL_CSRST_Msk                        // Core soft reset          */
-
-#define TU_BIT(n)                       (1UL << (n))
-#define PCGCTL_RSTPDWNMODULE            TU_BIT(3)
-#define PCGCTL_PWRCLMP                  TU_BIT(2)
-#define PCGCTL_GATEHCLK                 TU_BIT(1)
-#define PCGCTL_STOPPCLK                 TU_BIT(0)
+#include "rom/usb/usb_dc.h"
 
 const char *TAG = "modbootloader";
 
@@ -58,21 +41,27 @@ void bootloader_shutdown_handler(void)
     chip_usb_set_persist_flags(0);
     REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
 
-    // stop PHY clock
-    DWC2->pcgctl &= (PCGCTL_STOPPCLK | PCGCTL_GATEHCLK | PCGCTL_PWRCLMP | PCGCTL_RSTPDWNMODULE);
+    // Disconnect USB peripheral from host to allow bootloader to create new one
+    tud_disconnect();
 
+    // Wait to make sure the USB peripheral is disconnected
     ets_delay_us(1 * 1000 * 1000);
-
   } else if (next_reboot == REBOOT_BOOTLOADER_DFU) {
     chip_usb_set_persist_flags(USBDC_BOOT_DFU);
     REG_WRITE(RTC_CNTL_OPTION1_REG, RTC_CNTL_FORCE_DOWNLOAD_BOOT);
   } else {
+    usb_dc_prepare_persist();
     chip_usb_set_persist_flags(USBDC_PERSIST_ENA);
     REG_WRITE(RTC_CNTL_OPTION1_REG, 0);
   }
 }
 
 esp_err_t bootloader_init(void) {
+  ESP_LOGI(TAG, "DWC USB Persist: %d", chip_usb_dw_did_persist());
+
+  // Disable bootloader mode on reboot by default
+  REG_WRITE(RTC_CNTL_OPTION1_REG, 0);
+
   esp_err_t err;
   err = esp_register_shutdown_handler(bootloader_shutdown_handler);
   if (err != ESP_OK) {
