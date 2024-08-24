@@ -1,12 +1,12 @@
 set(srcs
-    "bootloader.c"
-    "modbootloader.c"
+    "modusb.c"
+    "usb_cdc_helpers.c"
 )
 
 set(includes
     "include"
-    )
+)
 
 idf_component_register(SRCS "${srcs}"
                        INCLUDE_DIRS ${includes}
-                       REQUIRES main esp_rom soc)
+                       PRIV_REQUIRES main esp_tinyusb)
