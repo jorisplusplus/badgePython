@@ -58,11 +58,14 @@ def populate_apps():
         userApps = []
     for app in userApps:
         add_app(app, read_metadata(app))
+    add_app("pouringgame", {"name": "Brucon game", "category": "system", "icon": icon_beer})
     add_app("nickname", {"name": "Nickname", "category": "system", "icon": icon_nickname})
-    add_app("pouringgame", {"name": "Pouring game", "category": "system", "icon": icon_beer})
+    add_app("challenges/1a", {"name": "CTF chall 1", "category": "system", "icon": icon_unknown})
+    add_app("challenges/1b", {"name": "CTF chall 2", "category": "system", "icon": icon_unknown})
+    add_app("challenges/1c", {"name": "CTF chall 3", "category": "system", "icon": icon_unknown})
     add_app("snake", {"name": "Snake", "category": "system", "icon": icon_snake})
     add_app("nyan", {"name": "Nyan cat", "category": "system", "icon": icon_nyan})
-    add_app("partsim", {"name": "Particle simulator", "category": "system", "icon": icon_partsim})
+    # add_app("partsim", {"name": "Particle simulator", "category": "system", "icon": icon_partsim})
     # add_app("clock", {"name": "Clock", "category": "system", "icon": icon_clock})
     # add_app("slider", {"name": "Slider", "category": "system", "icon": icon_slider})
     # add_app("appstore", {"name": "App store", "category": "system", "icon": icon_appstore})
