@@ -1,7 +1,7 @@
-import uos as os, time, ujson, gc, term, deepsleep, nvs
+import uos as os, time, ujson, gc, term, deepsleep, nvs, usb
 import system, term_menu, virtualtimers, tasks.powermanagement as pm, buttons
 import rgb, uinterface
-from default_icons import icon_snake, icon_nickname, icon_nyan, icon_partsim, icon_unknown, icon_beer
+from default_icons import icon_snake, icon_nickname, icon_nyan, icon_unknown, icon_beer
 
 # Application list
 apps = []
@@ -60,9 +60,9 @@ def populate_apps():
         add_app(app, read_metadata(app))
     add_app("pouringgame", {"name": "Brucon game", "category": "system", "icon": icon_beer})
     add_app("nickname", {"name": "Nickname", "category": "system", "icon": icon_nickname})
-    add_app("challenges/1a", {"name": "CTF chall 1", "category": "system", "icon": icon_unknown})
-    add_app("challenges/1b", {"name": "CTF chall 2", "category": "system", "icon": icon_unknown})
-    add_app("challenges/1c", {"name": "CTF chall 3", "category": "system", "icon": icon_unknown})
+    add_app("chall_a", {"name": "CTF chall 1", "category": "system", "icon": icon_unknown})
+    add_app("chall_b", {"name": "CTF chall 2", "category": "system", "icon": icon_unknown})
+    add_app("chall_c", {"name": "CTF chall 3", "category": "system", "icon": icon_unknown})
     add_app("snake", {"name": "Snake", "category": "system", "icon": icon_snake})
     add_app("nyan", {"name": "Nyan cat", "category": "system", "icon": icon_nyan})
     # add_app("partsim", {"name": "Particle simulator", "category": "system", "icon": icon_partsim})
@@ -272,13 +272,10 @@ def start():
 start()
 init_power_management()
 
-try:
-    cfg_term_menu = nvs.get_int("system", "term_menu")
-except Exception as e:
-    cfg_term_menu = True
+while not usb.cdc_connected():
+    time.sleep(0.5)
 
-
-if cfg_term_menu:
+cfg_term_menu = nvs.get_int("system", "term_menu")
+if cfg_term_menu == 1 or cfg_term_menu is None:
     menu = term_menu.UartMenu(deepsleep.start_sleeping, pm)
-    print(gc.mem_free())
     menu.main()
