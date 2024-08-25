@@ -6,8 +6,8 @@ def start_sleeping(sleepTime=0):
     rgb.scrolltext('ZzZz')
     time.sleep(3)
 
-    if (sleepTime >= 86400000):  # One day
-        sleepTime = 0
+    if (sleepTime == 0 or sleepTime >= 86400000):  # One day
+        machine.deepsleep()  # indefinitely
     if (sleepTime < 1):
         print("Sleeping until A-button is pressed...")
     else:
