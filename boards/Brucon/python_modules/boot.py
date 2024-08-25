@@ -13,10 +13,12 @@ if nvs.get_int("system", "factory_checked") != 2:
 	# going back into bootloader mode
 	import factory_checks
 	app = "shell"
+elif nvs.get_int("system", "first_powerup") != 1:
+	nvs.set_int("system", "first_powerup", 1)
+	app = "powerup"
 elif nvs.get_int("system", "splash_played") != 1:
 	nvs.set_int("system", "splash_played", 1)
-	# Boot splash screen
-	app = "nyan"
+	app = "bootsplash"
 else:
 	# Default app
 	app = nvs.get_str("system", "boot_app")
@@ -30,7 +32,10 @@ if app and app != "shell":
 		print("Starting app '%s'..." % app)
 		system.__current_app__ = app
 		if app:
-			__import__(app)
+			module = __import__(app)
+			for name in dir(module):
+				globals()[name] = getattr(module, name)
+			del module
 	except KeyboardInterrupt:
 		system.shell()
 	except BaseException as e:
@@ -42,4 +47,18 @@ if app and app != "shell":
 			system.launcher()
 
 if app and app == "shell":
+	import rgb, usb, gc
+
+	secs_without_conn = 0.0
+	while not usb.cdc_connected():
+		if secs_without_conn >= 2.0:
+			rgb.scrolltext("USB Serial python shell active")
+		time.sleep(0.5)
+		secs_without_conn += 0.5
+
+	rgb.clear()
+	del rgb, usb, secs_without_conn
+	gc.collect()
+	del gc
+
 	print("\nWelcome to the python shell of your badge!")

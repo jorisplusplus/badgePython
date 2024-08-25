@@ -1,4 +1,4 @@
-import network, term, sys, system, machine
+import network, term, sys, system, nvs, usb, time
 
 system.serialWarning()
 
@@ -16,13 +16,17 @@ def main():
 
 def confirm(nickname):
     term.header(True, "Nickname setup")
-    machine.nvs_setstr("badge", "nickname", nickname)
+    nvs.set_str("badge", "nickname", nickname)
     print("New configuration has been saved.")
     print("")
     print("Nickname:\t\t"+nickname)
     print("Press any key to return to the homescreen")
     sys.stdin.read(1)
     system.home(True)
+
+
+while not usb.cdc_connected():
+    time.sleep(0.5)
 
 while True:
     main()

@@ -21,8 +21,10 @@ class UartMenu():
 		import shell
 	
 	def menu_main(self):
-		items = ["Python shell", "Apps", "Installer", "Settings", "About", "Check for updates", self.power_off_label]
-		callbacks = [self.drop_to_shell, self.opt_launcher, self.opt_installer, self.menu_settings, self.opt_about, self.opt_ota_check, self.go_to_sleep]
+		items = ["Python shell", "Apps", "Settings", "About", self.power_off_label]
+		callbacks = [self.drop_to_shell, self.opt_launcher, self.menu_settings, self.opt_about,  self.go_to_sleep]
+		# items = ["Python shell", "Apps", "Installer", "Settings", "About", "Check for updates", self.power_off_label]
+		# callbacks = [self.drop_to_shell, self.opt_launcher, self.opt_installer, self.menu_settings, self.opt_about, self.opt_ota_check, self.go_to_sleep]
 		current = str(consts.INFO_FIRMWARE_BUILD)
 		short_current = current[6:] if len(current) > 6 else current
 		message = "Welcome!\nYour badge is running firmware version "+short_current+": "+consts.INFO_FIRMWARE_NAME+"\n"

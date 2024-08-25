@@ -1,4 +1,4 @@
-import term, system, time, wifi, uos, json, sys, gc, woezel, uinstaller
+import term, system, time, uos, json, sys, gc, woezel, uinstaller, usb
 
 system.serialWarning()
 
@@ -64,6 +64,8 @@ def install_app(i,fromcat):
     uinstaller.install(slug)
 
 #Main application
+while not usb.cdc_connected():
+    time.sleep(0.5)
 
 showMessage("Loading categories...")
 if not woezel.update_cache():

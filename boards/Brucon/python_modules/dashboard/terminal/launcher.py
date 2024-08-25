@@ -1,4 +1,4 @@
-import term, system, sys, uos as os, ujson
+import term, system, sys, uos as os, ujson, usb, time
 import woezel
 
 system.serialWarning()
@@ -69,6 +69,9 @@ def expandhome(s):
         h = os.getenv("HOME")
         s = s.replace("~/", h + "/")
     return s
+
+while not usb.cdc_connected():
+    time.sleep(0.5)
 
 term.empty_lines()
 term.header("Loading application list...")

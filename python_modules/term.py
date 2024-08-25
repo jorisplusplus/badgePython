@@ -146,7 +146,7 @@ def prompt(prompt, x, y, buff = ""):
 			return buff
 		if ord(last) >= 32 and ord(last) < 127:
 			buff += last
-		if ord(last) == 127:
+		if ord(last) == 8:  # backspace
 			buff = buff[:-1]
 		time.sleep(0.01)
 

@@ -1,4 +1,4 @@
-import network, term, sys, system, machine
+import network, term, sys, system, nvs, usb, time
 
 system.serialWarning()
 
@@ -59,8 +59,8 @@ def password(ssidName, ssidType):
 
 def confirm(ssid, password):
     term.header(True, "WiFi setup")
-    machine.nvs_setstr("system", "wifi.ssid", ssid)
-    machine.nvs_setstr("system", "wifi.password", password)
+    nvs.setstr("system", "wifi.ssid", ssid)
+    nvs.setstr("system", "wifi.password", password)
     print("New configuration has been saved.")
     print("")
     print("SSID:\t\t"+ssid)
@@ -72,6 +72,10 @@ def confirm(ssid, password):
     print("Press any key to return to the homescreen")
     sys.stdin.read(1)
     system.home(True)
+
+
+while not usb.cdc_connected():
+    time.sleep(0.5)
 
 while True:
     main()
