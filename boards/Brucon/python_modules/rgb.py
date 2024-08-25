@@ -67,7 +67,7 @@ def getbrightness():
 
 
 def setbrightness(brightness=hub75.defaultbrightness):
-    brightness = 1 if brightness < 1 else (MAX_BRIGHTNESS if brightness > MAX_BRIGHTNESS else brightness)
+    brightness = 4 if brightness < 4 else (MAX_BRIGHTNESS if brightness > MAX_BRIGHTNESS else brightness)
     hub75.brightness(brightness)
 
     # Allow non-visible brightness, but don't make it persistent across reboot
