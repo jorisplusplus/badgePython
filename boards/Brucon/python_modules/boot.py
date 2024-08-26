@@ -12,7 +12,8 @@ if nvs.get_int("system", "factory_checked") != 2:
 	# Direct import because of GPIO0 strapped value after initial flash, we can't deepsleep without
 	# going back into bootloader mode
 	import factory_checks
-	app = "shell"
+	import sys
+	sys.exit(0)
 elif nvs.get_int("system", "first_powerup") != 1:
 	nvs.set_int("system", "first_powerup", 1)
 	app = "powerup"
@@ -49,15 +50,15 @@ if app and app != "shell":
 if app and app == "shell":
 	import rgb, usb, gc
 
-	secs_without_conn = 0.0
+	wait_times = 0
 	while not usb.cdc_connected():
-		if secs_without_conn >= 2.0:
+		if wait_times == 2:
 			rgb.scrolltext("USB Serial python shell active")
 		time.sleep(0.5)
-		secs_without_conn += 0.5
+		wait_times += 1
 
 	rgb.clear()
-	del rgb, usb, secs_without_conn
+	del rgb, usb, wait_times
 	gc.collect()
 	del gc
 

@@ -1,173 +1,177 @@
 import fluidsim, valuestore, appconfig, rsa, binascii, time, machine
 
-rsa_n, rsa_d = (5761068715642095319418692770738575717788571182868274601949, 65537)
+rsa_n, rsa_d = (3181043203283898343167976280123643027884448147992670247681, 65537)
 
 accepted_list = []
 config = appconfig.get('pouringgame', {
     'colour': 0xffbf00,
-    'droplets_encrypted': [b'22d0c2b2c2831ccc8eada2220a68a1d0cadb8f405257ed0b',
-                           b'58f2a413187eb9a8d8f110a4805f227d9c8445a2e39fa49b',
-                           b'ceda2fab2451a5131dd42d31e078311afca24cbd53a43bdb',
-                           b'1ee81d451a439979a87107c67dee251d28f7f41fd99bd449',
-                           b'9646fc30de72477a983671f5a7440a6057b72c8fbbedd612',
-                           b'7f0bbe15c34d414c7640252144358a35f5af498bc50548ad',
-                           b'a91c0378c129bfbd98598793383ffa4e742536c9d5876451',
-                           b'92e1d85ee531cbfeb6cd24fa8e3f950f65d5dfdb442f68f6',
-                           b'cf3a5fe45ec46876371629c272fb28cbb8566098317af63e',
-                           b'd7ef21daa45fd1e2066127a004e2bbcbf2ec215fcec93510',
-                           b'4cbeeec27b1936f62ffc5eea05fffd74f44f35f30ea4db5b',
-                           b'cb90b678da84b8c9670223332382a953b87c97ace6a082df',
-                           b'af8346b3e3100ee609a4863950ab9ede30c0aad745904d7b',
-                           b'1bf979e2ec6c8c1afe33ca0fb5bb60423ae5cc1e781ab882',
-                           b'a49e1cc4cf10d9f2af4d22fc8835ab0dd5b2681dff62a29d',
-                           b'7c27dec8a1d8d70d3c1054b2e144e174c787affd9f0e8430',
-                           b'9fdeea662834c0a8c22278ce60e4c2e0200c90a9d74f01bb',
-                           b'1347acc652cfbd71ec068d78abff04e788d9b3cd357df7bb',
-                           b'0b239c43ac210f2485491213ecec52c34d1a19b26e9e4be8',
-                           b'd175eccbb9fb037660f54dbe35af651d5ff2332cdaf38e86',
-                           b'4002e64db6e364c2afe634b00ece4e67b0b924fa5dbb174b',
-                           b'5bfd0c847ed9c0e30c69a718fb280e4194ec697ad60a3171',
-                           b'4fb1fc56a77ca92d43f53eadaf5a3e1a4976f00473a4a42d',
-                           b'a4c68afb7608740dba9ef6d9e50dae88899c5b357c553983',
-                           b'b4ac0aa40bf3c102b1c8f83c34c16978fe9a5dafb3e839b5',
-                           b'8ad3fd2cba41a03193abeac4298945ebf0a44ef25167b657',
-                           b'7f35967b35eb28bb0ca7262a7e2f78621327185cc64ba40e',
-                           b'7de69c61dd0a16387f8e570751461c122a7fe2dc4d180008',
-                           b'bf72be2a668546440b57fccffbecfe322d6f38d4e7975522',
-                           b'a1921a103f291c9ac8911caccf172f0b0d55b2e09e605589',
-                           b'ac50bb04d33f23c20de447ffd58da1bf4303a3c9712a389d',
-                           b'ba496442b60779d6417e6d72aa3083f5be354563332122da',
-                           b'2e1d90b49b28be6c365e884657c36603c06e1ff9a5e78b05',
-                           b'0bab88771f57a99b1c05b832c4ad0828369616882259c7dc',
-                           b'49b4d3fac8eb971f3ae36b1e492d76226974ab8644dd877d',
-                           b'133a861cad16894ffef938759e3f203e03075eff62464726',
-                           b'437999cbfdfb4b4d5324f0a568fad5ee5923b070f94d8ab1',
-                           b'71d8feda219c04ff923e573a6ae4b6d65465d0aa459d1cd2',
-                           b'7f4ba75dec7501a5c2df52349f7fb7c412d1ce074efc50dc',
-                           b'2e0bcbdcd5818b6bb8239f4ccf830e4a6416ba0106edf0bb',
-                           b'a0fa7ca2cb988e5fe8605721324b4d3245db0b43114855a6',
-                           b'e07ade5bd6fe3c9fc1870715374ae2c9aebd15277adab07f',
-                           b'ddd604862ed0d9510b7be1e7525f47ad7c076cbee3ada982',
-                           b'5c6d25f4e4d63ae008a7abb4a1b26694e6d26cd78b487605',
-                           b'b1cbb016fe4edc3930ec3420053e4b05e369cfd435e5b57e',
-                           b'1e674050254ef02fed95ba559668f701e99bd3243308f9d8',
-                           b'ac181edbf4201ec6562d7f43b8c99ab3942c0976fecac235',
-                           b'c0c1300334df2f2f3e09b78b1434e05e28397b6c273153fa',
-                           b'729a0a88b88d48e8cad249420b1ccb7b3c38b5787d7bfe43',
-                           b'16e8a114d46eeace06100b09fdbdfcdad77a0baa79994a03',
-                           b'b2d48cfb4616f6ebb34b88b8c221a102bf2bac9874dc8548',
-                           b'76d086bd75f94310ef73946f2031e23a07458bee0b43fa1f',
-                           b'7660bb9ae00b32085b2d165aaf3073cb119fb9db16f9ae9c',
-                           b'2d7c70a28422f6ad76e029561c57f2f0eb854a21b40490a3',
-                           b'af09eeb0fa6adb8d41c13094a2da80ca550e6173674a6fca',
-                           b'36faf13294f313e1f5771b07dede8a8cef0518d16b97d4b4',
-                           b'34ce0aced9b6516f516dbdc9d95f770926293d29d17d2723',
-                           b'ab8ac84df967a685a755b63a4fbea937ffdf6c897fa468bb',
-                           b'29afe9ac551dd11b697d67b954d57194c1635af72699b9ca',
-                           b'c70a5ee1fa8e1d276ef962c58d91610b3dd4b0edf7276917',
-                           b'e37612e08388466636fcdad040cf47b7f5e83a487c359d45',
-                           b'3b56e9d7992142ea126fc39c5d9272cf4f4ff08de224114b',
-                           b'c122cc80d4db2776c0ab266c7356c6c827493fbbb7c6f543',
-                           b'a6407f0779452192fa5eb301d8c87890d705076aae063307',
-                           b'ce1f36635ba91c8e798351a6b7c27a9d6af7ade847b6773d',
-                           b'81681f742d224fba10dc5dbcf323a5711f3fd6ce7035ea9c',
-                           b'8a9846b0c8d0aad3590c150f22d7627fb92753bf8b284bf6',
-                           b'2b54e0ac2e3cbe41123598fb096a5ac4409e54769a5eae7d',
-                           b'1d8c5166b5f26c0107fdcbf8dad6ddc4bdbc958be535a290',
-                           b'952cad8b942e31130ca2257d45d2e761c8da20776962eb10',
-                           b'8a4110a82bcf8749978e0a93429632cebc6de6487b65d9e6',
-                           b'92ad70c4bbe4f6942d85af4b7fbfc408861a7c2ee4c1a015',
-                           b'b617b76a54ee930340d795c68ab233ab884cb1d8d5d03716',
-                           b'2bad10d13515440b4af9e86dba0ceda0050233add9edddde',
-                           b'35b6f6fd697fece35bf68c09b5d8352e80dbb086dc5a5fc5',
-                           b'c6f308c7445b0247007750d08f3deec98dea7fd6cc8bd401',
-                           b'a6e70d6d36f3716d2ea953cb4718fc539c1aa1927de5222c',
-                           b'b48e63748f462565748dc0fbe93f57b4d619e366b987ae01',
-                           b'8c26134706849e41e9399b40e56d37e873ec03c46c77a8ed',
-                           b'57704199c6c0780f641b1dc1b4a67477556303c352ffd845',
-                           b'd1c59df6cd99677a5c9fc21a0bfd92f3e296cdb60a1d6356',
-                           b'311d015e56050133ed32c30e11d66d76429208175849422f',
-                           b'39c4eb209c2d27f91b682076be064a90a32e73dfcf187bca',
-                           b'19bd53b551322be6e100a3e865a133594a7e7a5dab1c9dab',
-                           b'45948a7d424e6cae819aa2df9b1f8a226b7cb2c07cdf7410',
-                           b'5e11cbd922593f867baa7c13f1f6f3366b33f09de9edab5d',
-                           b'c5ed18c4a5dac1b72395f768cb60f9fb3ae96547082a1619',
-                           b'507a81683b83b0a0208f50bf970bd00bc3a9c99a33da7111',
-                           b'e32ece0d8447057f0792bbe9971c125cd6cbc9d669b8e1a5',
-                           b'444f4803ad98247f2a13571e48cd098e35d7b54dfcf54550',
-                           b'579908f4b1f19887d4c4ca8ffa0082ebaa6adeec1535d22f',
-                           b'28f39d5ebdc0bd01d8c65b1365cc0779e7f4e64f43c211dc',
-                           b'1e41f478790bf2df0dcdb89d4b1b0679bf47d8eea06ff3d6',
-                           b'b8095cc4114eb73d5ad13e4093d81957943a90090d444398',
-                           b'95419cf214f5091e00e8aea506425520ffb79375143a9f37',
-                           b'6bdac0231c02ea4b21fa42082fbe0d2cbe2e1863534ceac0',
-                           b'9d1ebbcddddf46269789befecf026abd49577706717d855a',
-                           b'0fc289caa7c9e227e42c5f3e236fd400f1badfd5f64788c0',
-                           b'02a35aa8884ef5a93059f8bdd2a543aeb93e4c5a35436216',
-                           b'1f60159d89da03918a3fa02b9a13219561ab8ba87e0d84d4',
-                           b'621b3cebde18b80842c90b1ac7c90aef9d0e60384815e074',
-                           b'a096b932bc2caf38797a487fac2cbf93ff89583070930906',
-                           b'c8875db7812cbfcf72d5951e250cb5cd145cb4d0a6a35ecb',
-                           b'5692856772be19a5053d5d7b46796bae59da26e9b8289bcc',
-                           b'3397f93cf3bfc961e8ed8962328f6a2b64c37a204b28f3b8',
-                           b'9e097f7fa284849ce3d1ecb39363c1b66490c1f64d7a4f2a',
-                           b'7b5670d0e9d3c3a29858321707aad942d67c1908b2b91e0d',
-                           b'415742eac6026666c8db2caaf577c8c06b0daf1c0d6e3df7',
-                           b'314630fc095f883f99249eeb23c1545ee366573d07e9ab5f',
-                           b'44592435e32af14314e7b22fc0459fae1d65b05799b1adea',
-                           b'0789c5de7b277b36d49926e25a5c8c822a9824f182c242f5',
-                           b'dfcdc6f9f7be01549a642cdbff52f5b8d37d8da321be89d6',
-                           b'235fc19d7e6aa12698de11c780afca06452f160f379805d5',
-                           b'6daf7d5bfca7f5549a5bb7c97b809d5a1d21c67b3dc4589d',
-                           b'1e9062ea5af373ae436b8f864fc132ef99129c258463c00f',
-                           b'564b6154100b72c03be6be2766274b2983b5915d1a013cd4',
-                           b'4656677ffe038576ea8bd893e8f83e04ec2bd242a9dc1f96',
-                           b'71a169e56c67270464c91c54c30eea3a1abf72b56584b89b',
-                           b'60c669bcfbf9d799b16470c7ac3da06d6c49b55f2d93cda9',
-                           b'cf53ca2bb581a99d37818374f214585bad491d9598906251',
-                           b'e69089f1f4a2f8e5a1246571470f2ac219dfb7d9a073d14d',
-                           b'a92a95d4e618ef0521e6d194d15107b59f6cef4df3666136',
-                           b'459e65cfb6bf444221279c2e637818318eaf903793385dff',
-                           b'2a9d1937c385cea0f67bd4798d3e4151758a3befe667b7ae',
-                           b'0c050a4193b2aa4e4ce5a427574e3bc3fdd2b26396039f2a',
-                           b'd4433d63ab0ea6d532ba72cae380004a5c1283508f2c3547',
-                           b'90b63f6ba4ec0f580004b860f0fa6ff799bf47be144c7469',
-                           b'c92090d9938041d8012f058f297c52512ad7cc8e4ec26f15',
-                           b'128e59bcec0ff18fffaa05a771fd7e34cbbe5c14c67cce10',
-                           b'879fd5ad3009fafd0694f8aa5686e476a8f0b056bedbdc88',
-                           b'3ec6513939cbcf74e5ca239b5576784a0429ee9de2ab9db5',
-                           b'bca5c1496a6ee2e8c6dbba3fa89dd6826e2f94eaa4cd594a',
-                           b'110f47789b635f9cb6ca38366b23f89af4c386fdf18fe7e7',
-                           b'8af4af1817bf6256c7908dacb3cba7a96caab732b1f167d4',
-                           b'e9f80fb0d78d6f09990b1fd949b08776fe3f3f6b11bf5d65',
-                           b'616e810aba2f9e03f1be9b44799153162d89b91f945953bb',
-                           b'5266d35d54c387e0907b9762bdca5ed8573c76d94f911f0f',
-                           b'45c68007b132d527c986c7455d6ad7f05b7108897f086307',
-                           b'9442bfaeda1a21187bdc003c14750014c2a4f5a44d790ab0',
-                           b'ba114c247300a9cf01e7ee2fbcbb4fd9d2be2e46aeb9b328',
-                           b'aa53e03d5f83501783bb77fd90773600e36b638c1fdaaef8',
-                           b'046faf5cdce6f34fa90888b91435a8971d102e6ffcee6027',
-                           b'c1d7478735b10a75e80f6d1f91b73646743349cd8c875675',
-                           b'9c9bd9456892ab2d2fd662eeba744073f82f0bb2358f8f6b',
-                           b'455e3315f091126513668300d659ade8e8492553e0fa5fcf',
-                           b'7d6b2fbf6634460eace7c2841e175ea1fd4309b8082b3d33',
-                           b'd078e5a1d262850581257563157a4ded7113ddb631f10222',
-                           b'995c9b85eb9b3b72379b36895643cac17e7d594a0deaca00',
-                           b'8c1be5f4f6c2334f3887d034ab3e73d4b7035c288a070146',
-                           b'2cd3feb0afb0537106293f89d001ac73f41f5cdf96c489c6']
+    'droplets_encrypted': [
+        b'0b0fe297a6613f0fb057892b41d5d8e6f9ac48b01c79a800',
+        b'61febc6d65a2c8d075168e7f885564290b18fbe85acf9e32',
+        b'6bf86b8e0db5ac957cef9c2d420a38bf18057c9e138bc788',
+        b'51ff45f0dc5c8a57d9d7ef0295a17ddc402dee99843a5c08',
+        b'472d93e91b63f601efb26bc2efa3d38fed0292cbd3be9a73',
+        b'6ae3419b65e47142cbd3690f4d6adda6206ae91bd5b97f25',
+        b'8174844b3bb959177040d469a89f32e571aba3e541d5e3f5',
+        b'436f27d848a0f51db55c892ebfd1775a6d258d368ac302da',
+        b'3adc64fd5362c37cb217ce99a7ca49e68f366d56802ee758',
+        b'80c9a1ec64478ec1d84e13b8a377e384b8f95d9065b1caaf',
+        b'05715217706498f9d90aeebc11dbac9af877229f64033a0e',
+        b'4a1ea9da29b04f53198f63516bfa9e52d23c7603c7589a9f',
+        b'0e6b6bf698392dd88075b302069bc2977c8bec016673734c',
+        b'759b4a9d86f9caaf2e644c08c573fe1d7a7558dbb1faf979',
+        b'17b6b8dc1370352054a71a90ad96c7a6d117ff927de608e7',
+        b'3a767358ac355faf8909bd3b9d79dcf636e52aa97cacbaaf',
+        b'5cb6e1627e258fd2d8a867101303b90cc75d907e50c451db',
+        b'124df818572fc0ea7bad9d9c7222368458bb9160e8dce213',
+        b'4a05e048fc11944706b2b60dc6ecf1d892983e1317ae4a14',
+        b'4fcdda3e4890990eefc1c3f335f782e2ce88598efbcbb82e',
+        b'422fb121b4be63fe1dbb412cac892ed09a45a672ab5a2514',
+        b'3267f1b35777087ffdd6157eb5eba02a2589fda0375c0600',
+        b'4c1999830b5b6748ff422f6f7ac5e839e5c8a9e46c95486f',
+        b'3c90a4e4d482d41a89eb1684ba511201918bb69d06319285',
+        b'7e4266f763df1750f6323bfa9ebfe1c2a2ecb209e0e59055',
+        b'43e8b8e85a1465cc3fac82c461e9f2bbd869bed56931bdba',
+        b'5e22173fc2b29b8ffcde9524f4d98b1e00018a2b2f93031a',
+        b'1498f950de51bfe073bcac4ffd0e3c53d56830bbf5eb4816',
+        b'208c52a41c15ce1bb46ddab9b590002137eef7e308a7b6e0',
+        b'1b9004c1b3d1cf4d585405c39a83bbe5b6ba8d32f088c77b',
+        b'00b723052861daa3e0dbb688b324ae08e7c7500cd722e911',
+        b'761810f28a737d65cf0b58f2b402c5592c368121ac97dead',
+        b'737a1c1653c782ab55c4f7403f222ea019ea8219b2e39043',
+        b'5ef2f0f79f9b538c430f559e09ab527548f675648da094c9',
+        b'0dcef6f5bb866761c352eadf2cffecd59686f75317782f51',
+        b'097b827786a2deed0e658ca08c5e78bfd49d3ea1e501d793',
+        b'33f7e06f3c7e698798ba648aaaaf221b0abc8a303f6d7652',
+        b'24bf9e2f4d8a4f5f0b2149e45ccaf3aff5fd569647433fd9',
+        b'283f64483ce5484843fbc5d984550f4bde29dfb33a174351',
+        b'26cba95f3413ae57836143ba3342b128d9e20c2698d86aeb',
+        b'3b8c3701e68ed572e20565f6b0c67eaf1364f9c9c3dca0ad',
+        b'63083543b3463867c3051a5951dc095184eb8f86ee3f0f1a',
+        b'6a80c641e1d5276b06396a32f5270a8753cb6d8e7a052fea',
+        b'3e07f23128b7f0e4f0af9cf01b452a4d87717c7e97aaec47',
+        b'1a80bf6b5c81ce37caeeec87a1ad448e6358b83e472d7fd7',
+        b'523e4eff32ac591cbb7d96ce7da4f0a3ada365258a1af0bd',
+        b'18ab0822765b2ac076f69eff514435c7c46f078037ad2558',
+        b'34078b235ebb423eba9ce81ba717b547c273fe1ab8214cb1',
+        b'64412bb5357a8b74f46d64cdea073fe76319e755001f0c04',
+        b'179502461e7a32738c950279e90e2d84b324a11ddea5ebda',
+        b'17269139e1b8ac6996e28fdf560759446763fb776e2eb614',
+        b'5e8315a47eb5baf6753e3b1cf185562fb1bb0ab3370d36bf',
+        b'5eef79c01e544d8d74713bc3b77a7f7d3c806051b35187bf',
+        b'4af155ca3909907d4baf2927a5366cfa66ce42a927713051',
+        b'0066e786de8911c76b7c99947fa9f5a1690ddac695f5939a',
+        b'144b29b93bc317308da46f56ca231f5113c7bce118b1f1ea',
+        b'3a200fd0e2d48c7a573435196cf1f34bddbd9d23dca8ee7c',
+        b'10dba203707152980e488fa11833e5b3cf714f87b2499699',
+        b'3d93dc4397a0df3ed0d48b3d35fe777ffc09156a78043d5a',
+        b'63ed412a26ec4172d75619d33d21ef6d5c7a9fdf430f17ba',
+        b'271f699e29b9a8c8b7b0aa8e6a4c2d6b5442f2f789d2064c',
+        b'7420ecf26590945963438d30f20d342b207c56c15883652f',
+        b'4dcfdb08b206c0f8183d97ac8227afd84d181022c9ea916e',
+        b'0d7a6c27ea337d4ab64a764dceeb496de17724cb4c8eeb44',
+        b'582607b650c2f27ddab94795baaf66404551cb0f7e75c385',
+        b'1eeef4647fd5f10183eb861248f2fc68d1a3653d02d43a36',
+        b'23f018a591dd7efb610318cdf464bde8dc45a887cb482371',
+        b'250b7d82f9102a92b2e89a4a87c5cc6b467d098f8d3b6251',
+        b'349abb380c9d98875f01aceb4f2fe538158c527f90974b12',
+        b'6d2e7af35ec16a20e25921d7bed935c0f4ec4b67499314cb',
+        b'269c541d4d261bc3b49f4c2bc3725f2a2482505ea4e6d6f6',
+        b'05e6ac329a3eeab0a119b2628a09d48235a5483c51655130',
+        b'75841b182b0e6a63533958f24c917013f4ede6a43f271976',
+        b'59af2c572ef900a73054153b585ea7a485688c79874d332b',
+        b'6d5378c03b1153fa529807b37fc0def63dddf1328cb3f569',
+        b'1f53162b951649c76b47eb77a059c7e25dc12a9d877df2f6',
+        b'3061d847f44c648cadb72549235a81f147b09b339ef034d4',
+        b'5079a024a572f49c0826efdbdc76225a679baa088a34c3d8',
+        b'232dfe1d1119dc869f00fdf494c28cb058dec550f35075af',
+        b'5927aedfbb61b01df7433bf85775bfbc19c2a1e2a35859f3',
+        b'70a287e57de1ff142f71a30265cd66e21c3a1030974d1eba',
+        b'016258a1dc0b9935511d6b2d8de3075272ab679a4549d682',
+        b'1898bfb613998701c899f7cd2298d03e8c7c3bb2f7cfe643',
+        b'7eb666835fc33b320945c727f9227334ad87d15a0efc27f1',
+        b'140a0d7a4c555f1aa83a54e365d3ce2d14c80871aee987dd',
+        b'4cec2df8dbb6d954c718ad4beeb0cf39bf5d68df2fa85c32',
+        b'513ad8f7ca5a5d6a8945c1c1f4771a93ef7865ac464ac4e3',
+        b'788404c7e12adff4e141ab2339fe66d3203de8a1e5b68325',
+        b'4d1d8226ba869b7c095e77cb10633a08a2df071e780dd591',
+        b'27f6dd8033bc9f74f73fff6adb0095c166e20e5c9d14638d',
+        b'1b0fadd9762e9188148a13fbc8fce3c8d473b901fd0028a0',
+        b'1cb9c62fee1bcfa100c5e2bb5654b0c4344edad966eab5af',
+        b'1691737172e134ca797f2df3e57c607eac30fc015f170d37',
+        b'68853f7dff8c1bdcb3c4bfed0b483fd5e29108cf274455ef',
+        b'16781e2df05e6e6d3b1842682e1798e699fe0791da8382ec',
+        b'14b12533cd4df3216b3d202390b16453ca69e466f91e09aa',
+        b'0045ff2f50a921763cde471b431df1afab4202854d6dbe15',
+        b'25c0e6e59f3c29e7fec1105d075770e52dd740a39820e45f',
+        b'6bbe22f1bc5be0ae9c0ebe461c52e65a6fc6a2e7092cf280',
+        b'5dda266707a371a0633d8fcb38ee84c0a29790de4f27a01b',
+        b'4c137d61b175ecfe2191837fa19edb36de4792baeee65425',
+        b'7b2141377204fff0d009f7460d90dd4f0d058a31723ca7e2',
+        b'4923fffadbcefa8f2323372e8bd5c7f33bb124750bed8ed8',
+        b'1d4b2eebbec8694435f525a5ced245e7813b8e8ac8879a21',
+        b'41c14177d1894dc15b9135071ea3a574f902cc546ab951e1',
+        b'73673bcec5a746ddfcd41a87201e01b175c572fbdec4c091',
+        b'234f56bafc76107124131d871f149523c2b78c945d388615',
+        b'5648cf089866a11713d0f7dba4c2afe5ff8639f4f8e36101',
+        b'6717be22fc1f4275285c58ae1982f860facf4c5481820c24',
+        b'3380884db7b11daa008ca31e7b75466a78dd8e32f0b20477',
+        b'0e97f1fadb7eee86c48734df20074b57e7a2dcd934fc7ea3',
+        b'5e100bac2be41b03af80997e34779802b4496fb0d39664ca',
+        b'68b01adde5695e62a2af735f4272d57eb06243cce50c7c47',
+        b'21df80acee01cd0ad4c39fbb4a3debddb0f93fff27b4d6ad',
+        b'5d92b83d7cde7eba160f5496bfb03ad124c92ac471e955ab',
+        b'78c6a7ba1ba1baa9a5d1c1d1b3de183e9b05214fc603a8bb',
+        b'333dbf476c34858192125caae765f45793ed153191658ad0',
+        b'28c01ea8f874e55ae65b6ca8233a00e3bce4a3250e7f16d2',
+        b'4787d12903d3edf82a8bf7bfc9c6541a8978c7ebdc7eb09f',
+        b'148415df1708df6c7f853b8aecef051b8d46fc6dddfdf35b',
+        b'3803cfa7eb35605515a5a26df79be0f382440d7fd65e62af',
+        b'4dd35cd242e142a83910e834f5a2553753dd54aab88e3a8b',
+        b'10c9b5a8c4e4f0a1cebede17a44f9b7f23d04ccd66b395f8',
+        b'3bda09420621ac154cc96682bd1e73ee0e57bdace5aa3432',
+        b'1bb9e9a5275d0b4107c7e397a535339f511bc2ed167bc9ae',
+        b'12b42c395a6b55e68cfa755e208da63c041e1dd95ff95c0a',
+        b'742d1a54f746a9206409ddd745fe7895ba48198b088f77ce',
+        b'57905da766a627759da49f9e509f449d795d4915817f3d28',
+        b'5961297b9bbfbe61dcf318b57e0ce8b4ba06d2b70dfd5328',
+        b'640cb113efb0219cebf86326e8e9bf5b188fd568821ff9fb',
+        b'6c96368ee12316437f4cedfb9905b8518f0ac923817db998',
+        b'659d1d354fbfe2916d238ab374801bdb92d3769bf184ce59',
+        b'0d9742df86d2087605b77175e6824aa87143d1a27df6809f',
+        b'28975ca58c275cde16baf879dbe0986a2e050460a1deed2d',
+        b'13d84dd592b6dd6c747eb7e2bf707463530c116292d22658',
+        b'193d74d09e1f19f26ae527b8e499814eb9b62746062f6eab',
+        b'26a444636335c8f9c9789b093e45400a091d36d04b9adcca',
+        b'20f64f1db1d30383af4776c6b2d522b3939fa69219a28262',
+        b'2e3c316e3f8016d55c53ab29a73a960c83e4682d4078c257',
+        b'7df9162d81c5d9e884b64c8af5c691b8a2909677be349bab',
+        b'57e67d98d36f831f11a25c265073809d8770c692df72440f',
+        b'4bb8a4ca4f2fa0eb22e1890b7ba9d09ad169e7a99add4dd9',
+        b'7385c86ead2a08e8a90c3bfde6e5c50d1c1cf08ecbbd51b8',
+        b'1f58518ad74d3a841f18be7e9194eb63334300758a5b57b3',
+        b'0fccaa47f34e0d971f82b57c618978e14f3cc880168e65c6',
+        b'346db65f5134063bd9a7f738362d7b1f35c8c4bc2af644a9',
+        b'7c3422cbbe0e79c71a383412dfc1b7700213affd33a80294',
+        b'5271648bc65bcfa394b262f4eff4cffe84c9092c54366b05',
+        b'6ce40d49f0abb37f4ea67a3489a53968e119bd6db015bcf6',
+        b'57f6293a424b78c546b44fa3ce57caca063afac6e9645777'
+    ]
 })
 
 
 def is_legit_droplet(ciphertext):
-    plaintext = rsa.decrypt(rsa_n, rsa_d, binascii.unhexlify(ciphertext))
-    return 'bru' in plaintext
+    try:
+        plaintext = rsa.decrypt(rsa_n, rsa_d, binascii.unhexlify(ciphertext))
+        return 'bru' in plaintext
+    except:
+        return False
 
 
 def check_config():
     global config
     accepted_list = []
     for droplet in config['droplets_encrypted']:
-        plaintext = rsa.decrypt(rsa_n, rsa_d, binascii.unhexlify(droplet))
         if is_legit_droplet(ciphertext=droplet):
             accepted_list.append(droplet)
         else:
@@ -177,30 +181,71 @@ def check_config():
 
 fluidsim.begin(len(config['droplets_encrypted']), config['colour'])
 
-serial = machine.UART(0, 115200, timeout=10, timeout_char=10)
+serial = machine.UART(0, 115200, timeout=10, timeout_char=10, tx=43, rx=44)
+txpin = machine.Pin(43, machine.Pin.IN, machine.Pin.PULL_UP)
+
+serial.read()  # Clear entire receive buffer
 last_written_config = time.time()
 config_changed = False
+def tx_mode():
+    global serial
+    serial.init(baudrate=115200, tx=43, rx=44)
+
+def rx_mode():
+    global serial
+    txpin.init(txpin.IN, txpin.PULL_UP)
+
 
 while True:
-    data = serial.read(24)
-    if data is not None and len(data) == 24:
-        ciphertext = binascii.hexlify(data)
-        if is_legit_droplet(ciphertext):
-            serial.writeline("Thanks!")
-            print("You got a droplet from a friendly neighbour!")
-            config['droplets_encrypted'].append(ciphertext)
-            fluidsim.push_particle()
-            config_changed = True
+    data = serial.read()
+    if data is not None:
+        if len(data) == 24:
+            tx_mode()
+            serial.write("Thanks!\n")
+            serial.flush()
+            rx_mode()
+            serial.read()  # Clear entire receive buffer
+            ciphertext = binascii.hexlify(data)
+            if is_legit_droplet(ciphertext):
+                print("You got a droplet from a friendly neighbour! ")
+                config['droplets_encrypted'].append(ciphertext)
+                fluidsim.push_particle()
+                config_changed = True
+            else:
+                print(f"err: {ciphertext}")
+                serial.read()  # Clear entire receive buffer
+        else:
+            print("got: ", data)
+            serial.read()  # Clear entire receive buffer
 
     if fluidsim.has_particle(4, 0):
         ciphertext = config['droplets_encrypted'][-1]
-        serial.write(binascii.unhexlify(ciphertext))
-        reply = serial.readline()
-        if reply is not None and 'Thanks' in reply:
+        packet = binascii.unhexlify(ciphertext)
+        tx_mode()
+        serial.write(packet)
+        serial.flush()
+        rx_mode()
+
+        tries = 3
+        got_thanks = False
+        while tries > 0 and not got_thanks:
+            line = serial.read()
+            if line is not None and 'Thanks!' in line:
+                got_thanks = True
+                print(f'Took {4-tries} tries')
+            else:
+                tries -= 1
+                # time.sleep(0.1)
+
+        if got_thanks:
             print("Sent droplet to a friendly neighbour!")
             config['droplets_encrypted'].pop()
             fluidsim.pop_particle()
             config_changed = True
+        else:
+            print('Didn\'t get thanks')
+
+        serial.read()  # Clear entire receive buffer
 
     if config_changed and (time.time() - last_written_config) >= 10:
         valuestore.save('app', 'pouringgame', config)

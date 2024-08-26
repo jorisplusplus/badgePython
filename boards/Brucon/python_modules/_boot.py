@@ -11,7 +11,7 @@ except OSError:
 
 gc.collect()
 
-folders = ['lib', 'apps', 'cache', 'cache/woezel', 'config']
+folders = ['lib', 'apps', 'cache', 'cache/woezel', 'private', 'private/system', 'proc', 'config']
 print("Running _boot.py")
 for folder in folders:
     try:
@@ -23,4 +23,4 @@ sys.path.append('/apps')
 sys.path.append('/lib')
 
 del folders, uos
-gc.collect(); gc.mem_free()
+gc.collect()

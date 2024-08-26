@@ -16,7 +16,7 @@ def main():
 
 def confirm(nickname):
     term.header(True, "Nickname setup")
-    nvs.set_str("badge", "nickname", nickname)
+    nvs.set_str("system", "nickname", nickname)
     print("New configuration has been saved.")
     print("")
     print("Nickname:\t\t"+nickname)

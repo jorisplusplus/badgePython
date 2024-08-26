@@ -65,6 +65,12 @@ def populate_apps():
     add_app("chall_c", {"name": "CTF chall 3", "category": "system", "icon": icon_unknown})
     add_app("snake", {"name": "Snake", "category": "system", "icon": icon_snake})
     add_app("nyan", {"name": "Nyan cat", "category": "system", "icon": icon_nyan})
+
+    if nvs.get_int("system", "ctf_done"):
+        from default_icons import icon_flappy, icon_flashlight
+        add_app("flappybadge", {"name": "Flappy Badge", "category": "system", "icon": icon_flappy})
+        add_app("flashlight", {"name": "Flashlight", "category": "system", "icon": icon_flashlight})
+
     # add_app("partsim", {"name": "Particle simulator", "category": "system", "icon": icon_partsim})
     # add_app("clock", {"name": "Clock", "category": "system", "icon": icon_clock})
     # add_app("slider", {"name": "Slider", "category": "system", "icon": icon_slider})

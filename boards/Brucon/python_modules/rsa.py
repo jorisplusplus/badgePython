@@ -94,4 +94,4 @@ def decrypt(n, d, bin_data):
 
 if __name__ == '__main__':
     # Allows generating big keys on PC
-    print(gen_p_q(192))
+    print(gen_keys(192))
