@@ -12,8 +12,10 @@ if nvs.get_int("system", "factory_checked") != 2:
 	# Direct import because of GPIO0 strapped value after initial flash, we can't deepsleep without
 	# going back into bootloader mode
 	import factory_checks
-	import sys
-	sys.exit(0)
+	while True:
+		# Force factory flasher to see that we're alive
+		print(">>> ")
+		time.sleep(0.5)
 elif nvs.get_int("system", "first_powerup") != 1:
 	nvs.set_int("system", "first_powerup", 1)
 	app = "powerup"
