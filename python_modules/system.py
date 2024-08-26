@@ -16,14 +16,16 @@ def reboot(goHome=True):
         machine.deepsleep(1)
 
 def sleep(duration=0, status=False):
-    if (duration >= 86400000): #One day
-        duration = 0
     if status:
         if duration < 1:
             term.header(True, "Sleeping until button is pressed...")
         else:
             term.header(True, "Sleeping for "+str(duration)+"ms...")
     time.sleep(0.1)
+
+    if (duration == 0 or duration >= 86400000): #One day
+        machine.deepsleep() # Indefinitely
+
     machine.deepsleep(duration)
 
 def isColdBoot():
