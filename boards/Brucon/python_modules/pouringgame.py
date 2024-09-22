@@ -171,6 +171,8 @@ def is_legit_droplet(ciphertext):
 def check_config():
     global config
     accepted_list = []
+    if 'droplets_encrypted' not in config or config['droplets_encrypted'] is None or len(config['droplets_encrypted']) < 1:
+        config['droplets_encrypted'] = []
     for droplet in config['droplets_encrypted']:
         if is_legit_droplet(ciphertext=droplet):
             accepted_list.append(droplet)

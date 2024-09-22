@@ -58,6 +58,7 @@ def populate_apps():
         userApps = []
     for app in userApps:
         add_app(app, read_metadata(app))
+    # add_app("pouringdump", {"name": "Beer Void", "category": "system", "icon": icon_beer})
     add_app("pouringgame", {"name": "Brucon game", "category": "system", "icon": icon_beer})
     add_app("nickname", {"name": "Nickname", "category": "system", "icon": icon_nickname})
     add_app("chall_a", {"name": "CTF chall 1", "category": "system", "icon": icon_unknown})
@@ -262,7 +263,7 @@ def start():
     global options
     global install_path
     options = None
-    install_path = None
+    install_path = '/apps'
 
     buttons.init_button_mapping()
     buttons.register(buttons.BTN_A, input_A)

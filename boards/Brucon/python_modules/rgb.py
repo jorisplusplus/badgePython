@@ -6,6 +6,7 @@ FONT_7x5 = 0
 FONT_6x3 = 1
 current_framerate = 20
 current_font = FONT_7x5
+font_widths = [5, 3]
 font_heights = [7, 6]
 
 # Copies all attributes from hub75,
@@ -22,7 +23,11 @@ def framerate(frame):
 
 def text(text, color=(255, 255, 255), pos=None):
     if pos is None:
-        pos = (0, int((hub75.screenheight - font_heights[current_font]) / 2))
+        text_width = len(text) * font_widths[current_font]
+        text_height = font_heights[current_font]
+        text_x = int(max(0,(hub75.screenwidth - text_width)) / 2)
+        text_y = int((hub75.screenheight - text_height) / 2)
+        pos = (text_x, text_y)
 
     r, g, b = color
     x, y = pos

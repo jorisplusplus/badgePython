@@ -125,7 +125,7 @@ def connect_wifi(duration=None):
 
 def loading_text(text):
     data, size, frames = animation_loading
-    rgb.gif(data, (1, 1), size, frames)
+    rgb.gif(data, (1, (rgb.screenheight-size[1])//2), size, frames)
     rgb.scrolltext(text, pos=(8,(rgb.screenheight-8)//2), width=(rgb.screenwidth - 8))
     del data, size, frames
     gc.collect()

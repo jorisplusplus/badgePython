@@ -32,6 +32,7 @@ else:
 
 if app and app != "shell":
 	try:
+		# Set app back to launcher in case of a crash
 		print("Starting app '%s'..." % app)
 		system.__current_app__ = app
 		if app:
